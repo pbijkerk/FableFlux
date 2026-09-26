@@ -14,6 +14,7 @@ en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 - Verversen haalt de bestaande artikelen van een feed niet langer één voor één uit de database: dubbelcontrole, datumherstel en opruimen gebruiken elk één gebundelde query. In een meting met 300 artikelen daalt het aantal leesqueries van 301 naar 13 (#119)
 - De samenvatting haalt alleen de artikelen binnen het 48-uursvenster van meetellende feeds op, in één query, in plaats van eerst alle artikelen afzonderlijk te laden. In een meting met 600 artikelen daalt het aantal leesqueries van 402 naar 3 (#120)
 - De teller per feed in de feedlijst wordt geteld met één `COUNT`-query per feed in plaats van alle artikelen van elke feed te laden, en alleen bijgewerkt zolang de lijst in beeld is. In de stand "ongelezen" laadde elke teller eerst elk artikel afzonderlijk (#121)
+- De artikellijst van een feed en van een map haalt zijn artikelen met één query op in plaats van via de relatie `feed.items`, die elk artikel afzonderlijk laadde. Bij het openen van een map met 4 feeds daalt het aantal leesqueries van 137 naar 9 (#136)
 
 ### Opgelost
 - De bewaarknop in het artikelscherm verdween mee zodra een artikel geen link had (bijvoorbeeld een Mastodon-bericht zonder externe verwijzing), terwijl bewaren geen URL nodig heeft; alleen "open in browser" en "delen" blijven nu achter de link hangen (#118)

@@ -219,4 +219,76 @@ final class ArticleFilterTests: XCTestCase {
             try titels(hideRead: false, feedIDs: nil).contains("zonder feed"),
             "Zonder mapfilter hoort het artikel er gewoon bij te staan")
     }
+
+    // MARK: - Feed- en mapweergave (#136)
+
+    /// `FeedItemsView` en `FolderItemsView` bouwden hun lijst uit `feed.items`, gefilterd
+    /// en gesorteerd in het geheugen. De query moet dezelfde artikelen in dezelfde volgorde
+    /// opleveren: nieuwste eerst, zonder datum achteraan.
+    private func oudeLijst(_ feeds: [Feed], hideRead: Bool) -> [String] {
+        feeds.flatMap { $0.items }
+            .filter { hideRead ? !$0.isRead : true }
+            .sorted { ($0.pubDate ?? .distantPast) > ($1.pubDate ?? .distantPast) }
+            .map(\.title)
+    }
+
+    private func maakFeedsMetDatums() throws -> (map: FeedFolder, feeds: [Feed], buiten: Feed) {
+        let context = container.mainContext
+        let map = FeedFolder(name: "Map", sortOrder: 0)
+        context.insert(map)
+        var feeds: [Feed] = []
+        for f in 0..<3 {
+            let feed = Feed(url: "https://f\(f).example/rss", title: "F\(f)")
+            feed.folder = map
+            context.insert(feed)
+            feeds.append(feed)
+            for i in 0..<5 {
+                // Datums door elkaar tussen feeds, één zonder datum per feed.
+                let datum: Date? = i == 4 ? nil : Date(timeIntervalSince1970: Double(1_700_000_000 + (i * 3 + f) * 60))
+                let item = FeedItem(title: "F\(f)-\(i)", pubDate: datum)
+                item.isRead = i % 2 == 0
+                item.feed = feed
+                context.insert(item)
+            }
+        }
+        let buiten = Feed(url: "https://buiten.example/rss", title: "Buiten")
+        context.insert(buiten)
+        let item = FeedItem(title: "Buiten-0", pubDate: Date(timeIntervalSince1970: 1_800_000_000))
+        item.feed = buiten
+        context.insert(item)
+        try context.save()
+        return (map, feeds, buiten)
+    }
+
+    private func nieuweLijst(feedIDs: [UUID], hideRead: Bool) throws -> [String] {
+        try container.mainContext
+            .fetch(ArticleFilter.descriptor(hideRead: hideRead, feedIDs: feedIDs))
+            .map(\.title)
+    }
+
+    func testFeedweergaveGelijkAanOudeLijst() throws {
+        let (_, feeds, _) = try maakFeedsMetDatums()
+        for hideRead in [false, true] {
+            let nieuw = try nieuweLijst(feedIDs: [feeds[1].id], hideRead: hideRead)
+            XCTAssertEqual(
+                nieuw.filter { !$0.hasSuffix("-4") },
+                oudeLijst([feeds[1]], hideRead: hideRead).filter { !$0.hasSuffix("-4") },
+                "hideRead=\(hideRead)")
+            XCTAssertEqual(Set(nieuw), Set(oudeLijst([feeds[1]], hideRead: hideRead)), "hideRead=\(hideRead)")
+        }
+    }
+
+    func testMapweergaveGelijkAanOudeLijst() throws {
+        let (map, _, _) = try maakFeedsMetDatums()
+        for hideRead in [false, true] {
+            let nieuw = try nieuweLijst(feedIDs: map.feeds.map(\.id), hideRead: hideRead)
+            let oud = oudeLijst(map.feeds, hideRead: hideRead)
+            XCTAssertEqual(Set(nieuw), Set(oud), "hideRead=\(hideRead)")
+            XCTAssertFalse(nieuw.contains("Buiten-0"), "Een feed buiten de map telt niet mee")
+            // Artikelen met datum staan in dezelfde volgorde; zonder datum komen ze achteraan.
+            let metDatum = nieuw.filter { !$0.hasSuffix("-4") }
+            XCTAssertEqual(metDatum, oud.filter { !$0.hasSuffix("-4") }, "hideRead=\(hideRead)")
+            XCTAssertEqual(Set(nieuw.suffix(nieuw.count - metDatum.count)), Set(nieuw.filter { $0.hasSuffix("-4") }))
+        }
+    }
 }

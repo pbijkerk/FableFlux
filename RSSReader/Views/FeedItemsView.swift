@@ -1,18 +1,36 @@
 import SwiftUI
 import SwiftData
 
+/// De artikelen van één feed.
+///
+/// Dun omhulsel om `FeedItemsList`: `@Query` krijgt zijn predicaat bij initialisatie, en
+/// `@AppStorage` is daar nog niet beschikbaar (zelfde patroon als `ArticleListView`).
 struct FeedItemsView: View {
-    @Environment(\.modelContext) private var modelContext
     @AppStorage(AppConfiguration.UserDefaultsKeys.hideReadArticles) private var hideReadArticles = false
     let feed: Feed
     var refreshService: FeedRefreshService
 
+    var body: some View {
+        FeedItemsList(feed: feed, refreshService: refreshService, hideRead: hideReadArticles)
+    }
+}
+
+/// Haalt de artikelen met één query op in plaats van via `feed.items` (#136). Die
+/// relatie laadde elk artikel afzonderlijk, en na elke opslag opnieuw voor alle feeds
+/// die samen waren opgehaald. De `@Query` werkt zelf bij na opslaan, dus nieuwe
+/// artikelen na verversen verschijnen direct.
+private struct FeedItemsList: View {
+    @Environment(\.modelContext) private var modelContext
+    let feed: Feed
+    var refreshService: FeedRefreshService
+    @Query private var sortedItems: [FeedItem]
+
     @State private var opslagFout: OpslagFoutmelding?
 
-    var sortedItems: [FeedItem] {
-        feed.items
-            .filter { hideReadArticles ? !$0.isRead : true }
-            .sorted { ($0.pubDate ?? .distantPast) > ($1.pubDate ?? .distantPast) }
+    init(feed: Feed, refreshService: FeedRefreshService, hideRead: Bool) {
+        self.feed = feed
+        self.refreshService = refreshService
+        _sortedItems = Query(ArticleFilter.descriptor(hideRead: hideRead, feedIDs: [feed.id]))
     }
 
     var body: some View {

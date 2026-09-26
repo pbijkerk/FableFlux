@@ -1,10 +1,28 @@
 import SwiftUI
 import SwiftData
 
+/// De artikelen van alle feeds in een map.
+///
+/// Dun omhulsel om `FolderItemsContent`: `@Query` krijgt zijn predicaat bij initialisatie,
+/// en `@AppStorage` is daar nog niet beschikbaar. De feeds van de map zijn een lijst van
+/// feeds, geen artikelen; die ophalen is goedkoop.
 struct FolderItemsView: View {
-    @Environment(\.modelContext) private var modelContext
     @AppStorage(AppConfiguration.UserDefaultsKeys.hideReadArticles) private var hideReadArticles = false
     let folder: FeedFolder
+
+    var body: some View {
+        FolderItemsContent(
+            folder: folder, feedIDs: folder.feeds.map(\.id), hideRead: hideReadArticles
+        )
+    }
+}
+
+/// Haalt de artikelen met één query op in plaats van `folder.feeds.flatMap { $0.items }`
+/// (#136), wat bij elke hertekening alle artikelen van de map afzonderlijk laadde.
+private struct FolderItemsContent: View {
+    @Environment(\.modelContext) private var modelContext
+    let folder: FeedFolder
+    @Query private var sortedItems: [FeedItem]
 
     @State private var viewMode: ViewMode = .timeline
     @State private var eventClusters: [EventCluster] = []
@@ -14,11 +32,9 @@ struct FolderItemsView: View {
 
     enum ViewMode { case timeline, events }
 
-    var sortedItems: [FeedItem] {
-        folder.feeds
-            .flatMap { $0.items }
-            .filter { hideReadArticles ? !$0.isRead : true }
-            .sorted { ($0.pubDate ?? .distantPast) > ($1.pubDate ?? .distantPast) }
+    init(folder: FeedFolder, feedIDs: [UUID], hideRead: Bool) {
+        self.folder = folder
+        _sortedItems = Query(ArticleFilter.descriptor(hideRead: hideRead, feedIDs: feedIDs))
     }
 
     var body: some View {
