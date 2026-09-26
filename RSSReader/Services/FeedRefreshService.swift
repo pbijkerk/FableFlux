@@ -134,19 +134,21 @@ class FeedRefreshService {
         }
 
         let existing = Self.existingKeys(of: feed, context: context)
-        let existingGuids = Set(existing.compactMap { $0.guid })
-        let existingLinks = Set(existing.compactMap { $0.link })
-        let existingTitles = Set(existing.map { $0.title })
+        var existingGuids = Set(existing.compactMap { $0.guid.map(Self.guidKey) })
+        var existingLinks = Set(existing.compactMap { $0.link })
+        var existingTitles = Set(existing.map { $0.title })
 
         var newItems: [FeedItem] = []
         for parsedItem in parsed.items {
+            // De sets groeien mee, zodat een artikel dat twee keer in dezelfde feed staat
+            // ook binnen één verversing maar één keer binnenkomt (#135).
             let isNew: Bool
             if !parsedItem.guid.isEmpty {
-                isNew = !existingGuids.contains(parsedItem.guid)
+                isNew = existingGuids.insert(Self.guidKey(parsedItem.guid)).inserted
             } else if !parsedItem.link.isEmpty {
-                isNew = !existingLinks.contains(parsedItem.link)
+                isNew = existingLinks.insert(parsedItem.link).inserted
             } else {
-                isNew = !existingTitles.contains(parsedItem.title)
+                isNew = existingTitles.insert(parsedItem.title).inserted
             }
 
             guard isNew else { continue }
@@ -190,6 +192,20 @@ class FeedRefreshService {
         if feed.folder == nil {
             detectAndAssignFolder(feed: feed, parsed: parsed, context: context)
         }
+    }
+
+    /// De vergelijkingssleutel voor een `guid`: bij een http(s)-URL zonder het fragment na
+    /// `#`. De BBC zet hetzelfde artikel meermaals in de feed als `…/cwywld5v28jo#1` en
+    /// `…#9`, en dat getal wisselt in de loop van de dag (#135). Bewust niet op `link`
+    /// ontdubbelen: veel podcastfeeds geven elk item dezelfde link (de homepage), en dan
+    /// zou elke nieuwe aflevering als dubbel worden weggegooid. De opgeslagen `guid`
+    /// zelf blijft ongewijzigd.
+    static func guidKey(_ guid: String) -> String {
+        let lower = guid.lowercased()
+        guard lower.hasPrefix("http://") || lower.hasPrefix("https://"),
+            let hash = guid.firstIndex(of: "#")
+        else { return guid }
+        return String(guid[..<hash])
     }
 
     /// De bestaande artikelen van een feed in één query (#119). Via `feed.items` werd elk
