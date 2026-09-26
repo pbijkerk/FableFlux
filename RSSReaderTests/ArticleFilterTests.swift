@@ -291,4 +291,21 @@ final class ArticleFilterTests: XCTestCase {
             XCTAssertEqual(Set(nieuw.suffix(nieuw.count - metDatum.count)), Set(nieuw.filter { $0.hasSuffix("-4") }))
         }
     }
+
+    // MARK: - Vastgelegde lijst in het artikelscherm (#139)
+
+    func testVastgelegdeLijstHoudtGelezenArtikelEnVultAan() {
+        let context = container.mainContext
+        let artikelen = (0..<5).map { FeedItem(title: "A\($0)") }
+        artikelen.forEach(context.insert)
+
+        // Bij openen: A0-A2 geladen. Daarna is A1 gelezen en verborgen, en is er een
+        // pagina bijgeladen (A3, A4).
+        let vastgelegd = Array(artikelen[0...2])
+        let actueel = [artikelen[0], artikelen[2], artikelen[3], artikelen[4]]
+
+        let lijst = VastgelegdeArtikelPagina.aangevuld(vastgelegd, met: actueel)
+
+        XCTAssertEqual(lijst.map(\.title), ["A0", "A1", "A2", "A3", "A4"])
+    }
 }

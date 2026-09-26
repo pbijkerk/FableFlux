@@ -26,6 +26,7 @@ private struct FeedItemsList: View {
     @Query private var sortedItems: [FeedItem]
 
     @State private var opslagFout: OpslagFoutmelding?
+    @State private var geopend: FeedArtikel?
 
     init(feed: Feed, refreshService: FeedRefreshService, hideRead: Bool) {
         self.feed = feed
@@ -36,14 +37,16 @@ private struct FeedItemsList: View {
     var body: some View {
         List {
             ForEach(Array(sortedItems.enumerated()), id: \.element.id) { index, item in
-                ZStack {
+                // Geen NavigationLink per rij: die verdwijnt met de rij (gelezen verbergen),
+                // en dan verdwijnt ook het geopende artikel. Ook geen `NavigationLink(value:)`:
+                // dit scherm wordt zelf via een destination geopend, en een waarde-link springt
+                // dan terug naar de feedlijst in plaats van het artikel te tonen (#139).
+                Button {
+                    geopend = FeedArtikel(id: item.id)
+                } label: {
                     FeedItemCard(item: item)
-                    // Onzichtbare NavigationLink zonder disclosure-chevron
-                    NavigationLink(destination: ArticlePageView(items: sortedItems, initialIndex: index)) {
-                        EmptyView()
-                    }
-                    .opacity(0)
                 }
+                .buttonStyle(.plain)
                 .listRowSeparator(.hidden)
                 .listRowBackground(Color.clear)
                 .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
@@ -97,6 +100,9 @@ private struct FeedItemsList: View {
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
         .background(Theme.background.ignoresSafeArea())
+        .navigationDestination(item: $geopend) { artikel in
+            VastgelegdeArtikelPagina(id: artikel.id, items: sortedItems)
+        }
         .refreshable {
             await refreshService.refresh(feed: feed, context: modelContext)
         }
@@ -285,6 +291,46 @@ struct FeedItemCard: View {
     private static func relativeTime(for date: Date) -> String {
         guard abs(date.timeIntervalSinceNow) >= 60 else { return "Zojuist" }
         return relativeDateFormatter.localizedString(for: date, relativeTo: .now)
+    }
+}
+
+/// Het geopende artikel in `FeedItemsView`, voor `navigationDestination(item:)`.
+struct FeedArtikel: Hashable {
+    let id: UUID
+}
+
+/// Het artikelscherm met de lijst zoals die was op het moment van openen (#139).
+///
+/// Openen markeert een artikel als gelezen. Met "gelezen verbergen" aan haalt de lijst
+/// zich daarna opnieuw op zonder dat artikel, en een bestemming die het in de actuele
+/// lijst opzoekt vindt het niet meer: een leeg scherm. Deze view legt de lijst bij het
+/// openen vast in `@State` (die bewaart alleen de eerste waarde) en vult hem aan met
+/// artikelen die er later bijkomen, zodat bijladen tijdens het vegen blijft werken.
+struct VastgelegdeArtikelPagina: View {
+    let id: UUID
+    let actueel: [FeedItem]
+    var onReachEnd: (() -> Void)?
+    @State private var vastgelegd: [FeedItem]
+
+    init(id: UUID, items: [FeedItem], onReachEnd: (() -> Void)? = nil) {
+        self.id = id
+        self.actueel = items
+        self.onReachEnd = onReachEnd
+        _vastgelegd = State(initialValue: items)
+    }
+
+    var body: some View {
+        let lijst = Self.aangevuld(vastgelegd, met: actueel)
+        if let index = lijst.firstIndex(where: { $0.id == id }) {
+            ArticlePageView(items: lijst, initialIndex: index, onReachEnd: onReachEnd)
+        }
+    }
+
+    /// De vastgelegde lijst, met daarachter de artikelen uit de actuele lijst die er nog
+    /// niet in staan (bijgeladen pagina's). Wat intussen uit de actuele lijst viel, blijft.
+    static func aangevuld(_ vastgelegd: [FeedItem], met actueel: [FeedItem]) -> [FeedItem] {
+        let bekend = Set(vastgelegd.map(\.id))
+        return vastgelegd + actueel.filter { !bekend.contains($0.id) }
     }
 }
 

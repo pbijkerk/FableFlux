@@ -264,10 +264,11 @@ private struct ArticleListView<EmptyState: View>: View {
         // Eén bestemming voor de hele lijst in plaats van één per rij. De index wordt
         // pas opgezocht wanneer er daadwerkelijk genavigeerd wordt; dat is één keer
         // lineair zoeken bij een tik, in plaats van werk bij elke update.
+        // `VastgelegdeArtikelPagina` legt de lijst bij het openen vast: met "gelezen
+        // verbergen" aan valt het geopende artikel anders uit `items` en blijft het
+        // scherm leeg (#139).
         .navigationDestination(for: UUID.self) { id in
-            if let index = items.firstIndex(where: { $0.id == id }) {
-                ArticlePageView(items: items, initialIndex: index, onReachEnd: onReachEnd)
-            }
+            VastgelegdeArtikelPagina(id: id, items: items, onReachEnd: onReachEnd)
         }
         .refreshable { await onRefresh() }
         // Overlay in plaats van een vervangende view: de lijst blijft bestaan, dus

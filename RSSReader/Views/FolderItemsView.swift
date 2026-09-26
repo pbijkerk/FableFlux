@@ -29,6 +29,7 @@ private struct FolderItemsContent: View {
     @State private var expandedClusters: Set<UUID> = []
     @State private var isClustering = false
     @State private var opslagFout: OpslagFoutmelding?
+    @State private var geopend: MapArtikel?
 
     enum ViewMode { case timeline, events }
 
@@ -48,6 +49,9 @@ private struct FolderItemsContent: View {
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
         .background(Theme.background.ignoresSafeArea())
+        .navigationDestination(item: $geopend) { artikel in
+            VastgelegdeArtikelPagina(id: artikel.id, items: artikel.lijst)
+        }
         .navigationTitle(folder.name)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -132,13 +136,13 @@ private struct FolderItemsContent: View {
 
     @ViewBuilder
     private func itemRow(item: FeedItem, allItems: [FeedItem], index: Int) -> some View {
-        ZStack {
+        // Selectie in plaats van een NavigationLink: zie `FeedItemsView` (#139).
+        Button {
+            geopend = MapArtikel(id: item.id, lijst: allItems)
+        } label: {
             FeedItemCard(item: item)
-            NavigationLink(destination: ArticlePageView(items: allItems, initialIndex: index)) {
-                EmptyView()
-            }
-            .opacity(0)
         }
+        .buttonStyle(.plain)
         .listRowSeparator(.hidden)
         .listRowBackground(Color.clear)
         .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
@@ -179,4 +183,12 @@ private struct FolderItemsContent: View {
             expandedClusters = [first.id]
         }
     }
+}
+
+/// Het geopende artikel in `FolderItemsView`, voor `navigationDestination(item:)`. Draagt
+/// de lijst waar het artikel uit komt mee: de tijdlijn of de artikelen van de opengeklapte
+/// gebeurtenissen.
+struct MapArtikel: Hashable {
+    let id: UUID
+    let lijst: [FeedItem]
 }
