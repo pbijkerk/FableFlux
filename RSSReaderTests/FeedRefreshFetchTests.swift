@@ -116,6 +116,71 @@ final class FeedRefreshFetchTests: XCTestCase {
         XCTAssertEqual(try titels(feed, context), ["Een", "Twee"])
     }
 
+    // MARK: - Wisselende guid-fragmenten (#135)
+
+    /// Het BBC-patroon: hetzelfde artikel twee keer in één feed, met `#1` en `#9`.
+    func testZelfdeArtikelMetAnderGuidFragmentKomtEenKeerBinnen() throws {
+        let (feed, context) = try opgeslagenFeed(items: [])
+        let link = "https://www.bbc.co.uk/sport/football/articles/cwywld5v28jo?at_medium=RSS"
+        var parsed = ParsedFeed()
+        parsed.items = [
+            ParsedFeedItem(
+                title: "Hacker", link: link, guid: "https://www.bbc.co.uk/sport/football/articles/cwywld5v28jo#1"),
+            ParsedFeedItem(
+                title: "Hacker", link: link, guid: "https://www.bbc.co.uk/sport/football/articles/cwywld5v28jo#9"),
+        ]
+
+        FeedRefreshService().applyParsedFeed(parsed, to: feed, context: context)
+        try context.save()
+
+        XCTAssertEqual(try titels(feed, context), ["Hacker"])
+    }
+
+    /// Later in de dag draagt hetzelfde artikel een ander fragment.
+    func testAnderGuidFragmentBijEenLatereVerversingIsEenDubbel() throws {
+        let (feed, context) = try opgeslagenFeed(items: [
+            FeedItem(title: "Hacker", guid: "https://www.bbc.co.uk/sport/football/articles/cwywld5v28jo#1")
+        ])
+        var parsed = ParsedFeed()
+        parsed.items = [
+            ParsedFeedItem(title: "Hacker", guid: "https://www.bbc.co.uk/sport/football/articles/cwywld5v28jo#3")
+        ]
+
+        FeedRefreshService().applyParsedFeed(parsed, to: feed, context: context)
+        try context.save()
+
+        XCTAssertEqual(try titels(feed, context), ["Hacker"])
+    }
+
+    /// Podcastfeeds geven elk item vaak dezelfde link; afleveringen onderscheiden zich
+    /// alleen op guid. Die mogen niet als dubbel worden gezien.
+    func testAfleveringenMetDezelfdeLinkKomenAllemaalBinnen() throws {
+        let (feed, context) = try opgeslagenFeed(items: [
+            FeedItem(title: "Aflevering 1", link: "https://podcast.example.com", guid: "ep-1")
+        ])
+        var parsed = ParsedFeed()
+        parsed.items = [
+            ParsedFeedItem(title: "Aflevering 1", link: "https://podcast.example.com", guid: "ep-1"),
+            ParsedFeedItem(title: "Aflevering 2", link: "https://podcast.example.com", guid: "ep-2"),
+            ParsedFeedItem(title: "Aflevering 3", link: "https://podcast.example.com", guid: "ep-3"),
+        ]
+
+        FeedRefreshService().applyParsedFeed(parsed, to: feed, context: context)
+        try context.save()
+
+        XCTAssertEqual(try titels(feed, context), ["Aflevering 1", "Aflevering 2", "Aflevering 3"])
+    }
+
+    func testGuidSleutel() {
+        XCTAssertEqual(
+            FeedRefreshService.guidKey("https://www.bbc.co.uk/news/articles/abc#9"),
+            "https://www.bbc.co.uk/news/articles/abc")
+        XCTAssertEqual(FeedRefreshService.guidKey("https://example.com/a"), "https://example.com/a")
+        // Geen URL: een # hoort dan bij de id zelf.
+        XCTAssertEqual(FeedRefreshService.guidKey("tag:example.com,2026:post#1"), "tag:example.com,2026:post#1")
+        XCTAssertEqual(FeedRefreshService.guidKey("ep-1"), "ep-1")
+    }
+
     // MARK: - Opruimen en datumherstel uit de store
 
     func testOpruimenUitDeStoreRespecteertBewaardEnDatum() throws {
