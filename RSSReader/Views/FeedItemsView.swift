@@ -8,6 +8,7 @@ struct FeedItemsView: View {
     var refreshService: FeedRefreshService
 
     @State private var opslagFout: OpslagFoutmelding?
+    @State private var geopend: FeedArtikel?
 
     var sortedItems: [FeedItem] {
         feed.items
@@ -18,16 +19,16 @@ struct FeedItemsView: View {
     var body: some View {
         List {
             ForEach(Array(sortedItems.enumerated()), id: \.element.id) { index, item in
-                ZStack {
+                // Geen NavigationLink per rij: die verdwijnt met de rij (gelezen verbergen),
+                // en dan verdwijnt ook het geopende artikel. Ook geen `NavigationLink(value:)`:
+                // dit scherm wordt zelf via een destination geopend, en een waarde-link springt
+                // dan terug naar de feedlijst in plaats van het artikel te tonen (#139).
+                Button {
+                    geopend = FeedArtikel(id: item.id)
+                } label: {
                     FeedItemCard(item: item)
-                    // Onzichtbare NavigationLink zonder disclosure-chevron. Een waarde in
-                    // plaats van een destination: die link hoort bij de rij, en verdwijnt
-                    // de rij (gelezen verbergen), dan verdwijnt ook het geopende artikel (#139).
-                    NavigationLink(value: FeedArtikel(id: item.id)) {
-                        EmptyView()
-                    }
-                    .opacity(0)
                 }
+                .buttonStyle(.plain)
                 .listRowSeparator(.hidden)
                 .listRowBackground(Color.clear)
                 .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
@@ -81,7 +82,7 @@ struct FeedItemsView: View {
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
         .background(Theme.background.ignoresSafeArea())
-        .navigationDestination(for: FeedArtikel.self) { artikel in
+        .navigationDestination(item: $geopend) { artikel in
             VastgelegdeArtikelPagina(id: artikel.id, items: sortedItems)
         }
         .refreshable {
@@ -275,9 +276,7 @@ struct FeedItemCard: View {
     }
 }
 
-/// Navigatiewaarde voor een artikel uit `FeedItemsView`. Een eigen type in plaats van
-/// `UUID`, zodat de bestemming niet botst met die van de artikelenlijst als beide in
-/// dezelfde navigatiestapel staan.
+/// Het geopende artikel in `FeedItemsView`, voor `navigationDestination(item:)`.
 struct FeedArtikel: Hashable {
     let id: UUID
 }
