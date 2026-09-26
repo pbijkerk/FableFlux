@@ -5,7 +5,7 @@ Alle noemenswaardige wijzigingen aan dit project worden in dit bestand bijgehoud
 Het formaat is gebaseerd op [Keep a Changelog](https://keepachangelog.com/nl/1.1.0/)
 en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 
-## [Unreleased]
+## [1.10.0] - 2026-09-26
 
 ### Gewijzigd
 - Een mislukte SwiftData-opslag verdwijnt niet langer stil: alle 28 opslagplekken lopen via één helper die de fout logt, en bij een expliciete actie (bewaren, verwijderen, mappen, onderwerpen, feedinstellingen, OPML-import) toont het scherm een melding (#123)
