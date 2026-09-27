@@ -77,28 +77,35 @@ al in: Xcode bouwt standaard naar `~/Library/Developer/Xcode/DerivedData`, buite
 5. Controleren dat het verwachte versienummer op het toestel staat.
 
 ### Via de terminal (alternatief)
-Bruikbaar als je het onbemand wilt draaien. Let op: **twee verschillende identifiers, niet door
-elkaar halen.** `devicectl` werkt met zijn eigen UUID (`A500BDFC-…`), `xcodebuild -destination
-id=` met de hardware-UDID van het toestel (`00008110-…`). Geef je de eerste aan `xcodebuild`,
-dan meldt die *"CoreDeviceService was unable to locate a device matching the requested device
-identifier"* — de foutmelding somt de juiste UDID wel op onder *Available destinations*.
-Daarom hieronder: `xcodebuild` op toestelnaam (dat scheelt het overtypen van een UDID) en
-`devicectl` op zijn eigen id. Zoek dat id op in plaats van het over te typen; het verandert bij
-herkoppelen, een ander toestel of een andere Mac. De regel moet `available (paired)` tonen.
+Bruikbaar als je het onbemand wilt draaien. Het blok zoekt het aangesloten toestel zelf op; typ
+geen identifier over, want die verschilt per toestel. `xcrun devicectl list devices` toont per
+toestel de hardware-UDID (`00008110-…`, gevolgd door `(UDID)`), en zowel `xcodebuild -destination
+id=` als `devicectl` accepteren die. Filter niet op de kolom *State*: die wisselt tussen
+`connected` en `available (paired)` (#148). Filter op *Reality* `physical`: de lijst bevat ook
+simulators, die ook "iPhone" heten. Zonder aangesloten iPhone stopt het blok met een melding in
+plaats van met een lege identifier.
 
 ```bash
 xcodegen generate
-DEVICE=$(xcrun devicectl list devices | grep iPhone | grep 'available (paired)' \
-  | grep -oE '[0-9A-F]{8}-([0-9A-F]{4}-){3}[0-9A-F]{12}' | head -1)
+DEVICE=$(xcrun devicectl list devices \
+  | awk '/ physical *$/ && /iPhone/ { for (i = 1; i < NF; i++) if ($(i + 1) == "(UDID)") print $i }' \
+  | head -1)
 DERIVED=~/Library/Developer/Xcode/DerivedData/FableFlux-device
-xcodebuild -project FableFlux.xcodeproj -scheme FableFlux -configuration Release \
-  -destination 'platform=iOS,name=iPhone van Peter' \
-  -derivedDataPath "$DERIVED" -allowProvisioningUpdates build
-xcrun devicectl device install app --device "$DEVICE" \
-  "$DERIVED/Build/Products/Release-iphoneos/FableFlux.app"
+: "${DEVICE:?Geen aangesloten iPhone gevonden: sluit hem aan met een kabel en ontgrendel hem}" \
+  && xcodebuild -project FableFlux.xcodeproj -scheme FableFlux -configuration Release \
+    -destination "id=$DEVICE" \
+    -derivedDataPath "$DERIVED" -allowProvisioningUpdates build \
+  && xcrun devicectl device install app --device "$DEVICE" \
+    "$DERIVED/Build/Products/Release-iphoneos/FableFlux.app"
 ```
 
-Heet het toestel anders, pas dan de naam aan; `xcrun devicectl list devices` toont hem.
+De stappen hangen met `&&` aan elkaar. Zonder toestel start de build niet. Faalt de build, dan
+installeert het blok niet de vorige app die nog in `$DERIVED` staat. Dat geldt ook als je het
+blok in de terminal plakt: een losse regel zou daar gewoon doorlopen.
+
+Staan er meerdere iPhones aangesloten, dan kiest het blok de eerste; `xcrun devicectl list devices`
+toont welke dat is.
+
 Controleer na afloop het versienummer:
 
 ```bash
