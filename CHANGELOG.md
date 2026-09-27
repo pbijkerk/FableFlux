@@ -7,6 +7,9 @@ en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 
 ## [Unreleased]
 
+### Opgelost
+- Geen smalle strook meer tussen artikelen bij het vegen: de pager legt pagina's niet meer naast elkaar maar laat de volgende over de vorige schuiven, die vertraagd meeschuift en donkerder wordt (#149)
+
 ### Gewijzigd
 - Interne naam RSSReader hernoemd naar FableFlux: GitHub-repository, Xcode-project, scheme, targets, bronmappen, CI en documentatie. Bundle-ID, Keychain-service en URL-scheme `rssreader://` blijven bewust gelijk, zodat gegevens, API-sleutels en Mastodon-login behouden blijven (#145)
 
