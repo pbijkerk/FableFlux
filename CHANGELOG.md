@@ -5,6 +5,12 @@ Alle noemenswaardige wijzigingen aan dit project worden in dit bestand bijgehoud
 Het formaat is gebaseerd op [Keep a Changelog](https://keepachangelog.com/nl/1.1.0/)
 en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 
+## [Unreleased]
+
+### Gewijzigd
+- Het installatiecommando in `Workflow-feature.md` zoekt de aangesloten iPhone zelf op via de UDID, negeert simulators en stopt met een melding als er geen toestel is (#148)
+- Drie verouderde Xcode-handleidingen in de bronmap verwijderd; sinds XcodeGen overbodig (#147)
+
 ## [1.11.1] - 2026-09-27
 
 ### Opgelost
