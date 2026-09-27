@@ -14,6 +14,7 @@ en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 
 ### Gewijzigd
 - De laatste Engelstalige schermteksten in feed toevoegen, OPML-import, samenvattingsdetail en feedlijst zijn vertaald naar het Nederlands (#156)
+- De standaardonderwerpen herkennen ook Nederlandse artikelen en tonen hun naam in de samenvattingstaal, zoals "Politiek" (#155)
 
 ## [1.11.2] - 2026-09-27
 
