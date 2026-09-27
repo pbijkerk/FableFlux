@@ -223,30 +223,39 @@ enum MastodonAccountLinker {
             context.insert(account)
         }
 
-        saveToken(accessToken, instanceURL, credentials.id)
+        // Bij een bestaand account blijft het opgeslagen adres leidend, ook als de schrijfwijze nu anders is:
+        // het maakt deel uit van de Keychain-sleutel die `MastodonService` gebruikt.
+        let storedInstanceURL = account.instanceURL
+        saveToken(accessToken, storedInstanceURL, account.accountID)
 
-        // Een bestaand account houdt zijn feed (en daarmee zijn artikelen); alleen zonder feed komt er een bij.
-        if account.feed == nil {
-            let host = URL(string: instanceURL)?.host ?? instanceURL
+        let host = URL(string: storedInstanceURL)?.host ?? storedInstanceURL
+        let feedTitle = "\(credentials.displayName) (@\(credentials.username)@\(host))"
+        if let feed = account.feed {
+            // Een bestaand account houdt zijn feed (en daarmee zijn artikelen); alleen de titel volgt de naam.
+            feed.title = feedTitle
+        } else {
             let feedURL = "mastodon://\(host)/@\(credentials.username)"
-            let feedTitle = "\(credentials.displayName) (@\(credentials.username)@\(host))"
             let virtualFeed = Feed(url: feedURL, title: feedTitle)
             virtualFeed.folder = findOrCreateSocialFolder(context: context)
             context.insert(virtualFeed)
             account.feed = virtualFeed
+            // Met de oude cursor kreeg de nieuwe feed alleen berichten van na de vorige ophaalbeurt.
+            account.lastFetchedStatusID = nil
         }
 
         try context.save()
         return account
     }
 
+    /// Zoekt een account op account-ID en instantie-adres. Het adres wordt zonder onderscheid tussen
+    /// hoofd- en kleine letters vergeleken: `Mastodon.social` en `mastodon.social` zijn hetzelfde account.
     static func findAccount(instanceURL: String, accountID: String, context: ModelContext) throws -> MastodonAccount? {
-        let targetInstanceURL = instanceURL
         let targetAccountID = accountID
         let descriptor = FetchDescriptor<MastodonAccount>(
-            predicate: #Predicate { $0.instanceURL == targetInstanceURL && $0.accountID == targetAccountID }
+            predicate: #Predicate { $0.accountID == targetAccountID }
         )
-        return try context.fetch(descriptor).first
+        let targetInstanceURL = instanceURL.lowercased()
+        return try context.fetch(descriptor).first(where: { $0.instanceURL.lowercased() == targetInstanceURL })
     }
 
     static func findOrCreateSocialFolder(context: ModelContext) -> FeedFolder {

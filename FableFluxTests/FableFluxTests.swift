@@ -214,6 +214,46 @@ final class MastodonAccountLinkerTests: XCTestCase {
         XCTAssertEqual(savedTokens.last?.token, "token-2")
         XCTAssertEqual(savedTokens.last?.instanceURL, "https://example.social")
         XCTAssertEqual(savedTokens.last?.accountID, "42")
+        XCTAssertEqual(relinked.feed?.title, "Alice Nieuw (@alice2@example.social)")
+        XCTAssertEqual(relinked.feed?.url, "mastodon://example.social/@alice", "De feed-URL blijft ongewijzigd")
+    }
+
+    func testRelinkingAccountWithoutFeedResetsCursor() throws {
+        let account = try link(credentials: credentials())
+        account.lastFetchedStatusID = "1000"
+        if let feed = account.feed {
+            account.feed = nil
+            container.mainContext.delete(feed)
+        }
+        try container.mainContext.save()
+
+        let relinked = try link(credentials: credentials(), token: "token-2")
+
+        XCTAssertNotNil(relinked.feed)
+        XCTAssertNil(relinked.lastFetchedStatusID, "Een nieuwe feed moet de recente tijdlijn ophalen")
+    }
+
+    func testRelinkingAccountWithFeedKeepsCursor() throws {
+        let account = try link(credentials: credentials())
+        account.lastFetchedStatusID = "1000"
+        try container.mainContext.save()
+
+        let relinked = try link(credentials: credentials(), token: "token-2")
+
+        XCTAssertEqual(relinked.lastFetchedStatusID, "1000")
+    }
+
+    func testRelinkingWithDifferentCapitalizationFindsSameAccount() throws {
+        try link(instanceURL: "https://mastodon.social", credentials: credentials())
+        let relinked = try link(instanceURL: "https://Mastodon.Social", credentials: credentials(), token: "token-2")
+
+        XCTAssertEqual(try allAccounts().count, 1)
+        XCTAssertEqual(try mastodonFeeds().count, 1)
+        XCTAssertEqual(relinked.instanceURL, "https://mastodon.social", "Het opgeslagen adres blijft ongewijzigd")
+        XCTAssertEqual(savedTokens.last?.token, "token-2")
+        XCTAssertEqual(
+            savedTokens.last?.instanceURL, "https://mastodon.social",
+            "Het token hoort onder het opgeslagen adres, anders past de Keychain-sleutel niet meer")
     }
 
     func testRelinkingAccountWithoutFeedCreatesFeedInSocial() throws {
