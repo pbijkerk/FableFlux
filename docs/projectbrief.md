@@ -95,6 +95,7 @@ Afgeleid van de gewenste uitkomst; geprioriteerd volgens MoSCoW. Elke actionable
 - Fact-check uit zich als een **waarschuwing per onderwerp** bij betwijfelde beweringen — reden: consistente granulariteit met de bronduiding, zonder de samenvatting te blokkeren.
 - De koppeling samenvatting→bron (R3/R11) gebeurt via **gestructureerde generatie**: het model levert beweringen met bron-ids, niet inline-tekstmarkers of achteraf-matchen — reden: maakt "elke bewering herleidbaar" (R11) structureel afdwingbaar en draagt later ook de bronduiding per onderwerp (R4) en de fact-check-waarschuwing (R7) per bewering/onderwerp.
 - Beweringen citeren bronnen **hybride** (#33): synthese waar bronnen elkaar overlappen (meerdere bron-ids per bewering), anders enkelvoudig — reden: toont brede dekking waar die er is en behoudt tegelijk directe herleidbaarheid; de prompt stuurt hier expliciet op.
+- **Favoriet = voorrang, geen filter** (#154, 2026-09-27): alle onderwerpen (eigen + ingebouwd) doen altijd mee op Vandaag; favorieten staan bovenaan, daarna volgt de rest op aantal artikelen — reden: één tik op "favoriet maken" mocht de hoofdpagina niet ongemerkt leegmaken, en "voorrang" is wat de app al beloofde.
 
 ## Herziene besluiten
 - Openstaand punt "precieze rol van bronanalyse en fact-check" (vorige brief) — vervalt: de rol is nu belegd (zie besluiten hierboven en Gewenste uitkomst). Resteert alleen de weergavevorm (matrix, zie Richting).
