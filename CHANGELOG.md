@@ -5,10 +5,10 @@ Alle noemenswaardige wijzigingen aan dit project worden in dit bestand bijgehoud
 Het formaat is gebaseerd op [Keep a Changelog](https://keepachangelog.com/nl/1.1.0/)
 en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 
-## [Unreleased]
+## [1.11.1] - 2026-09-27
 
 ### Opgelost
-- Geen smalle strook meer tussen artikelen bij het vegen: de pager legt pagina's niet meer naast elkaar maar laat de volgende over de vorige schuiven, die vertraagd meeschuift en donkerder wordt (#149)
+- Geen smalle strook meer tussen artikelen bij het vegen: de pager legt pagina's niet meer naast elkaar maar laat de volgende over de vorige schuiven, die vertraagd meeschuift en donkerder wordt. De tekst van het volgende artikel staat er al tijdens het vegen (#149)
 
 ### Gewijzigd
 - Interne naam RSSReader hernoemd naar FableFlux: GitHub-repository, Xcode-project, scheme, targets, bronmappen, CI en documentatie. Bundle-ID, Keychain-service en URL-scheme `rssreader://` blijven bewust gelijk, zodat gegevens, API-sleutels en Mastodon-login behouden blijven (#145)
