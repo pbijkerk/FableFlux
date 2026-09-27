@@ -71,6 +71,8 @@ struct SettingsView: View {
     private var appTheme = AppTheme.standaard.rawValue
     /// Melding als iOS het app-icoon niet kon wisselen; de accentkleur is dan wel gewijzigd.
     @State private var iconFout: String?
+    /// Lopende icoonwissel; een volgende wissel wacht hierop.
+    @State private var iconTask: Task<Void, Never>?
 
     @State private var showAPIKey = false
     @State private var showGoogleKey = false
@@ -253,15 +255,23 @@ struct SettingsView: View {
     }
 
     private func kiesThema(_ theme: AppTheme) {
-        guard AppTheme(storedValue: appTheme) != theme else { return }
+        let app = UIApplication.shared
+        // Ook bij hetzelfde thema opnieuw proberen als het icoon achterloopt (eerdere wissel mislukt).
+        guard AppTheme(storedValue: appTheme) != theme || app.alternateIconName != theme.iconName else { return }
         appTheme = theme.rawValue
         iconFout = nil
-        guard UIApplication.shared.supportsAlternateIcons else { return }
-        Task {
+        guard app.supportsAlternateIcons else { return }
+        // Wissels na elkaar uitvoeren: iOS weigert een wissel terwijl de vorige nog loopt.
+        let vorige = iconTask
+        iconTask = Task {
+            await vorige?.value
+            // Inmiddels een ander thema gekozen: die wissel volgt, deze overslaan.
+            guard AppTheme(storedValue: appTheme) == theme, app.alternateIconName != theme.iconName else { return }
             do {
-                try await UIApplication.shared.setAlternateIconName(theme.iconName)
+                try await app.setAlternateIconName(theme.iconName)
             } catch {
-                iconFout = "Het app-icoon kon niet worden gewijzigd; de accentkleur is wel aangepast."
+                guard AppTheme(storedValue: appTheme) == theme else { return }
+                iconFout = "Het app-icoon kon niet worden gewijzigd; de accentkleur is wel aangepast. Tik opnieuw om het nog eens te proberen."
             }
         }
     }
