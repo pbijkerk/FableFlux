@@ -90,14 +90,18 @@ xcodegen generate
 DEVICE=$(xcrun devicectl list devices \
   | awk '/ physical *$/ && /iPhone/ { for (i = 1; i < NF; i++) if ($(i + 1) == "(UDID)") print $i }' \
   | head -1)
-: "${DEVICE:?Geen aangesloten iPhone gevonden: sluit hem aan met een kabel en ontgrendel hem}"
 DERIVED=~/Library/Developer/Xcode/DerivedData/FableFlux-device
-xcodebuild -project FableFlux.xcodeproj -scheme FableFlux -configuration Release \
-  -destination "id=$DEVICE" \
-  -derivedDataPath "$DERIVED" -allowProvisioningUpdates build
-xcrun devicectl device install app --device "$DEVICE" \
-  "$DERIVED/Build/Products/Release-iphoneos/FableFlux.app"
+: "${DEVICE:?Geen aangesloten iPhone gevonden: sluit hem aan met een kabel en ontgrendel hem}" \
+  && xcodebuild -project FableFlux.xcodeproj -scheme FableFlux -configuration Release \
+    -destination "id=$DEVICE" \
+    -derivedDataPath "$DERIVED" -allowProvisioningUpdates build \
+  && xcrun devicectl device install app --device "$DEVICE" \
+    "$DERIVED/Build/Products/Release-iphoneos/FableFlux.app"
 ```
+
+De stappen hangen met `&&` aan elkaar. Zonder toestel start de build niet. Faalt de build, dan
+installeert het blok niet de vorige app die nog in `$DERIVED` staat. Dat geldt ook als je het
+blok in de terminal plakt: een losse regel zou daar gewoon doorlopen.
 
 Staan er meerdere iPhones aangesloten, dan kiest het blok de eerste; `xcrun devicectl list devices`
 toont welke dat is.
