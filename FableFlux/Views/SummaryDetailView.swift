@@ -27,7 +27,7 @@ struct SummaryDetailView: View {
             }
             .padding()
         }
-        .navigationTitle(cluster.topicName)
+        .navigationTitle(cluster.displayName)
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             checkIfTopicSaved()
@@ -118,7 +118,7 @@ struct SummaryDetailView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Interessant onderwerp?")
                         .font(.subheadline.bold())
-                    Text("Maak \"\(cluster.topicName)\" favoriet; het komt dan bovenaan op Vandaag.")
+                    Text("Maak \"\(cluster.displayName)\" favoriet; het komt dan bovenaan op Vandaag.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }

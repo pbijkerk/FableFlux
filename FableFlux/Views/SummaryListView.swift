@@ -156,7 +156,7 @@ struct TopicSummaryCardView: View {
                     .foregroundStyle(accent)
                     .accessibilityLabel("Favoriet")
             }
-            Text(cluster.topicName.uppercased())
+            Text(cluster.displayName.uppercased())
                 .font(Theme.headline(15))
                 .foregroundStyle(accent)
             Spacer()

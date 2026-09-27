@@ -253,4 +253,64 @@ final class TopicClusteringOrderTests: XCTestCase {
 
         XCTAssertEqual(clusters.map(\.topicName), ["Ballon", "Zeppelin", "Worst", "Kaas"])
     }
+
+    // MARK: - Nederlandse onderwerpen (#155)
+
+    /// Clustert de titels zonder opgeslagen onderwerpen, dus alleen op de standaardonderwerpen,
+    /// en levert per titel de (Engelse) sleutel van het cluster waarin hij terechtkwam.
+    private func standaardonderwerp(voor titles: [String]) async throws -> [String: String] {
+        let items = makeItems(titles: titles)
+        let service = TopicClusteringService()
+        let resultaat = await service.cluster(items: items, savedTopics: [], claudeAPIKey: nil)
+        let clusters = try XCTUnwrap(resultaat)
+
+        var onderwerpPerTitel: [String: String] = [:]
+        for cluster in clusters {
+            for item in cluster.items { onderwerpPerTitel[item.title] = cluster.topicName }
+        }
+        return onderwerpPerTitel
+    }
+
+    func testNederlandseArtikelenKomenInHetJuisteStandaardonderwerp() async throws {
+        let onderwerpen = try await standaardonderwerp(voor: [
+            "Kabinet valt na stemming in de Tweede Kamer",
+            "Ajax wint van PSV in de eredivisie",
+            "Ziekenhuizen kampen met tekort aan verpleegkundigen",
+        ])
+
+        XCTAssertEqual(onderwerpen["Kabinet valt na stemming in de Tweede Kamer"], "Politics")
+        XCTAssertEqual(onderwerpen["Ajax wint van PSV in de eredivisie"], "Sports")
+        XCTAssertEqual(onderwerpen["Ziekenhuizen kampen met tekort aan verpleegkundigen"], "Health")
+    }
+
+    func testEngelsArtikelBlijftHetzelfdeIngedeeld() async throws {
+        let titel = "Stock market rallies as investors cheer record profit"
+        let onderwerpen = try await standaardonderwerp(voor: [titel])
+
+        XCTAssertEqual(onderwerpen[titel], "Business")
+    }
+
+    func testWeergavenaamVolgtDeSamenvattingstaal() {
+        XCTAssertEqual(TopicCluster.displayName(for: "Politics", language: "nl"), "Politiek")
+        XCTAssertEqual(TopicCluster.displayName(for: "Politics", language: "en"), "Politics")
+        XCTAssertEqual(TopicCluster.displayName(for: "Entertainment", language: "nl"), "Cultuur & media")
+        XCTAssertEqual(
+            TopicCluster.displayName(for: "politics", language: "nl"), "Politiek",
+            "Een opgeslagen onderwerp met afwijkende hoofdletters hoort ook vertaald te worden")
+    }
+
+    func testEigenOnderwerpHoudtZijnEigenNaam() {
+        XCTAssertEqual(TopicCluster.displayName(for: "Klimaat", language: "nl"), "Klimaat")
+        XCTAssertEqual(TopicCluster.displayName(for: "Klimaat", language: "en"), "Klimaat")
+    }
+
+    /// De sleutel blijft Engels: daarop rusten identiteit, kleur en opslag van het onderwerp.
+    func testTopicNameBlijftDeEngelseSleutel() async throws {
+        let items = makeItems(titles: ["Kabinet valt na stemming in de Tweede Kamer"])
+        let service = TopicClusteringService()
+        let resultaat = await service.cluster(items: items, savedTopics: [], claudeAPIKey: nil)
+        let clusters = try XCTUnwrap(resultaat)
+
+        XCTAssertEqual(clusters.map(\.topicName), ["Politics"])
+    }
 }

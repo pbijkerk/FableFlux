@@ -34,6 +34,36 @@ struct TopicCluster {
     /// Platte previewtekst (samengevoegde beweringen) voor lijstweergaven.
     var summary: String { statements.map(\.text).joined(separator: " ") }
 
+    /// De naam die de gebruiker ziet, in de samenvattingstaal (#155). `topicName` blijft de
+    /// Engelse sleutel voor identiteit, kleur en opslag; alleen de weergave wordt vertaald.
+    var displayName: String {
+        Self.displayName(for: topicName, language: Self.currentSummaryLanguage)
+    }
+
+    /// Nederlandse namen van de standaardonderwerpen, op kleingeletterde Engelse naam.
+    static let dutchDefaultTopicNames: [String: String] = [
+        "artificial intelligence": "Kunstmatige intelligentie",
+        "technology": "Technologie",
+        "politics": "Politiek",
+        "science": "Wetenschap",
+        "business": "Economie",
+        "sports": "Sport",
+        "health": "Gezondheid",
+        "entertainment": "Cultuur & media",
+    ]
+
+    /// Weergavenaam voor `topicName` in `language` (`"en"` of `"nl"`). Een standaardonderwerp
+    /// krijgt bij Nederlands zijn vertaalde naam; een eigen onderwerp houdt zijn eigen naam.
+    static func displayName(for topicName: String, language: String) -> String {
+        guard language != "en" else { return topicName }
+        return dutchDefaultTopicNames[topicName.lowercased()] ?? topicName
+    }
+
+    /// De ingestelde samenvattingstaal; Nederlands als er niets is ingesteld.
+    static var currentSummaryLanguage: String {
+        UserDefaults.standard.string(forKey: AppConfiguration.UserDefaultsKeys.summaryLanguage) ?? "nl"
+    }
+
     /// `items` opzoekbaar via id — gedeeld tussen de kaarten op Vandaag en `SummaryDetailView`
     /// voor het herleiden van bron-ids uit `SummaryStatement.sourceItemIDs`.
     var itemsByID: [UUID: FeedItem] {
@@ -142,6 +172,9 @@ class TopicClusteringService {
                 "ai", "artificial intelligence", "machine learning", "llm",
                 "chatgpt", "openai", "gpt", "neural", "deep learning", "claude",
                 "gemini", "copilot", "ml", "generative", "transformer", "model",
+                "kunstmatige intelligentie", "taalmodel", "taalmodellen", "algoritme", "algoritmes",
+                "algoritmen", "chatbot", "chatbots", "generatieve", "deepfake", "deepfakes",
+                "zelflerende", "neurale netwerken",
             ]
         ),
         (
@@ -149,6 +182,9 @@ class TopicClusteringService {
             [
                 "tech", "software", "hardware", "app", "code", "programming", "developer",
                 "startup", "silicon valley", "computer", "digital", "cloud", "saas", "api", "platform",
+                "technologie", "techbedrijf", "techbedrijven", "smartphone", "smartphones", "internet",
+                "digitale", "digitalisering", "cyberaanval", "cyberaanvallen", "hackers", "datalek",
+                "datalekken", "sociale media", "halfgeleiders", "chipfabrikant", "programmeurs",
             ]
         ),
         (
@@ -156,6 +192,9 @@ class TopicClusteringService {
             [
                 "president", "election", "government", "congress", "senate", "democrat",
                 "republican", "political", "vote", "policy", "law", "minister", "parliament", "legislation",
+                "kabinet", "tweede kamer", "eerste kamer", "kamerlid", "kamerleden", "coalitie", "oppositie",
+                "verkiezingen", "verkiezing", "partij", "partijen", "motie", "wetsvoorstel", "gemeenteraad",
+                "formatie", "kabinetsformatie", "regering", "politiek", "politieke", "staatssecretaris",
             ]
         ),
         (
@@ -163,6 +202,10 @@ class TopicClusteringService {
             [
                 "research", "study", "scientist", "discovery", "space", "nasa", "experiment",
                 "physics", "biology", "climate", "environment", "gene", "medicine", "quantum",
+                "wetenschap", "wetenschapper", "wetenschappers", "wetenschappelijk", "wetenschappelijke",
+                "onderzoeker", "onderzoekers", "universiteit", "ontdekking", "ruimtevaart", "klimaat",
+                "klimaatverandering", "opwarming", "natuurkunde", "sterrenkunde", "astronomen", "biologie",
+                "evolutie", "esa",
             ]
         ),
         (
@@ -170,6 +213,9 @@ class TopicClusteringService {
             [
                 "market", "stock", "economy", "investment", "revenue", "profit", "startup",
                 "ipo", "acquisition", "merger", "ceo", "company", "finance", "trade", "economic",
+                "economie", "economische", "economisch", "bedrijven", "beurs", "aandelen", "aandeelhouders",
+                "winst", "omzet", "inflatie", "rente", "werkloosheid", "faillissement", "failliet",
+                "overname", "investeringen", "koopkracht", "topman",
             ]
         ),
         (
@@ -177,6 +223,9 @@ class TopicClusteringService {
             [
                 "game", "match", "tournament", "championship", "player", "team", "score",
                 "season", "league", "win", "lose", "football", "soccer", "basketball", "tennis",
+                "sport", "voetbal", "wedstrijd", "wedstrijden", "eredivisie", "kampioen", "kampioenschap",
+                "doelpunt", "doelpunten", "wint", "gelijkspel", "trainer", "wielrennen", "schaatsen",
+                "formule 1", "olympische spelen", "wk", "ajax", "psv", "feyenoord",
             ]
         ),
         (
@@ -184,6 +233,9 @@ class TopicClusteringService {
             [
                 "health", "medical", "disease", "treatment", "vaccine", "hospital", "doctor",
                 "drug", "clinical", "mental health", "fda", "cancer", "virus", "pandemic",
+                "gezondheid", "gezondheidszorg", "ziekenhuis", "ziekenhuizen", "patiënt", "patiënten",
+                "artsen", "huisarts", "huisartsen", "verpleegkundige", "verpleegkundigen", "ziekte",
+                "vaccin", "vaccinatie", "kanker", "medicijnen", "griep", "rivm", "ggz", "zorgverzekeraars",
             ]
         ),
         (
@@ -191,6 +243,9 @@ class TopicClusteringService {
             [
                 "movie", "film", "music", "album", "artist", "celebrity", "award",
                 "streaming", "netflix", "disney", "show", "series", "tv", "gaming", "game",
+                "muziek", "zanger", "zangeres", "acteur", "actrice", "concert", "festival", "televisie",
+                "serie", "theater", "voorstelling", "museum", "tentoonstelling", "bioscoop", "schrijver",
+                "omroep", "npo", "podcast",
             ]
         ),
     ]
@@ -305,6 +360,7 @@ class TopicClusteringService {
             topicKeywordsMap[name] = keywords
         }
 
+        let summaryLanguage = TopicCluster.currentSummaryLanguage
         let topicsForMatching = topicMap
         let minimumScore = AppConfiguration.minimumClusterScore
         // `Task.detached` erft géén cancellation: koppel die expliciet door, anders
@@ -355,18 +411,20 @@ class TopicClusteringService {
             let topicItems = ordered.map { items[$0] }
             let topicSnaps = ordered.map { snapshots[$0] }
             let keywords = topicKeywordsMap[name] ?? []
+            // De samenvatting noemt het onderwerp bij zijn weergavenaam, niet bij de sleutel.
+            let displayName = TopicCluster.displayName(for: name, language: summaryLanguage)
 
             let statements: [SummaryStatement]
             if let apiKey = claudeAPIKey, !apiKey.isEmpty {
                 logger.debug("Generating Claude summary for topic: \(name)")
                 // Pass only Sendable snapshots to async Claude call
                 statements = await generateSummaryWithClaude(
-                    topicName: name,
+                    topicName: displayName,
                     snapshots: topicSnaps,
                     apiKey: apiKey
                 )
             } else {
-                statements = localSummary(topicName: name, snapshots: topicSnaps)
+                statements = localSummary(topicName: displayName, snapshots: topicSnaps)
             }
 
             result.append(
