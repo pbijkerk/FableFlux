@@ -11,6 +11,7 @@ en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 - Gebruikershandleiding in `docs/handleiding.md`, met een verwijzing vanuit de README
 
 ### Opgelost
+- Opnieuw koppelen van een al gekoppeld Mastodon-account werkt dat account bij (nieuw token, waarschuwing weg) in plaats van een tweede account en feed aan te maken, waardoor berichten niet meer dubbel verschijnen (#159)
 - Het feedoverzicht opent zonder hapering: de tellers per feed worden op de achtergrond geteld in plaats van op de main thread, waar dat ongeveer 65 ms per keer openen kostte (#161)
 - Scrollen hapert minder tijdens het verversen: het wegschrijven van nieuwe artikelen, datumcorrectie en opruimen gebeurt in een achtergrondcontext in plaats van op de main thread. Gemeten op het toestel: van ongeveer 525 ms naar 6 ms verversingswerk op de main thread (#153)
 
