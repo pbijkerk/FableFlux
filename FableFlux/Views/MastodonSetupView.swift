@@ -142,45 +142,13 @@ final class MastodonSetupViewModel {
         token: MastodonToken, creds: MastodonVerifyCredentials,
         context: ModelContext
     ) throws {
-        let socialFolder = findOrCreateSocialFolder(context: context)
-
-        let account = MastodonAccount(
-            instanceURL: instanceURL,
-            accountID: creds.id,
-            username: creds.username,
-            displayName: creds.displayName,
-            avatarURL: creds.avatar,
-            clientID: reg.clientId,
-            clientSecret: "",  // niet in SwiftData opslaan; clientSecret is alleen nodig tijdens setup
-            accessToken: ""  // niet in SwiftData opslaan; token staat uitsluitend in Keychain
-        )
-        context.insert(account)
-
         // Token veilig opslaan in Keychain (via MastodonService — Services-laag)
-        MastodonService.shared.saveToken(token.accessToken, instanceURL: instanceURL, accountID: creds.id)
-
-        let host = URL(string: instanceURL)?.host ?? instanceURL
-        let feedURL = "mastodon://\(host)/@\(creds.username)"
-        let feedTitle = "\(creds.displayName) (@\(creds.username)@\(host))"
-        let virtualFeed = Feed(url: feedURL, title: feedTitle)
-        virtualFeed.folder = socialFolder
-        context.insert(virtualFeed)
-        account.feed = virtualFeed
-
-        try context.save()
-    }
-
-    private func findOrCreateSocialFolder(context: ModelContext) -> FeedFolder {
-        let descriptor = FetchDescriptor<FeedFolder>(
-            predicate: #Predicate { $0.isSystem == true && $0.name == "Social" }
-        )
-        if let existing = try? context.fetch(descriptor).first { return existing }
-
-        let allDesc = FetchDescriptor<FeedFolder>(sortBy: [SortDescriptor(\.sortOrder, order: .reverse)])
-        let maxOrder = (try? context.fetch(allDesc).first?.sortOrder) ?? -1
-        let folder = FeedFolder(name: "Social", sortOrder: maxOrder + 1, isSystem: true)
-        context.insert(folder)
-        return folder
+        try MastodonAccountLinker.link(
+            instanceURL: instanceURL, credentials: creds, clientID: reg.clientId,
+            accessToken: token.accessToken, context: context
+        ) { accessToken, tokenInstanceURL, accountID in
+            MastodonService.shared.saveToken(accessToken, instanceURL: tokenInstanceURL, accountID: accountID)
+        }
     }
 
     // MARK: - Helpers
@@ -212,6 +180,95 @@ final class MastodonSetupViewModel {
         case .registering, .waitingForOAuth, .exchangingToken, .verifyingCredentials, .saving: return true
         default: return false
         }
+    }
+}
+
+// MARK: - Account koppelen
+
+/// Legt een gekoppeld Mastodon-account vast. Is dezelfde combinatie van instantie en
+/// account-ID al gekoppeld, dan wordt dát account bijgewerkt in plaats van een tweede
+/// account met een tweede feed aan te maken; anders zou elk bericht dubbel binnenkomen (#159).
+/// Losgemaakt van de view zodat het zonder UI en zonder Keychain testbaar is.
+enum MastodonAccountLinker {
+
+    /// - Parameters:
+    ///   - instanceURL: genormaliseerd instantie-adres (zie `normalize`).
+    ///   - saveToken: slaat het token op; krijgt token, instantie-adres en account-ID mee.
+    /// - Returns: het nieuwe of bijgewerkte account.
+    @discardableResult
+    static func link(
+        instanceURL: String, credentials: MastodonVerifyCredentials, clientID: String,
+        accessToken: String, context: ModelContext,
+        saveToken: (_ token: String, _ instanceURL: String, _ accountID: String) -> Void
+    ) throws -> MastodonAccount {
+        let account: MastodonAccount
+        if let existing = try findAccount(instanceURL: instanceURL, accountID: credentials.id, context: context) {
+            account = existing
+            account.username = credentials.username
+            account.displayName = credentials.displayName
+            account.avatarURL = credentials.avatar
+            account.clientID = clientID
+            account.needsReauth = false
+        } else {
+            account = MastodonAccount(
+                instanceURL: instanceURL,
+                accountID: credentials.id,
+                username: credentials.username,
+                displayName: credentials.displayName,
+                avatarURL: credentials.avatar,
+                clientID: clientID,
+                clientSecret: "",  // niet in SwiftData opslaan; clientSecret is alleen nodig tijdens setup
+                accessToken: ""  // niet in SwiftData opslaan; token staat uitsluitend in Keychain
+            )
+            context.insert(account)
+        }
+
+        // Bij een bestaand account blijft het opgeslagen adres leidend, ook als de schrijfwijze nu anders is:
+        // het maakt deel uit van de Keychain-sleutel die `MastodonService` gebruikt.
+        let storedInstanceURL = account.instanceURL
+        saveToken(accessToken, storedInstanceURL, account.accountID)
+
+        let host = URL(string: storedInstanceURL)?.host ?? storedInstanceURL
+        let feedTitle = "\(credentials.displayName) (@\(credentials.username)@\(host))"
+        if let feed = account.feed {
+            // Een bestaand account houdt zijn feed (en daarmee zijn artikelen); alleen de titel volgt de naam.
+            feed.title = feedTitle
+        } else {
+            let feedURL = "mastodon://\(host)/@\(credentials.username)"
+            let virtualFeed = Feed(url: feedURL, title: feedTitle)
+            virtualFeed.folder = findOrCreateSocialFolder(context: context)
+            context.insert(virtualFeed)
+            account.feed = virtualFeed
+            // Met de oude cursor kreeg de nieuwe feed alleen berichten van na de vorige ophaalbeurt.
+            account.lastFetchedStatusID = nil
+        }
+
+        try context.save()
+        return account
+    }
+
+    /// Zoekt een account op account-ID en instantie-adres. Het adres wordt zonder onderscheid tussen
+    /// hoofd- en kleine letters vergeleken: `Mastodon.social` en `mastodon.social` zijn hetzelfde account.
+    static func findAccount(instanceURL: String, accountID: String, context: ModelContext) throws -> MastodonAccount? {
+        let targetAccountID = accountID
+        let descriptor = FetchDescriptor<MastodonAccount>(
+            predicate: #Predicate { $0.accountID == targetAccountID }
+        )
+        let targetInstanceURL = instanceURL.lowercased()
+        return try context.fetch(descriptor).first(where: { $0.instanceURL.lowercased() == targetInstanceURL })
+    }
+
+    static func findOrCreateSocialFolder(context: ModelContext) -> FeedFolder {
+        let descriptor = FetchDescriptor<FeedFolder>(
+            predicate: #Predicate { $0.isSystem == true && $0.name == "Social" }
+        )
+        if let existing = try? context.fetch(descriptor).first { return existing }
+
+        let allDesc = FetchDescriptor<FeedFolder>(sortBy: [SortDescriptor(\.sortOrder, order: .reverse)])
+        let maxOrder = (try? context.fetch(allDesc).first?.sortOrder) ?? -1
+        let folder = FeedFolder(name: "Social", sortOrder: maxOrder + 1, isSystem: true)
+        context.insert(folder)
+        return folder
     }
 }
 
