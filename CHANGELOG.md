@@ -7,6 +7,9 @@ en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 
 ## [Unreleased]
 
+### Toegevoegd
+- Gebruikershandleiding in `docs/handleiding.md`, met een verwijzing vanuit de README
+
 ### Opgelost
 - Scrollen hapert minder tijdens het verversen: het wegschrijven van nieuwe artikelen, datumcorrectie en opruimen gebeurt in een achtergrondcontext in plaats van op de main thread. Gemeten op het toestel: van ongeveer 525 ms naar 6 ms verversingswerk op de main thread (#153)
 
