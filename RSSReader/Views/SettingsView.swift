@@ -271,7 +271,8 @@ struct SettingsView: View {
                 try await app.setAlternateIconName(theme.iconName)
             } catch {
                 guard AppTheme(storedValue: appTheme) == theme else { return }
-                iconFout = "Het app-icoon kon niet worden gewijzigd; de accentkleur is wel aangepast. Tik opnieuw om het nog eens te proberen."
+                iconFout =
+                    "Het app-icoon kon niet worden gewijzigd; de accentkleur is wel aangepast. Tik opnieuw om het nog eens te proberen."
             }
         }
     }
