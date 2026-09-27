@@ -9,6 +9,7 @@ en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 
 ### Opgelost
 - Een favoriet onderwerp verbergt de andere onderwerpen op Vandaag niet meer: alle onderwerpen doen mee en favorieten staan bovenaan, met een hartje (#154)
+- De uitleg bij de bewaarperiode per feed klopt nu: oudere artikelen verdwijnen zodra je op Gereed tikt, en bewaarde artikelen blijven staan (#158)
 
 ### Gewijzigd
 - De laatste Engelstalige schermteksten in feed toevoegen, OPML-import, samenvattingsdetail en feedlijst zijn vertaald naar het Nederlands (#156)

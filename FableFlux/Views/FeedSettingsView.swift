@@ -87,8 +87,10 @@ struct FeedSettingsView: View {
                         Text("Artikelen van deze feed worden nooit automatisch verwijderd.")
                             .font(.caption)
                     } else if let d = selectedDays {
-                        Text("Artikelen ouder dan \(d) dagen worden verwijderd bij de volgende verversing.")
-                            .font(.caption)
+                        Text(
+                            "Artikelen ouder dan \(d) dagen worden verwijderd zodra je op Gereed tikt. Bewaarde artikelen blijven staan."
+                        )
+                        .font(.caption)
                     }
                 }
             }
