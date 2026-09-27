@@ -25,6 +25,7 @@
 		3E7BA848E1FE60543BC43ED1 /* TopicSourceRatingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FA9A6D1D5C110ECF9CD5BA8 /* TopicSourceRatingView.swift */; };
 		432E627121212D0DB7D449C9 /* FeedItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 744B093F3B071BF152628219 /* FeedItem.swift */; };
 		4A8C772BB2311A23D9840E72 /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9233396FD8879518C66E9EC5 /* AppConfiguration.swift */; };
+		4B0FD0E25C04C6CB262BF7A0 /* AppThemeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 808B58B7AF89F662FB08B403 /* AppThemeTests.swift */; };
 		4F1736DD6590C43595F31B4D /* FactCheckChipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3CE45A5CC10DAE8D217FE2C /* FactCheckChipView.swift */; };
 		51EC3ACDF8E83954E4824FED /* EventClusteringService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F3EB43EC69B54A21CE5BD8C /* EventClusteringService.swift */; };
 		5525C6D1E1F30DD210B6D45B /* RSSParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F706F1D0689160C666814841 /* RSSParser.swift */; };
@@ -36,6 +37,7 @@
 		717C8A7A495EF3195743062E /* SummaryWindowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EF7C842139C0455EDC0F5A7 /* SummaryWindowTests.swift */; };
 		7445C399BA87D37096062B02 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C81ABC3A7216FC51E58BADAA /* KeychainService.swift */; };
 		76C6411FE6BAF96F83A8D196 /* ClaudeKeyMigration.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7588F00419B0F188601EC6B /* ClaudeKeyMigration.swift */; };
+		77426575B25D7F8200DB9DEE /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7992C2B4584A322A6BB8D290 /* AppTheme.swift */; };
 		7C288435F8EDD51DC9157C31 /* TopicsManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89FA9E6817FEC2215C98EB09 /* TopicsManagementView.swift */; };
 		829EEF704FFE4D64F9C6F8E2 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A141C3F01C3973984C38479E /* SettingsView.swift */; };
 		8B00AE0EF6D6F58B261E06AD /* ArticleExtractorService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 074AB5466B63AE41A4FBDD75 /* ArticleExtractorService.swift */; };
@@ -107,8 +109,10 @@
 		6F3EB43EC69B54A21CE5BD8C /* EventClusteringService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventClusteringService.swift; sourceTree = "<group>"; };
 		744B093F3B071BF152628219 /* FeedItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedItem.swift; sourceTree = "<group>"; };
 		786FA3600FE09498F1AB870B /* VideoPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayerView.swift; sourceTree = "<group>"; };
+		7992C2B4584A322A6BB8D290 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
 		79C61248F4118795E1DB64B2 /* MastodonService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MastodonService.swift; sourceTree = "<group>"; };
 		8019B171CF4E4E093570F809 /* OPMLParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OPMLParserTests.swift; sourceTree = "<group>"; };
+		808B58B7AF89F662FB08B403 /* AppThemeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppThemeTests.swift; sourceTree = "<group>"; };
 		89FA9E6817FEC2215C98EB09 /* TopicsManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicsManagementView.swift; sourceTree = "<group>"; };
 		8F707FE843215491DF0F2E0D /* AllArticlesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllArticlesView.swift; sourceTree = "<group>"; };
 		9233396FD8879518C66E9EC5 /* AppConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfiguration.swift; sourceTree = "<group>"; };
@@ -171,6 +175,7 @@
 		7C50476F0883A116E1CCB0D7 /* RSSReaderTests */ = {
 			isa = PBXGroup;
 			children = (
+				808B58B7AF89F662FB08B403 /* AppThemeTests.swift */,
 				203B55E0C2C03F59CB278C9F /* ArticleFilterTests.swift */,
 				D1F47BFD69BE40060E681D0A /* ClaudeKeyMigrationTests.swift */,
 				B10834E72E78C2343D27036A /* FeedBadgeCountTests.swift */,
@@ -231,6 +236,7 @@
 		B5A0DB1AA0959AFA8672E737 /* DesignSystem */ = {
 			isa = PBXGroup;
 			children = (
+				7992C2B4584A322A6BB8D290 /* AppTheme.swift */,
 				1C4B2514958D9EAA31C80226 /* FloatingTabBar.swift */,
 				CEB3A1B2C9F7EA25631CDD38 /* StatementView.swift */,
 				1F662549E0FD8B4546638F6B /* Theme.swift */,
@@ -372,6 +378,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4B0FD0E25C04C6CB262BF7A0 /* AppThemeTests.swift in Sources */,
 				01688025BCBFD3E356E5D8F8 /* ArticleFilterTests.swift in Sources */,
 				5E498669D3E203EDD4C3156C /* ClaudeKeyMigrationTests.swift in Sources */,
 				DCDA4B4AFD22AC38F5925F9A /* FeedBadgeCountTests.swift in Sources */,
@@ -393,6 +400,7 @@
 				5A08CA9E421BCC7CE7639A09 /* AllArticlesView.swift in Sources */,
 				39F891B6C660D7492B763F1B /* AnthropicClient.swift in Sources */,
 				4A8C772BB2311A23D9840E72 /* AppConfiguration.swift in Sources */,
+				77426575B25D7F8200DB9DEE /* AppTheme.swift in Sources */,
 				8B00AE0EF6D6F58B261E06AD /* ArticleExtractorService.swift in Sources */,
 				C38FAF8D0B5D17180CBA6B19 /* BiasBarView.swift in Sources */,
 				76C6411FE6BAF96F83A8D196 /* ClaudeKeyMigration.swift in Sources */,
@@ -458,6 +466,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 68K8BCC3DL;
@@ -524,6 +533,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 68K8BCC3DL;

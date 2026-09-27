@@ -102,7 +102,6 @@ struct FactCheckWarningView: View {
                             if let urlStr = result.resultURL, let url = URL(string: urlStr) {
                                 Link("Bekijk beoordeling →", destination: url)
                                     .font(.system(size: base))
-                                    .tint(Theme.accent)
                             }
                         }
                         .padding(8)

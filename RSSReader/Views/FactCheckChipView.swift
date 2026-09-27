@@ -71,7 +71,6 @@ struct FactCheckChipView: View {
                                 if let urlStr = result.resultURL, let url = URL(string: urlStr) {
                                     Link("Bekijk beoordeling →", destination: url)
                                         .font(.system(size: base))
-                                        .tint(Theme.accent)
                                 }
                             }
                             .padding(8)
@@ -104,7 +103,7 @@ struct FactCheckChipView: View {
             return Theme.accentSecondary
         }
         if lower.contains("mislead") || lower.contains("mixed") || lower.contains("partly") || lower.contains("half") {
-            return Theme.accent
+            return Theme.amber
         }
         return .secondary
     }

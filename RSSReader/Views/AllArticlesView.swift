@@ -160,7 +160,7 @@ struct AllArticlesView: View {
                 .padding(.vertical, 7)
                 .background {
                     if isActive {
-                        Capsule().fill(Theme.accent)
+                        Capsule().fill(.tint)
                     } else {
                         Capsule().fill(Theme.card)
                             .overlay(Capsule().strokeBorder(Theme.textSecondary.opacity(0.25), lineWidth: 1))

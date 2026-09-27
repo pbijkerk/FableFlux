@@ -62,7 +62,7 @@ struct FloatingTabBar: View {
             .padding(.vertical, 8)
             .background {
                 if isSelected {
-                    Capsule().fill(Theme.accent)
+                    Capsule().fill(.tint)
                 }
             }
         }

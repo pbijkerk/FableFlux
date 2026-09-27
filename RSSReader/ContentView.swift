@@ -32,7 +32,7 @@ struct ContentView: View {
                 .tag(2)
         }
         .floatingTabBar(selection: $selectedTab)
-        .tint(Theme.accent)
+        .appThemeTint()
         .task {
             await refreshAndCluster()
         }

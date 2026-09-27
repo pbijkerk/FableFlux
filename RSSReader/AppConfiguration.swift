@@ -108,6 +108,8 @@ enum AppConfiguration {
         static let analysisTextSize = "analysisTextSize"
         /// UUID-string van de actieve mapfilter op de artikelstroom; leeg = alle mappen.
         static let articlesFolderFilter = "articlesFolderFilter"
+        /// Gekozen `AppTheme` (rawValue): bepaalt app-icoon en accentkleur.
+        static let appTheme = "appTheme"
     }
 
     // MARK: - Summary length

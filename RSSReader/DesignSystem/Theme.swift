@@ -32,8 +32,9 @@ enum Theme {
 
     // MARK: Kleuren (light / dark)
 
-    /// Rich Amber → Neon Amber. Primair accent: warm, uitnodigend.
-    static let accent = Color(light: 0xFF9500, dark: 0xFFB340)
+    /// Rich Amber → Neon Amber. Semantische kleur voor "gemengd"/waarschuwing; volgt het thema
+    /// bewust niet. De accentkleur van de app komt uit `AppTheme` via de `.tint`-stijl.
+    static let amber = Color(light: 0xFF9500, dark: 0xFFB340)
 
     /// Deep Raspberry → Vivid Pink. Secundair accent: opvallend voor notificaties.
     static let accentSecondary = Color(light: 0xD12D55, dark: 0xFF375F)
@@ -90,7 +91,7 @@ enum Theme {
     /// Geeft een stabiele, deterministische accentkleur voor een bron.
     /// Dezelfde sleutel (feed-titel of -URL) levert altijd dezelfde kleur.
     static func brandColor(for key: String) -> Color {
-        guard !key.isEmpty else { return accent }
+        guard !key.isEmpty else { return amber }
         // Stabiele hash (djb2) — onafhankelijk van Swift's per-run hashSeed.
         var hash: UInt64 = 5381
         for byte in key.utf8 {
