@@ -7,11 +7,11 @@ struct ItemDetailView: View {
     @Environment(\.modelContext) private var modelContext
     let item: FeedItem
 
-    /// Of dit de pagina is die de gebruiker daadwerkelijk bekijkt. Een pagina-`TabView`
-    /// houdt de buurpagina's in leven, en die zijn niet gratis: elke levende pagina zette
-    /// zijn knoppen in dezelfde navigatiebalk (die stonden dan dubbel, #98) en startte
-    /// artikel-extractie plus een fact-check — netwerkwerk tijdens de veeg, voor een
-    /// pagina die je misschien nooit ziet (#106).
+    /// Of dit de pagina is die de gebruiker daadwerkelijk bekijkt. De artikelpager bouwt de
+    /// buurpagina's vooraf op, zodat hun tekst er al staat tijdens het vegen (#149). Wat
+    /// niet voor een buurpagina hoort, hangt aan deze vlag: de knoppen in de navigatiebalk
+    /// (die stonden anders dubbel, #98), de fact-check — netwerkwerk voor een pagina die je
+    /// misschien nooit ziet (#106) — en de gelezen-markering.
     ///
     /// `ArticlePageView` geeft alleen de zichtbare pagina `true` mee. Standaard `true`,
     /// zodat het scherm losstaand — vanuit de samenvatting — ongewijzigd werkt.
@@ -75,14 +75,15 @@ struct ItemDetailView: View {
             SafariVideoPlayer(url: item.url).ignoresSafeArea()
         }
         .opslagFoutmelding($opslagFout)
-        // `task(id:)` en niet `task`: het werk start zodra deze pagina de zichtbare wordt,
-        // en wordt afgebroken zodra je doorveegt. Een `.task` zonder id zou bij een
-        // buurpagina één keer draaien en daarna nooit meer, ook niet als je er belandt.
+        // De HTML uit de feedtekst is lokaal werk en laadt meteen, ook voor een buurpagina:
+        // dan staat de tekst er al als je naar dat artikel veegt (#149).
+        .task { await loadContent() }
+        // De fact-check is netwerkwerk en alleen voor de zichtbare pagina. `task(id:)` en
+        // niet `task`: hij start zodra deze pagina de zichtbare wordt en wordt afgebroken
+        // zodra je doorveegt.
         .task(id: isActive) {
             guard isActive else { return }
-            async let content: Void = loadContent()
-            async let factCheck: Void = FactCheckService.shared.checkItem(item, context: modelContext)
-            _ = await (content, factCheck)
+            await FactCheckService.shared.checkItem(item, context: modelContext)
         }
         // Gelezen is wat je bekeken hebt, niet wat naast je scherm klaarstond.
         .onChange(of: isActive, initial: true) { _, active in

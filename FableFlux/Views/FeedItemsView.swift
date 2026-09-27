@@ -357,32 +357,46 @@ struct ArticlePageView: View {
     /// Hoeveel donkerder de uitgaande pagina wordt aan het einde van de veeg.
     private static let dimming: Double = 0.25
 
+    /// Hoeveel pagina's aan weerszijden van de zichtbare al worden opgebouwd, zodat de tekst
+    /// er staat zodra je veegt. De rest is een lege vlakte in de achtergrondkleur.
+    private static let buren = 1
+
     // Geen pagina-TabView: die legt pagina's naast elkaar, en de naad daartussen liet een
     // smalle strook zien (#149). Hier overlappen pagina's: de volgende schuift óver de
     // vorige, die vertraagd meeschuift en donkerder wordt — het terugveeg-patroon van iOS.
+    //
+    // Geen LazyHStack: die bouwt een pagina pas als hij in beeld schuift, en dan verschijnt
+    // de tekst pas tijdens de veeg. Een HStack met alleen de buren gevuld bouwt die vooraf.
     var body: some View {
+        let huidige = items.firstIndex { $0.id == currentID } ?? 0
         ScrollView(.horizontal) {
-            LazyHStack(spacing: 0) {
+            HStack(spacing: 0) {
                 ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
-                    ItemDetailView(item: item, isActive: item.id == currentID)
-                        .background(Theme.background)
-                        .clipShape(RoundedRectangle(cornerRadius: 44, style: .continuous))
-                        .containerRelativeFrame([.horizontal, .vertical])
-                        .visualEffect { content, proxy in
-                            let breedte = max(proxy.size.width, 1)
-                            // Negatief zodra de pagina naar links uit beeld schuift.
-                            let links = min(proxy.frame(in: .scrollView).minX, 0)
-                            // Helemaal voorbij: onzichtbaar. Door de parallax ligt de vorige pagina
-                            // anders ook in rust onder de huidige en schijnt hij door de afgeronde hoeken.
-                            let voorbij = links <= -breedte + 0.5
-                            return
-                                content
-                                .offset(x: -links * (1 - Self.parallax))
-                                .brightness(Double(links / breedte) * Self.dimming)
-                                .opacity(voorbij ? 0 : 1)
+                    Group {
+                        if abs(index - huidige) <= Self.buren {
+                            ItemDetailView(item: item, isActive: item.id == currentID)
+                        } else {
+                            Theme.background
                         }
-                        // Latere pagina's bovenop: de volgende schuift over de vorige heen.
-                        .zIndex(Double(index))
+                    }
+                    .background(Theme.background)
+                    .clipShape(RoundedRectangle(cornerRadius: 44, style: .continuous))
+                    .containerRelativeFrame([.horizontal, .vertical])
+                    .visualEffect { content, proxy in
+                        let breedte = max(proxy.size.width, 1)
+                        // Negatief zodra de pagina naar links uit beeld schuift.
+                        let links = min(proxy.frame(in: .scrollView).minX, 0)
+                        // Helemaal voorbij: onzichtbaar. Door de parallax ligt de vorige pagina
+                        // anders ook in rust onder de huidige en schijnt hij door de afgeronde hoeken.
+                        let voorbij = links <= -breedte + 0.5
+                        return
+                            content
+                            .offset(x: -links * (1 - Self.parallax))
+                            .brightness(Double(links / breedte) * Self.dimming)
+                            .opacity(voorbij ? 0 : 1)
+                    }
+                    // Latere pagina's bovenop: de volgende schuift over de vorige heen.
+                    .zIndex(Double(index))
                 }
             }
             .scrollTargetLayout()
