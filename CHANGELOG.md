@@ -8,7 +8,7 @@ en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 ## [Unreleased]
 
 ### Opgelost
-- Scrollen hapert minder tijdens het verversen: het wegschrijven van nieuwe artikelen, datumcorrectie en opruimen gebeurt in een achtergrondcontext in plaats van op de main thread. In een meting kostte dit ongeveer 525 ms op de main thread in de eerste seconden na opstarten (#153)
+- Scrollen hapert minder tijdens het verversen: het wegschrijven van nieuwe artikelen, datumcorrectie en opruimen gebeurt in een achtergrondcontext in plaats van op de main thread. Gemeten op het toestel: van ongeveer 525 ms naar 6 ms verversingswerk op de main thread (#153)
 
 ### Gewijzigd
 - Het installatiecommando in `Workflow-feature.md` zoekt de aangesloten iPhone zelf op via de UDID, negeert simulators en stopt met een melding als er geen toestel is (#148)
