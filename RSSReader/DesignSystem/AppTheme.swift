@@ -103,7 +103,8 @@ struct FableFluxLogo: View {
 
             var segment = Path()
             segment.move(to: c)
-            segment.addArc(center: c, radius: outer, startAngle: .degrees(225), endAngle: .degrees(360), clockwise: false)
+            segment.addArc(
+                center: c, radius: outer, startAngle: .degrees(225), endAngle: .degrees(360), clockwise: false)
             segment.closeSubpath()
             context.fill(segment, with: .color(Color(uiColor: UIColor(hex: kleuren.segment))))
 
