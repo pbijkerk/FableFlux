@@ -1,7 +1,7 @@
 # Projectbrief — FableFlux
 
 **Datum:** 2026-07-22
-**Status:** herijkt op 2026-07-22
+**Status:** herijkt op 2026-07-22; requirements aangevuld op 2026-09-27 (R13–R17)
 
 ## Doel
 Een native iOS RSS-lezer die nieuws per onderwerp samenvat met AI (Claude API), gebouwd voor eigen gebruik. Reden om zelf te bouwen: geen bestaande RSS-lezer maakte samenvattingen per onderwerp naar wens. De app wordt dagelijks gebruikt (ochtend en late middag) voor zowel de Mastodon social feed als losse RSS-feeds.
@@ -61,10 +61,15 @@ Afgeleid van de gewenste uitkomst; geprioriteerd volgens MoSCoW. Elke actionable
 - R7: Bij een onderwerp met een betwijfelde bewering toont de app een fact-check-waarschuwing — reden: versterkt betrouwbaarheid; hangt af van herstel fact-check (#13). (sub-issue onder #11)
 - R10: Per onderwerp behandelt de samenvatting de belangrijkste ontwikkelingen op basis van minimaal 2 onderliggende bronnen waar er meerdere beschikbaar zijn — reden: maakt "uitgebreider" toetsbaar. (sub-issue onder #14)
 - R12: De gebruiker kan per feed instellen of deze meetelt in de AI-samenvatting; uitgesloten feeds blijven gewoon leesbaar in Artikelen en Bewaard — reden: voorkomt dat een feed die niet relevant is voor het nieuwsoverzicht de samenvatting verwatert, zonder de feed te hoeven verwijderen; de hoofdpagina functioneert ook zonder deze instelling. (#68)
+- R13: Een Nederlandstalig nieuwsartikel wordt, ook zonder eigen onderwerpen, bij een passend standaardonderwerp ingedeeld — reden: Nederlands nieuws dat nergens bij past, ontbreekt stil op de hoofdpagina; eigen onderwerpen zijn een omweg. (#155)
+- R14: Een onderwerp opslaan vanuit de samenvatting laat de andere onderwerpen niet ongemerkt van Vandaag verdwijnen — reden: één tik mag de hoofdpagina niet leegmaken; eerst te beslissen welk gedrag favorieten krijgen. (#154)
+- R15: Een Mastodon-account opnieuw koppelen levert geen tweede account of dubbele berichten op — reden: dubbele berichten tellen dubbel mee in de samenvatting; er is een omweg (eerst verwijderen). (#159)
 
 ### Could — meerwaarde als er ruimte is
 - R5: Per losse bron/artikel zijn betrouwbaarheid en politieke kleur zichtbaar via de bronverwijzing — reden: detailverdieping bovenop de duiding per onderwerp. (sub-issue onder #11)
 - R9: Het aantal Claude-API-calls per samenvatting blijft binnen een nader te bepalen kostenkader — reden: kostenbeheersing; het kader moet eerst onderzocht worden (#12). (#12)
+- R16: Alle zichtbare tekst in de app is Nederlands — reden: consistentie; de functie werkt ook met de Engelse restanten. (#156)
+- R17: De uitleg bij een instelling beschrijft wat er werkelijk gebeurt (bewaarperiode per feed ruimt direct op) — reden: voorkomt onverwacht verlies van artikelen; raakt de samenvatting niet. (#158)
 
 ### Won't — nu bewust niet (sluit aan op Scope → Niet)
 - Geen iPad-versie — reden: persoonlijk iOS-gebruik, geen behoefte.
