@@ -340,11 +340,10 @@ class TopicClusteringService {
 
         // Alle opgeslagen onderwerpen plus de standaardonderwerpen doen mee; een favoriet
         // filtert de rest niet weg maar krijgt voorrang in de eindsortering (#154).
-        var topicMap: [(name: String, keywords: [String])] = savedTopics.map { ($0.name, $0.keywords) }
-        let savedNames = Set(savedTopics.map { $0.name.lowercased() })
-        for dt in defaultTopics where !savedNames.contains(dt.name.lowercased()) {
-            topicMap.append(dt)
-        }
+        let topicMap = Self.topicsForClustering(
+            saved: savedTopics.map { ($0.name, $0.keywords) },
+            defaults: defaultTopics
+        )
         let favoriteNames = Set(savedTopics.filter(\.isLiked).map { $0.name.lowercased() })
 
         logger.debug("Using \(topicMap.count) topics for clustering")
@@ -446,6 +445,45 @@ class TopicClusteringService {
         logger.info("Clustering complete: created \(result.count) clusters")
 
         return Self.sortedForToday(result)
+    }
+
+    /// De onderwerpen waarop geclusterd wordt: alle opgeslagen onderwerpen plus de
+    /// standaardonderwerpen die niet al door een opgeslagen onderwerp worden vertegenwoordigd.
+    /// Een opgeslagen onderwerp vertegenwoordigt een standaardonderwerp als zijn naam (zonder
+    /// hoofdletteronderscheid) gelijk is aan de Engelse sleutel of aan de Nederlandse
+    /// weergavenaam ("Politics" of "Politiek"). Het krijgt dan de vereniging van zijn eigen
+    /// trefwoorden en die van het standaardonderwerp. Een eerder bewaarde kopie mist anders
+    /// later toegevoegde trefwoorden, en zonder de weergavenaam-regel zouden er twee kaarten
+    /// met dezelfde kop staan (#155). Dubbele trefwoorden vallen weg: die zouden dubbel scoren.
+    static func topicsForClustering(
+        saved: [(name: String, keywords: [String])],
+        defaults: [(name: String, keywords: [String])]
+    ) -> [(name: String, keywords: [String])] {
+        var representedDefaults = Set<String>()
+        var result: [(name: String, keywords: [String])] = []
+        for topic in saved {
+            let savedName = topic.name.lowercased()
+            let matchingDefaults = defaults.filter { dt in
+                savedName == dt.name.lowercased()
+                    || savedName == TopicCluster.displayName(for: dt.name, language: "nl").lowercased()
+            }
+
+            var seen = Set<String>()
+            var keywords: [String] = []
+            let candidates = topic.keywords + matchingDefaults.flatMap { $0.keywords }
+            for keyword in candidates {
+                guard seen.insert(keyword.lowercased()).inserted else { continue }
+                keywords.append(keyword)
+            }
+            for dt in matchingDefaults {
+                representedDefaults.insert(dt.name.lowercased())
+            }
+            result.append((name: topic.name, keywords: keywords))
+        }
+        for dt in defaults where !representedDefaults.contains(dt.name.lowercased()) {
+            result.append(dt)
+        }
+        return result
     }
 
     /// Volgorde op Vandaag: eerst de favorieten, dan de rest; binnen elke groep het

@@ -313,4 +313,51 @@ final class TopicClusteringOrderTests: XCTestCase {
 
         XCTAssertEqual(clusters.map(\.topicName), ["Politics"])
     }
+
+    /// Een vóór #155 opgeslagen "Politics" heeft alleen de oude trefwoorden bewaard; bij het
+    /// clusteren horen de trefwoorden van het standaardonderwerp er toch bij.
+    func testOpgeslagenStandaardonderwerpKrijgtDeNederlandseTrefwoorden() async throws {
+        let titel = "Kabinet valt na stemming in de Tweede Kamer"
+        let items = makeItems(titles: [titel])
+        let politiek = Topic(name: "Politics", keywords: ["election"], isLiked: true)
+        container.mainContext.insert(politiek)
+
+        let service = TopicClusteringService()
+        let resultaat = await service.cluster(items: items, savedTopics: [politiek], claudeAPIKey: nil)
+        let clusters = try XCTUnwrap(resultaat)
+
+        XCTAssertEqual(clusters.map(\.topicName), ["Politics"])
+        XCTAssertEqual(clusters.first?.items.map(\.title), [titel])
+        XCTAssertEqual(politiek.keywords, ["election"], "Het opgeslagen onderwerp zelf verandert niet")
+    }
+
+    /// Een eigen onderwerp met de Nederlandse weergavenaam ("Sport") vervangt het
+    /// standaardonderwerp, zodat er geen twee kaarten met de kop SPORT staan.
+    func testEigenOnderwerpMetWeergavenaamVervangtStandaardonderwerp() async throws {
+        let titel = "Ajax wint van PSV in de eredivisie"
+        let items = makeItems(titles: [titel])
+        let sport = Topic(name: "Sport", keywords: ["sport"], isLiked: false)
+        container.mainContext.insert(sport)
+
+        let service = TopicClusteringService()
+        let resultaat = await service.cluster(items: items, savedTopics: [sport], claudeAPIKey: nil)
+        let clusters = try XCTUnwrap(resultaat)
+
+        XCTAssertFalse(clusters.contains { $0.topicName == "Sports" }, "Er hoort geen apart cluster Sports te zijn")
+        let cluster = try XCTUnwrap(clusters.first { $0.topicName == "Sport" })
+        XCTAssertEqual(cluster.items.map(\.title), [titel])
+    }
+
+    func testVerenigdeTrefwoordenBevattenGeenDubbelen() {
+        let topics = TopicClusteringService.topicsForClustering(
+            saved: [(name: "politics", keywords: ["Election", "kaas"])],
+            defaults: [
+                (name: "Politics", keywords: ["election", "kabinet"]),
+                (name: "Sports", keywords: ["voetbal"]),
+            ]
+        )
+
+        XCTAssertEqual(topics.map { $0.name }, ["politics", "Sports"])
+        XCTAssertEqual(topics.first?.keywords, ["Election", "kaas", "kabinet"])
+    }
 }
