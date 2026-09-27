@@ -21,6 +21,7 @@ struct FeedListView: View {
     @State private var editMode: EditMode = .inactive
     @State private var opslagFout: OpslagFoutmelding?
     @AppStorage(AppConfiguration.UserDefaultsKeys.feedCountMode) private var feedCountMode = "total"
+    @AppStorage(AppConfiguration.UserDefaultsKeys.appTheme) private var appTheme = AppTheme.standaard.rawValue
     /// Teller per feed, via `FeedBadgeCounter` in plaats van `feed.items` (#121).
     @State private var badgeCounts: [UUID: Int] = [:]
     @State private var isVisible = false
@@ -234,7 +235,7 @@ struct FeedListView: View {
             } label: {
                 Label("Vernieuwen", systemImage: "arrow.clockwise")
             }
-            .tint(Theme.accent)
+            .tint(AppTheme(storedValue: appTheme).accent)
         }
         .contextMenu {
             Menu("Verplaats naar folder") {
@@ -312,7 +313,7 @@ struct SectionHeaderView: View {
                     HStack(spacing: 8) {
                         Image(systemName: icon)
                             .font(.system(size: iconSize))
-                            .foregroundStyle(Theme.accent)
+                            .foregroundStyle(.tint)
                             .frame(width: iconFrame)
                         Text(title)
                             .font(titleFont)
@@ -323,7 +324,7 @@ struct SectionHeaderView: View {
             } else {
                 Image(systemName: icon)
                     .font(.system(size: iconSize))
-                    .foregroundStyle(Theme.accent)
+                    .foregroundStyle(.tint)
                     .frame(width: iconFrame)
                 Text(title)
                     .font(titleFont)

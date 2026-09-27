@@ -67,6 +67,11 @@ struct SettingsView: View {
     @AppStorage(AppConfiguration.UserDefaultsKeys.analysisTextSize)
     private var analysisTextSize = AppConfiguration.defaultAnalysisTextSize
 
+    @AppStorage(AppConfiguration.UserDefaultsKeys.appTheme)
+    private var appTheme = AppTheme.standaard.rawValue
+    /// Melding als iOS het app-icoon niet kon wisselen; de accentkleur is dan wel gewijzigd.
+    @State private var iconFout: String?
+
     @State private var showAPIKey = false
     @State private var showGoogleKey = false
     @State private var showMastodonSetup = false
@@ -102,6 +107,7 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
+                uiterlijkSection
                 weergaveSection
                 tekstgrootteSection
                 samenvattingenSection
@@ -118,6 +124,7 @@ struct SettingsView: View {
                 }
             }
         }
+        .appThemeTint()
         .onAppear(perform: loadStoredValues)
         .onDisappear { claudeValidationTask?.cancel() }
         .onChange(of: feedListPercent) { persistFeedListPercent() }
@@ -204,6 +211,61 @@ struct SettingsView: View {
         }
     }
 
+    // MARK: - 0. Uiterlijk
+
+    private var uiterlijkSection: some View {
+        Section {
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 64), spacing: 12)], spacing: 12) {
+                ForEach(AppTheme.allCases) { theme in
+                    themeButton(theme)
+                }
+            }
+            .padding(.vertical, 6)
+        } header: {
+            Text("Uiterlijk")
+        } footer: {
+            Text(iconFout ?? "Kies een logo als app-icoon; de accentkleur van de app past zich aan.")
+        }
+    }
+
+    private func themeButton(_ theme: AppTheme) -> some View {
+        let isSelected = AppTheme(storedValue: appTheme) == theme
+        return Button {
+            kiesThema(theme)
+        } label: {
+            VStack(spacing: 6) {
+                FableFluxLogo(theme: theme)
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .strokeBorder(isSelected ? theme.accent : .clear, lineWidth: 3)
+                    }
+                Text(theme.naam)
+                    .font(.caption)
+                    .foregroundStyle(isSelected ? .primary : .secondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(theme.naam)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+
+    private func kiesThema(_ theme: AppTheme) {
+        guard AppTheme(storedValue: appTheme) != theme else { return }
+        appTheme = theme.rawValue
+        iconFout = nil
+        guard UIApplication.shared.supportsAlternateIcons else { return }
+        Task {
+            do {
+                try await UIApplication.shared.setAlternateIconName(theme.iconName)
+            } catch {
+                iconFout = "Het app-icoon kon niet worden gewijzigd; de accentkleur is wel aangepast."
+            }
+        }
+    }
+
     // MARK: - 1. Weergave
 
     private var weergaveSection: some View {
@@ -236,7 +298,7 @@ struct SettingsView: View {
                 articlePercent = 100
                 analysisPercent = 100
             }
-            .foregroundStyle(Theme.accent)
+            .foregroundStyle(.tint)
         } header: {
             Text("Tekstgrootte")
         } footer: {
@@ -267,7 +329,7 @@ struct SettingsView: View {
             Button("Claude API-sleutel aanvragen") {
                 showingClaudeConsole = true
             }
-            .foregroundStyle(Theme.accent)
+            .foregroundStyle(.tint)
         } header: {
             Text("Samenvattingen")
         } footer: {
@@ -374,7 +436,7 @@ struct SettingsView: View {
 
     private var overSection: some View {
         Section("Over") {
-            LabeledContent("App", value: "RSS Reader")
+            LabeledContent("App", value: "FableFlux")
             LabeledContent(
                 "Versie",
                 value: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—"

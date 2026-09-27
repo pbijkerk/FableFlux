@@ -31,7 +31,7 @@ struct ReliabilityBadgeView: View {
     private func shieldColor(_ level: String) -> Color {
         switch level.lowercased() {
         case "high": return .green
-        case "mixed": return Theme.accent
+        case "mixed": return Theme.amber
         case "low": return Theme.accentSecondary
         default: return .secondary
         }

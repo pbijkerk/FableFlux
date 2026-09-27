@@ -90,7 +90,7 @@ func biasColor(for score: Int) -> Color {
     case -2: return Color(light: 0x2558A0, dark: 0x5B90D0)
     case -1: return Color(light: 0x5B8DB8, dark: 0x89B8E0)
     case 0: return Color(.systemGray3)
-    case 1: return Theme.accent
+    case 1: return Theme.amber
     case 2: return Theme.accentSecondary
     default: return Color(.systemGray3)
     }
