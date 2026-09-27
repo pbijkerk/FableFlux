@@ -61,8 +61,8 @@ final class SourceRatingService: Sendable {
         return nil
     }
 
-    /// Past de beoordeling toe op een Feed-object (aanroepen vanuit @MainActor context).
-    @MainActor
+    /// Past de beoordeling toe op een Feed-object. Aanroepen vanuit de context die de feed
+    /// bezit: de hoofdcontext of de achtergrondcontext van `FeedWriter` (#153).
     func applyRating(to feed: Feed) {
         guard let r = rating(forFeedURL: feed.url) else { return }
         feed.biasScore = r.biasScore

@@ -13,7 +13,10 @@ class FeedRefreshService {
     /// in plaats van een eigen ronde te starten.
     private var activeRefresh: Task<Void, Never>?
 
-    private static let logger = Logger(
+    /// Achtergrondschrijver voor de verversing (#153); per container één, bij eerste gebruik gemaakt.
+    private var writer: FeedWriter?
+
+    nonisolated private static let logger = Logger(
         subsystem: AppConfiguration.LogSubsystem.main,
         category: AppConfiguration.LogSubsystem.Category.feed
     )
@@ -110,9 +113,11 @@ class FeedRefreshService {
                 RSSParser().parse(data: data)
             }.value
 
-            // All model mutations back on MainActor (we already are, but explicit for clarity)
-            applyParsedFeed(parsed, to: feed, context: context)
-            try context.save()
+            // Het SwiftData-werk gebeurt in een achtergrondcontext, niet op de main thread
+            // (#153). Een net toegevoegde feed heeft nog een tijdelijk id dat de andere
+            // context niet kent; daarom eerst de hoofdcontext opslaan.
+            if context.hasChanges { try context.save() }
+            try await writer(for: context).apply(parsed, toFeedWith: feed.persistentModelID)
 
             Self.logger.info("Successfully refreshed feed: \(feed.title)")
 
@@ -122,8 +127,16 @@ class FeedRefreshService {
         }
     }
 
-    /// All writes to SwiftData happen here, synchronously on MainActor.
-    func applyParsedFeed(_ parsed: ParsedFeed, to feed: Feed, context: ModelContext) {
+    private func writer(for context: ModelContext) -> FeedWriter {
+        if let writer { return writer }
+        let nieuw = FeedWriter(modelContainer: context.container)
+        writer = nieuw
+        return nieuw
+    }
+
+    /// Verwerkt een geparste feed in `context`. In de app draait dit in de achtergrondcontext
+    /// van `FeedWriter`; `nonisolated`, zodat het niet aan de main thread vastzit.
+    nonisolated static func applyParsedFeed(_ parsed: ParsedFeed, to feed: Feed, context: ModelContext) {
         if feed.title == "New Feed" || feed.title.isEmpty, !parsed.title.isEmpty {
             feed.title = parsed.title
         }
@@ -200,7 +213,7 @@ class FeedRefreshService {
     /// ontdubbelen: veel podcastfeeds geven elk item dezelfde link (de homepage), en dan
     /// zou elke nieuwe aflevering als dubbel worden weggegooid. De opgeslagen `guid`
     /// zelf blijft ongewijzigd.
-    static func guidKey(_ guid: String) -> String {
+    nonisolated static func guidKey(_ guid: String) -> String {
         let lower = guid.lowercased()
         guard lower.hasPrefix("http://") || lower.hasPrefix("https://"),
             let hash = guid.firstIndex(of: "#")
@@ -216,7 +229,7 @@ class FeedRefreshService {
     /// (zoals `FeedItemsView`) opnieuw tekenen.
     /// Mislukt de fetch, dan valt dit terug op `feed.items`: liever traag dan dat elk
     /// bestaand artikel als nieuw wordt gezien en dubbel binnenkomt.
-    static func existingKeys(of feed: Feed, context: ModelContext) -> [FeedItem] {
+    nonisolated static func existingKeys(of feed: Feed, context: ModelContext) -> [FeedItem] {
         let feedID = feed.id
         let descriptor = FetchDescriptor<FeedItem>(predicate: #Predicate { $0.feed?.id == feedID })
         do {
@@ -233,7 +246,7 @@ class FeedRefreshService {
     /// Het artikel zelf blijft staan en valt terug op `fetchedAt`.
     /// Haalt alleen de betrokken artikelen op in plaats van de hele feed te doorlopen (#119);
     /// de grens is dezelfde als in `RSSParser.isPlausiblePublicationDate`.
-    static func clearImplausibleDates(feed: Feed, context: ModelContext, now: Date = Date()) {
+    nonisolated static func clearImplausibleDates(feed: Feed, context: ModelContext, now: Date = Date()) {
         let feedID = feed.id
         let limit = now.addingTimeInterval(AppConfiguration.maxFutureDateSkew)
         let distantPast = Date.distantPast
@@ -265,7 +278,7 @@ class FeedRefreshService {
     /// instantie te maken: die houdt `isRefreshing`/`lastError` bij en hoort bij een scherm.
     /// `now` is injecteerbaar zodat het opruimen toetsbaar is zonder van de echte klok
     /// af te hangen; in de app blijft het gewoon "nu".
-    static func pruneOldItems(feed: Feed, context: ModelContext, now: Date = Date()) {
+    nonisolated static func pruneOldItems(feed: Feed, context: ModelContext, now: Date = Date()) {
         let globalDefault =
             UserDefaults.standard.object(
                 forKey: AppConfiguration.UserDefaultsKeys.retentionDays
@@ -318,14 +331,14 @@ class FeedRefreshService {
         }
     }
 
-    private func detectAndAssignFolder(feed: Feed, parsed: ParsedFeed, context: ModelContext) {
+    nonisolated private static func detectAndAssignFolder(feed: Feed, parsed: ParsedFeed, context: ModelContext) {
         let mediaType = detectMediaType(url: feed.url, parsed: parsed)
         guard mediaType != .unknown else { return }
         let folderName = mediaType == .video ? "Video" : "Audio"
         feed.folder = getOrCreateSystemFolder(name: folderName, context: context)
     }
 
-    private func detectMediaType(url: String, parsed: ParsedFeed) -> FeedMediaType {
+    nonisolated private static func detectMediaType(url: String, parsed: ParsedFeed) -> FeedMediaType {
         let lower = url.lowercased()
         let videoPatterns = ["youtube.com", "youtu.be", "vimeo.com", "dailymotion.com"]
         let audioPatterns = [
@@ -337,7 +350,7 @@ class FeedRefreshService {
         return parsed.detectedMediaType
     }
 
-    private func getOrCreateSystemFolder(name: String, context: ModelContext) -> FeedFolder {
+    nonisolated private static func getOrCreateSystemFolder(name: String, context: ModelContext) -> FeedFolder {
         let descriptor = FetchDescriptor<FeedFolder>(
             predicate: #Predicate { $0.name == name && $0.isSystem == true }
         )
