@@ -317,7 +317,10 @@ accounts koppelen.
 - **Account verwijderen:** veeg het account naar links in **Instellingen → Mastodon**. De
   bijbehorende feed verdwijnt mee.
 - **Oranje waarschuwingsdriehoek** naast een account: de toegang is verlopen of ingetrokken.
-  Koppel het account opnieuw via **Mastodon-account toevoegen**.
+  Verwijder eerst het oude account (naar links vegen) en voeg het daarna opnieuw toe via
+  **Mastodon-account toevoegen**. Sla je het verwijderen over, dan staat het account er twee keer
+  en verschijnt elk bericht dubbel. Let op: met het oude account verdwijnen ook de berichten
+  van die tijdlijn, inclusief bewaarde.
 
 Tip: een drukke tijdlijn overheerst de samenvatting al snel. Zet **Meenemen in samenvatting**
 voor die feed uit als je dat niet wilt.
