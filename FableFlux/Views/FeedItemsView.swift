@@ -342,29 +342,53 @@ struct ArticlePageView: View {
     /// artikel. De andere schermen die deze view gebruiken pagineren niet en laten dit leeg.
     var onReachEnd: (() -> Void)?
 
-    @State private var currentIndex: Int
+    /// Id van het zichtbare artikel. Op id in plaats van index, zodat bijgeladen artikelen
+    /// achteraan de positie niet verschuiven.
+    @State private var currentID: UUID?
 
     init(items: [FeedItem], initialIndex: Int, onReachEnd: (() -> Void)? = nil) {
         self.items = items
         self.onReachEnd = onReachEnd
-        self._currentIndex = State(initialValue: initialIndex)
+        self._currentID = State(initialValue: items.indices.contains(initialIndex) ? items[initialIndex].id : nil)
     }
 
+    /// Hoe ver de uitgaande pagina meeschuift (0 = blijft staan, 1 = schuift gelijk op).
+    private static let parallax: CGFloat = 0.3
+    /// Hoeveel donkerder de uitgaande pagina wordt aan het einde van de veeg.
+    private static let dimming: Double = 0.25
+
+    // Geen pagina-TabView: die legt pagina's naast elkaar, en de naad daartussen liet een
+    // smalle strook zien (#149). Hier overlappen pagina's: de volgende schuift óver de
+    // vorige, die vertraagd meeschuift en donkerder wordt — het terugveeg-patroon van iOS.
     var body: some View {
-        TabView(selection: $currentIndex) {
-            ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
-                ItemDetailView(item: item, isActive: index == currentIndex)
-                    .tag(index)
+        ScrollView(.horizontal) {
+            LazyHStack(spacing: 0) {
+                ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
+                    ItemDetailView(item: item, isActive: item.id == currentID)
+                        .background(Theme.background)
+                        .clipShape(RoundedRectangle(cornerRadius: 44, style: .continuous))
+                        .containerRelativeFrame([.horizontal, .vertical])
+                        .visualEffect { content, proxy in
+                            let breedte = max(proxy.size.width, 1)
+                            // Negatief zodra de pagina naar links uit beeld schuift.
+                            let links = min(proxy.frame(in: .scrollView).minX, 0)
+                            return
+                                content
+                                .offset(x: -links * (1 - Self.parallax))
+                                .brightness(Double(links / breedte) * Self.dimming)
+                        }
+                        // Latere pagina's bovenop: de volgende schuift over de vorige heen.
+                        .zIndex(Double(index))
+                }
             }
+            .scrollTargetLayout()
         }
-        .tabViewStyle(.page(indexDisplayMode: .never))
-        .onChange(of: currentIndex, initial: true) { _, index in
-            if index >= items.count - 1 { onReachEnd?() }
+        .scrollTargetBehavior(.paging)
+        .scrollPosition(id: $currentID)
+        .scrollIndicators(.hidden)
+        .onChange(of: currentID, initial: true) { _, id in
+            if id != nil, id == items.last?.id { onReachEnd?() }
         }
-        // De pagina-TabView houdt ruimte tussen twee pagina's; die ruimte toont de
-        // achtergrond van de container. Zonder deze regel is dat de systeemstandaard
-        // (wit in lichte modus) in plaats van Theme.background (#F4F3EF), wat je bij
-        // elke veeg als een witte flits ziet.
         .background(Theme.background.ignoresSafeArea())
         .ignoresSafeArea(edges: .bottom)
     }
