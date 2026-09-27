@@ -235,15 +235,34 @@ struct FeedItemCard: View {
             }
             .padding(16)
         }
-        .background(Theme.card)
-        .clipShape(RoundedRectangle(cornerRadius: Theme.cardCornerRadius, style: .continuous))
+        // Schaduw, afronding en "gelezen" zonder offscreen passes (#122). Eerder lagen
+        // schaduw, masker en doorzichtigheid op de hele kaart: CoreAnimation moest elke
+        // kaart dan eerst apart tekenen, gemeten gemiddeld 69 passes per frame.
+        // - De schaduw hangt aan een eenvoudige vorm achter de inhoud, niet aan de inhoud.
+        // - Alleen de banner wordt afgeknipt; de achtergrondvorm is zelf al rond.
+        // - "Gelezen" is een laag in de achtergrondkleur over de kaart in plaats van
+        //   doorzichtigheid op de hele groep; het beeld is vrijwel gelijk.
+        .background {
+            Self.kaartvorm
+                .fill(Theme.card)
+                .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 3)
+        }
+        .overlay {
+            // Alleen beeld: tikken op de bias-balk en de fact-check-chip moeten doorgaan.
+            if item.isRead {
+                Self.kaartvorm.fill(Theme.background.opacity(Self.gelezenDekking))
+                    .allowsHitTesting(false)
+            }
+        }
         .overlay(
-            RoundedRectangle(cornerRadius: Theme.cardCornerRadius, style: .continuous)
-                .strokeBorder(Color.primary.opacity(0.05), lineWidth: 0.5)
+            Self.kaartvorm.strokeBorder(Color.primary.opacity(0.05), lineWidth: 0.5)
+                .allowsHitTesting(false)
         )
-        .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 3)
-        .opacity(item.isRead ? 0.72 : 1)
     }
+
+    private static let kaartvorm = RoundedRectangle(cornerRadius: Theme.cardCornerRadius, style: .continuous)
+    /// Zelfde indruk als de vroegere `.opacity(0.72)`: 28% van de achtergrond erover.
+    private static let gelezenDekking = 0.28
 
     /// De afbeelding mag de breedte van de kaart niet bepalen. `contentMode: .fill`
     /// maakt de view zo breed als de beeldverhouding vraagt (bij 3:1 is dat 504 pt bij
@@ -278,7 +297,10 @@ struct FeedItemCard: View {
                     }
                 }
             }
-            .clipped()
+            .clipShape(
+                UnevenRoundedRectangle(
+                    topLeadingRadius: Theme.cardCornerRadius, topTrailingRadius: Theme.cardCornerRadius,
+                    style: .continuous))
     }
 
     /// Relatieve tijd zonder seconden: onder een minuut → "Zojuist".

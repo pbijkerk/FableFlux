@@ -150,6 +150,12 @@ struct TopicSummaryCardView: View {
 
     private var header: some View {
         HStack(alignment: .firstTextBaseline) {
+            if cluster.isFavorite {
+                Image(systemName: "heart.fill")
+                    .font(.caption)
+                    .foregroundStyle(accent)
+                    .accessibilityLabel("Favoriet")
+            }
             Text(cluster.topicName.uppercased())
                 .font(Theme.headline(15))
                 .foregroundStyle(accent)
