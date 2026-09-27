@@ -58,7 +58,7 @@ struct TopicEditView: View {
         Section {
             Toggle("Markeer als favoriet", isOn: $isLiked)
         } footer: {
-            Text("Favoriete onderwerpen krijgen voorrang in je samenvattingen.")
+            Text("Favoriete onderwerpen staan bovenaan op Vandaag.")
         }
     }
 
