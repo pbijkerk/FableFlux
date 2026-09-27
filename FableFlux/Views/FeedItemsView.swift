@@ -372,10 +372,14 @@ struct ArticlePageView: View {
                             let breedte = max(proxy.size.width, 1)
                             // Negatief zodra de pagina naar links uit beeld schuift.
                             let links = min(proxy.frame(in: .scrollView).minX, 0)
+                            // Helemaal voorbij: onzichtbaar. Door de parallax ligt de vorige pagina
+                            // anders ook in rust onder de huidige en schijnt hij door de afgeronde hoeken.
+                            let voorbij = links <= -breedte + 0.5
                             return
                                 content
                                 .offset(x: -links * (1 - Self.parallax))
                                 .brightness(Double(links / breedte) * Self.dimming)
+                                .opacity(voorbij ? 0 : 1)
                         }
                         // Latere pagina's bovenop: de volgende schuift over de vorige heen.
                         .zIndex(Double(index))
