@@ -7,11 +7,20 @@ en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 
 ## [Unreleased]
 
+### Opgelost
+- Een favoriet onderwerp verbergt de andere onderwerpen op Vandaag niet meer: alle onderwerpen doen mee en favorieten staan bovenaan, met een hartje (#154)
+- De uitleg bij de bewaarperiode per feed klopt nu: oudere artikelen verdwijnen zodra je op Gereed tikt, en bewaarde artikelen blijven staan (#158)
+
+### Gewijzigd
+- De laatste Engelstalige schermteksten in feed toevoegen, OPML-import, samenvattingsdetail en feedlijst zijn vertaald naar het Nederlands (#156)
+
+## [1.11.2] - 2026-09-27
+
 ### Toegevoegd
 - Gebruikershandleiding in `docs/handleiding.md`, met een verwijzing vanuit de README
 
 ### Opgelost
-- De uitleg bij de bewaarperiode per feed klopt nu: oudere artikelen verdwijnen zodra je op Gereed tikt, en bewaarde artikelen blijven staan (#158)
+- Minder tekenwerk bij het scrollen door de artikelenlijst: de kaart legt schaduw, afronding en de gelezen-weergave niet meer over de hele kaart. Gemeten van gemiddeld 69 naar 47 offscreen passes per frame en van 6,8 naar 4,5 ms tekentijd, zonder haperingen door tekenwerk (#122)
 - Het feedoverzicht opent zonder hapering: de tellers per feed worden op de achtergrond geteld in plaats van op de main thread, waar dat ongeveer 65 ms per keer openen kostte (#161)
 - Scrollen hapert minder tijdens het verversen: het wegschrijven van nieuwe artikelen, datumcorrectie en opruimen gebeurt in een achtergrondcontext in plaats van op de main thread. Gemeten op het toestel: van ongeveer 525 ms naar 6 ms verversingswerk op de main thread (#153)
 

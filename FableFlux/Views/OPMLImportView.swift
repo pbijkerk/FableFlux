@@ -27,15 +27,15 @@ struct OPMLImportView: View {
                     feedSelectionView
                 }
             }
-            .navigationTitle("Import OPML")
+            .navigationTitle("OPML importeren")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button("Annuleren") { dismiss() }
                 }
                 if !parsedFeeds.isEmpty {
                     ToolbarItem(placement: .topBarTrailing) {
-                        Button("Import (\(selectedFeeds.count))") {
+                        Button("Importeer (\(selectedFeeds.count))") {
                             Task { await importSelected() }
                         }
                         .disabled(selectedFeeds.isEmpty || isImporting)
@@ -58,9 +58,9 @@ struct OPMLImportView: View {
             Image(systemName: "square.and.arrow.down")
                 .font(.system(size: 60))
                 .foregroundStyle(.secondary)
-            Text("Select OPML File")
+            Text("Kies een OPML-bestand")
                 .font(.title2.bold())
-            Text("Choose an OPML file exported from another RSS reader.")
+            Text("Kies een OPML-bestand dat je uit een andere RSS-lezer hebt geëxporteerd.")
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
                 .padding(.horizontal)
@@ -69,7 +69,7 @@ struct OPMLImportView: View {
                     .foregroundStyle(.red)
                     .padding(.horizontal)
             }
-            Button("Choose File") {
+            Button("Bestand kiezen") {
                 showFilePicker = true
             }
             .buttonStyle(.borderedProminent)
@@ -81,7 +81,7 @@ struct OPMLImportView: View {
         List {
             Section {
                 HStack {
-                    Button(selectedFeeds.count == parsedFeeds.count ? "Deselect All" : "Select All") {
+                    Button(selectedFeeds.count == parsedFeeds.count ? "Niets selecteren" : "Alles selecteren") {
                         if selectedFeeds.count == parsedFeeds.count {
                             selectedFeeds = []
                         } else {
@@ -89,7 +89,7 @@ struct OPMLImportView: View {
                         }
                     }
                     Spacer()
-                    Text("\(parsedFeeds.count) feeds found")
+                    Text("\(parsedFeeds.count) \(parsedFeeds.count == 1 ? "feed" : "feeds") gevonden")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -110,7 +110,7 @@ struct OPMLImportView: View {
                                 .foregroundStyle(.secondary)
                                 .lineLimit(1)
                             if isDuplicate {
-                                Text("Already added")
+                                Text("Al toegevoegd")
                                     .font(.caption2)
                                     .foregroundStyle(.orange)
                             }
@@ -131,7 +131,7 @@ struct OPMLImportView: View {
                 Section {
                     HStack {
                         ProgressView()
-                        Text("Importing feeds…")
+                        Text("Feeds importeren…")
                             .foregroundStyle(.secondary)
                     }
                 }
@@ -152,7 +152,7 @@ struct OPMLImportView: View {
             let feeds = parser.parse(data: data)
 
             if feeds.isEmpty {
-                errorMessage = "No feeds found in this file. Make sure it's a valid OPML file."
+                errorMessage = "Geen feeds gevonden in dit bestand. Controleer of het een geldig OPML-bestand is."
             } else {
                 parsedFeeds = feeds
                 selectedFeeds = Set(
@@ -161,7 +161,7 @@ struct OPMLImportView: View {
                     })
             }
         } catch {
-            errorMessage = "Failed to read file: \(error.localizedDescription)"
+            errorMessage = "Bestand kon niet worden gelezen: \(error.localizedDescription)"
         }
     }
 

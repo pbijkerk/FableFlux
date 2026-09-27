@@ -151,4 +151,106 @@ final class TopicClusteringOrderTests: XCTestCase {
             cluster.items.last?.id, zonderDatum.id,
             "Zonder datum hoort het artikel achteraan te staan, niet vooraan")
     }
+
+    // MARK: - Favoriet = voorrang (#154)
+
+    /// Voegt artikelen met de opgegeven titels toe aan één testfeed.
+    private func makeItems(titles: [String]) -> [FeedItem] {
+        let context = container.mainContext
+        let feed = Feed(url: "https://example.com/favorieten.rss", title: "Favorietenfeed")
+        context.insert(feed)
+
+        return titles.enumerated().map { index, title in
+            let item = FeedItem(
+                title: title,
+                itemDescription: nil,
+                pubDate: Date(timeIntervalSince1970: 1_700_000_000 + Double(index) * 3600)
+            )
+            item.feed = feed
+            feed.items.append(item)
+            context.insert(item)
+            return item
+        }
+    }
+
+    /// Clustert met één favoriet ("Zeppelin", één artikel) en één niet-favoriet
+    /// eigen onderwerp ("Kaas", drie artikelen), plus één artikel dat alleen op een
+    /// standaardonderwerp (Politics, trefwoord "election") past.
+    private func clusterMetFavoriet() async throws -> [TopicCluster] {
+        let items = makeItems(titles: [
+            "Zeppelin landt",
+            "Kaas uit Gouda",
+            "Kaas uit Edam",
+            "Kaas uit Leiden",
+            "Verkiezingen: de election is begonnen",
+        ])
+        let favoriet = Topic(name: "Zeppelin", keywords: ["zeppelin"], isLiked: true)
+        let gewoon = Topic(name: "Kaas", keywords: ["kaas"], isLiked: false)
+        container.mainContext.insert(favoriet)
+        container.mainContext.insert(gewoon)
+
+        let service = TopicClusteringService()
+        let resultaat = await service.cluster(items: items, savedTopics: [favoriet, gewoon], claudeAPIKey: nil)
+        return try XCTUnwrap(resultaat)
+    }
+
+    func testFavorietFiltertAndereOnderwerpenNietWegEnStaatEerst() async throws {
+        let clusters = try await clusterMetFavoriet()
+        let namen = clusters.map(\.topicName)
+
+        XCTAssertTrue(namen.contains("Zeppelin"), "Het favoriete onderwerp hoort een cluster te hebben")
+        XCTAssertTrue(namen.contains("Kaas"), "Een niet-favoriet eigen onderwerp hoort ook mee te doen")
+        XCTAssertEqual(
+            namen.first, "Zeppelin",
+            "De favoriet hoort bovenaan te staan, ook met minder artikelen")
+
+        let kaas = try XCTUnwrap(clusters.first { $0.topicName == "Kaas" })
+        XCTAssertEqual(kaas.items.count, 3)
+    }
+
+    func testStandaardonderwerpenDoenMeeNaastEenFavoriet() async throws {
+        let clusters = try await clusterMetFavoriet()
+
+        let politiek = try XCTUnwrap(
+            clusters.first { $0.topicName == "Politics" },
+            "Met een favoriet horen de standaardonderwerpen nog mee te doen")
+        XCTAssertEqual(politiek.items.map(\.title), ["Verkiezingen: de election is begonnen"])
+    }
+
+    func testIsFavorietAlleenVoorFavorieteOnderwerpen() async throws {
+        let clusters = try await clusterMetFavoriet()
+
+        for cluster in clusters {
+            XCTAssertEqual(
+                cluster.isFavorite, cluster.topicName == "Zeppelin",
+                "isFavorite klopt niet voor \(cluster.topicName)")
+        }
+        XCTAssertEqual(clusters.filter(\.isFavorite).count, 1)
+    }
+
+    /// Binnen de groep favorieten en binnen de rest blijft de sortering op aantal
+    /// artikelen, aflopend.
+    func testSorteringBinnenGroepenOpAantalArtikelen() async throws {
+        let items = makeItems(titles: [
+            "Zeppelin landt",
+            "Ballon stijgt",
+            "Ballon daalt",
+            "Kaas uit Gouda",
+            "Worst uit Gelderland",
+            "Worst uit Brabant",
+        ])
+        let topics = [
+            Topic(name: "Zeppelin", keywords: ["zeppelin"], isLiked: true),
+            Topic(name: "Ballon", keywords: ["ballon"], isLiked: true),
+            Topic(name: "Kaas", keywords: ["kaas"], isLiked: false),
+            Topic(name: "Worst", keywords: ["worst"], isLiked: false),
+        ]
+        for topic in topics { container.mainContext.insert(topic) }
+
+        let service = TopicClusteringService()
+        let resultaat = await service.cluster(items: items, savedTopics: topics, claudeAPIKey: nil)
+        let clusters = try XCTUnwrap(resultaat)
+
+        XCTAssertEqual(clusters.map(\.topicName), ["Ballon", "Zeppelin", "Worst", "Kaas"])
+    }
 }

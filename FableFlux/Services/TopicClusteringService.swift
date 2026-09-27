@@ -28,6 +28,9 @@ struct TopicCluster {
     var items: [FeedItem]
     /// Gestructureerde beweringen met bron-ids — renderpunt voor inline bronverwijzingen.
     var statements: [SummaryStatement]
+    /// Hoort bij een opgeslagen onderwerp dat als favoriet is gemarkeerd (`Topic.isLiked`);
+    /// zulke clusters staan bovenaan op Vandaag (#154).
+    var isFavorite: Bool = false
     /// Platte previewtekst (samengevoegde beweringen) voor lijstweergaven.
     var summary: String { statements.map(\.text).joined(separator: " ") }
 
@@ -280,19 +283,14 @@ class TopicClusteringService {
             (id: $0.id, title: $0.title, rawDescription: $0.itemDescription, cachedPlain: $0.cachedPlainDescription)
         }
 
-        let likedTopics = savedTopics.filter { $0.isLiked }
-        let usingLikedOnly = !likedTopics.isEmpty
-
-        var topicMap: [(name: String, keywords: [String])]
-        if usingLikedOnly {
-            topicMap = likedTopics.map { ($0.name, $0.keywords) }
-        } else {
-            topicMap = savedTopics.map { ($0.name, $0.keywords) }
-            let savedNames = Set(savedTopics.map { $0.name.lowercased() })
-            for dt in defaultTopics where !savedNames.contains(dt.name.lowercased()) {
-                topicMap.append(dt)
-            }
+        // Alle opgeslagen onderwerpen plus de standaardonderwerpen doen mee; een favoriet
+        // filtert de rest niet weg maar krijgt voorrang in de eindsortering (#154).
+        var topicMap: [(name: String, keywords: [String])] = savedTopics.map { ($0.name, $0.keywords) }
+        let savedNames = Set(savedTopics.map { $0.name.lowercased() })
+        for dt in defaultTopics where !savedNames.contains(dt.name.lowercased()) {
+            topicMap.append(dt)
         }
+        let favoriteNames = Set(savedTopics.filter(\.isLiked).map { $0.name.lowercased() })
 
         logger.debug("Using \(topicMap.count) topics for clustering")
 
@@ -376,7 +374,8 @@ class TopicClusteringService {
                     topicName: name,
                     keywords: keywords,
                     items: topicItems,
-                    statements: validated(statements, topicName: name)
+                    statements: validated(statements, topicName: name),
+                    isFavorite: favoriteNames.contains(name.lowercased())
                 ))
         }
 
@@ -388,7 +387,16 @@ class TopicClusteringService {
 
         logger.info("Clustering complete: created \(result.count) clusters")
 
-        return result.sorted { $0.items.count > $1.items.count }
+        return Self.sortedForToday(result)
+    }
+
+    /// Volgorde op Vandaag: eerst de favorieten, dan de rest; binnen elke groep het
+    /// cluster met de meeste artikelen eerst (#154).
+    static func sortedForToday(_ clusters: [TopicCluster]) -> [TopicCluster] {
+        clusters.sorted { lhs, rhs in
+            if lhs.isFavorite != rhs.isFavorite { return lhs.isFavorite }
+            return lhs.items.count > rhs.items.count
+        }
     }
 
     /// Kiest voor één (al op woordgrens getokeniseerde) artikeltekst het best
