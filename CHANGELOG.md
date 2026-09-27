@@ -7,6 +7,9 @@ en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 
 ## [Unreleased]
 
+### Toegevoegd
+- Gebruikershandleiding in `docs/handleiding.md`, met een verwijzing vanuit de README
+
 ### Gewijzigd
 - Het installatiecommando in `Workflow-feature.md` zoekt de aangesloten iPhone zelf op via de UDID, negeert simulators en stopt met een melding als er geen toestel is (#148)
 - Drie verouderde Xcode-handleidingen in de bronmap verwijderd; sinds XcodeGen overbodig (#147)

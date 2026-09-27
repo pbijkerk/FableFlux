@@ -6,6 +6,8 @@ Een native iOS RSS-lezer met AI-gedreven samenvattingen, Mastodon-integratie en 
 
 FableFlux brengt al je informatiebronnen samen in één app: RSS-feeds, Mastodon-tijdlijnen, podcasts en videokanalen. De app groepeert artikelen automatisch per onderwerp en genereert samenvattingen — lokaal of via de Claude API — zodat je snel het nieuws kunt overzien zonder alles te hoeven lezen.
 
+> **Gebruikershandleiding:** zie [`docs/handleiding.md`](docs/handleiding.md).
+
 ---
 
 ## Functionaliteiten
