@@ -94,7 +94,7 @@ class MastodonService {
     private let decoder: JSONDecoder
     private let redirectURI = "rssreader://oauth/mastodon"
     private let scope = "read"
-    private let appName = "RSSReader"
+    private let appName = "FableFlux"
 
     private let logger = Logger(
         subsystem: AppConfiguration.LogSubsystem.main,

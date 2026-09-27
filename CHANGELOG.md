@@ -5,6 +5,11 @@ Alle noemenswaardige wijzigingen aan dit project worden in dit bestand bijgehoud
 Het formaat is gebaseerd op [Keep a Changelog](https://keepachangelog.com/nl/1.1.0/)
 en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 
+## [Unreleased]
+
+### Gewijzigd
+- Interne naam RSSReader hernoemd naar FableFlux: GitHub-repository, Xcode-project, scheme, targets, bronmappen, CI en documentatie. Bundle-ID, Keychain-service en URL-scheme `rssreader://` blijven bewust gelijk, zodat gegevens, API-sleutels en Mastodon-login behouden blijven (#145)
+
 ## [1.11.0] - 2026-09-27
 
 ### Toegevoegd

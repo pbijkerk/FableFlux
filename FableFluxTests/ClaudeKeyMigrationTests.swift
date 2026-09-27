@@ -1,12 +1,12 @@
 //
 //  ClaudeKeyMigrationTests.swift
-//  RSSReaderTests
+//  FableFluxTests
 //
 
 import Security
 import XCTest
 
-@testable import RSSReader
+@testable import FableFlux
 
 /// Toetst de opstartmigratie van de Claude-sleutel en de atomaire Keychain-write (#124).
 ///

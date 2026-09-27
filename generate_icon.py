@@ -5,7 +5,7 @@ Tekent op 4x (4096x4096) en schaalt terug met LANCZOS voor scherpe randen.
 Draai vanuit de projectmap:  python3 generate_icon.py
 
 De kleuren horen gelijk te blijven aan `AppTheme` in
-RSSReader/DesignSystem/AppTheme.swift (logo in de instellingen).
+FableFlux/DesignSystem/AppTheme.swift (logo in de instellingen).
 """
 
 import json
@@ -17,7 +17,7 @@ FINAL = 1024
 SCALE = 4
 S = FINAL * SCALE
 
-ASSETS = Path(__file__).parent / "RSSReader" / "Assets.xcassets"
+ASSETS = Path(__file__).parent / "FableFlux" / "Assets.xcassets"
 
 # asset-naam: (ring, segment, achtergrond)
 VARIANTS = {

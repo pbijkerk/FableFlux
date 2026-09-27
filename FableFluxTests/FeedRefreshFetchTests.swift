@@ -1,12 +1,12 @@
 //
 //  FeedRefreshFetchTests.swift
-//  RSSReaderTests
+//  FableFluxTests
 //
 
 import SwiftData
 import XCTest
 
-@testable import RSSReader
+@testable import FableFlux
 
 /// Toetst dat verversen met gebundelde queries hetzelfde doet als voorheen (#119):
 /// dubbelen herkennen op guid, dan link, dan titel; en alleen de artikelen van de eigen

@@ -2,7 +2,7 @@ import SwiftUI
 import SwiftData
 
 @main
-struct RSSReaderApp: App {
+struct FableFluxApp: App {
     let modelContainer: ModelContainer
 
     init() {

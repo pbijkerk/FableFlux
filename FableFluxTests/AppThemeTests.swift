@@ -1,6 +1,6 @@
 import XCTest
 
-@testable import RSSReader
+@testable import FableFlux
 
 final class AppThemeTests: XCTestCase {
 

@@ -182,7 +182,7 @@ enum AppConfiguration {
     // MARK: - Logging
 
     enum LogSubsystem {
-        static let main = "com.rssreader.app"
+        static let main = "com.peterbijkerk.fableflux"
 
         enum Category {
             static let networking = "networking"
