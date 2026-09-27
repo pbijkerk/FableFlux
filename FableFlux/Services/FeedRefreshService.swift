@@ -13,8 +13,9 @@ class FeedRefreshService {
     /// in plaats van een eigen ronde te starten.
     private var activeRefresh: Task<Void, Never>?
 
-    /// Achtergrondschrijver voor de verversing (#153); per container één, bij eerste gebruik gemaakt.
-    private var writer: FeedWriter?
+    /// De laatst gestarte schrijfactie. Elke volgende wacht hierop, zodat verversingen niet
+    /// tegelijk schrijven (bijv. twee keer dezelfde systeemmap aanmaken).
+    private var laatsteSchrijfactie: Task<Void, Error>?
 
     nonisolated private static let logger = Logger(
         subsystem: AppConfiguration.LogSubsystem.main,
@@ -117,7 +118,7 @@ class FeedRefreshService {
             // (#153). Een net toegevoegde feed heeft nog een tijdelijk id dat de andere
             // context niet kent; daarom eerst de hoofdcontext opslaan.
             if context.hasChanges { try context.save() }
-            try await writer(for: context).apply(parsed, toFeedWith: feed.persistentModelID)
+            try await schrijfWeg(parsed, feedID: feed.persistentModelID, container: context.container)
 
             Self.logger.info("Successfully refreshed feed: \(feed.title)")
 
@@ -127,21 +128,32 @@ class FeedRefreshService {
         }
     }
 
-    /// Maakt de schrijver buiten de main thread aan. Een `@ModelActor` die op de main thread
-    /// ontstaat, krijgt een context die aan de main queue hangt en voert zijn werk dan
-    /// alsnog daar uit — zo gemeten op het toestel (#153).
-    private func writer(for context: ModelContext) async -> FeedWriter {
-        if let writer { return writer }
-        let container = context.container
-        let nieuw = await Task.detached(priority: .utility) { FeedWriter(modelContainer: container) }.value
-        // Een parallelle verversing kan intussen al een schrijver hebben gemaakt.
-        if let writer { return writer }
-        writer = nieuw
-        return nieuw
+    /// Voert `applyParsedFeed` uit in een eigen `ModelContext` op een achtergrondthread en
+    /// slaat op; de hoofdcontext neemt de wijzigingen daarna over (#153).
+    ///
+    /// Bewust geen `@ModelActor`: op het toestel gemeten draaide die zijn werk alsnog op de
+    /// main thread, ook als hij buiten de main thread was aangemaakt. Deze context ontstaat
+    /// in de losse taak en wordt alleen daar gebruikt.
+    private func schrijfWeg(_ parsed: ParsedFeed, feedID: PersistentIdentifier, container: ModelContainer)
+        async throws
+    {
+        let vorige = laatsteSchrijfactie
+        let actie = Task.detached(priority: .utility) {
+            _ = await vorige?.result
+            let context = ModelContext(container)
+            var descriptor = FetchDescriptor<Feed>(predicate: #Predicate { $0.persistentModelID == feedID })
+            descriptor.fetchLimit = 1
+            // Intussen verwijderd: niets te doen.
+            guard let feed = try context.fetch(descriptor).first else { return }
+            Self.applyParsedFeed(parsed, to: feed, context: context)
+            try context.save()
+        }
+        laatsteSchrijfactie = actie
+        try await actie.value
     }
 
     /// Verwerkt een geparste feed in `context`. In de app draait dit in de achtergrondcontext
-    /// van `FeedWriter`; `nonisolated`, zodat het niet aan de main thread vastzit.
+    /// van `schrijfWeg`; `nonisolated`, zodat het niet aan de main thread vastzit.
     nonisolated static func applyParsedFeed(_ parsed: ParsedFeed, to feed: Feed, context: ModelContext) {
         if feed.title == "New Feed" || feed.title.isEmpty, !parsed.title.isEmpty {
             feed.title = parsed.title

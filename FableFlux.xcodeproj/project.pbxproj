@@ -48,7 +48,6 @@
 		9C62128274E73048828C0A19 /* OAuthCallbackHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8754BDAB353218E9F083CA63 /* OAuthCallbackHandler.swift */; };
 		9CF591720872641D56BEFEA0 /* FableFluxTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22BF9A433834F4E60C38ACCE /* FableFluxTests.swift */; };
 		AC3A1D5DDAB660485EAAA0CD /* Topic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C98FEFE71B2067592669964 /* Topic.swift */; };
-		ACAA132FD7F6AA1F3032A1D9 /* FeedWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1F8E1AFB7BEE436C27EE964 /* FeedWriter.swift */; };
 		B068B7BC337740498C2F8329 /* RSSParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 611B50581E4D87817003CBB4 /* RSSParserTests.swift */; };
 		B4B43B33922BA79F310C40A5 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D096640302E7A67B3AF1E4D7 /* KeychainService.swift */; };
 		B6CC7C2EF2DA3BF04D938A54 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C83002285B9777D6C4729D13 /* ContentView.swift */; };
@@ -133,7 +132,6 @@
 		BC4803886B23CF6C97CD1417 /* MastodonService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MastodonService.swift; sourceTree = "<group>"; };
 		BD42AACE577A9618CFBADE05 /* ArticleFilterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleFilterTests.swift; sourceTree = "<group>"; };
 		C140A655FA7F7F5D0F17E7A5 /* EventClusteringService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventClusteringService.swift; sourceTree = "<group>"; };
-		C1F8E1AFB7BEE436C27EE964 /* FeedWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedWriter.swift; sourceTree = "<group>"; };
 		C67C1EFB6AEEEB0CB4D6C583 /* FactCheckChipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FactCheckChipView.swift; sourceTree = "<group>"; };
 		C83002285B9777D6C4729D13 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		CBC34685F5B48A95F26AAB98 /* TopicClusteringOrderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicClusteringOrderTests.swift; sourceTree = "<group>"; };
@@ -273,7 +271,6 @@
 				C140A655FA7F7F5D0F17E7A5 /* EventClusteringService.swift */,
 				B902A62F5F865C0217E26BAC /* FactCheckService.swift */,
 				DB5F21875FD78822261F12D4 /* FeedRefreshService.swift */,
-				C1F8E1AFB7BEE436C27EE964 /* FeedWriter.swift */,
 				D096640302E7A67B3AF1E4D7 /* KeychainService.swift */,
 				BC4803886B23CF6C97CD1417 /* MastodonService.swift */,
 				8754BDAB353218E9F083CA63 /* OAuthCallbackHandler.swift */,
@@ -404,7 +401,6 @@
 				D53EA0EC2394341F8FAE8A6F /* FeedListView.swift in Sources */,
 				7CFFFE4FAF29C0BE7FE1FE1D /* FeedRefreshService.swift in Sources */,
 				638CAF0BCEC3054960CE69E5 /* FeedSettingsView.swift in Sources */,
-				ACAA132FD7F6AA1F3032A1D9 /* FeedWriter.swift in Sources */,
 				9027629D3A660AEA7EFD602C /* FloatingTabBar.swift in Sources */,
 				ECEB48566B772B403F570B09 /* FolderItemsView.swift in Sources */,
 				92ED8B08FAED172B0D0834DD /* FolderManagementView.swift in Sources */,
