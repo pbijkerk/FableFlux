@@ -5,7 +5,7 @@ Alle noemenswaardige wijzigingen aan dit project worden in dit bestand bijgehoud
 Het formaat is gebaseerd op [Keep a Changelog](https://keepachangelog.com/nl/1.1.0/)
 en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 
-## [Unreleased]
+## [1.11.0] - 2026-09-27
 
 ### Toegevoegd
 - Themakiezer in Instellingen (sectie Uiterlijk): kies een van zeven FableFlux-logo's als app-icoon; de accentkleur van de app past zich aan. Semantische kleuren (gemengd, fact-check, bias) blijven amber (#142)
