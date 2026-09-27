@@ -5,6 +5,11 @@ Alle noemenswaardige wijzigingen aan dit project worden in dit bestand bijgehoud
 Het formaat is gebaseerd op [Keep a Changelog](https://keepachangelog.com/nl/1.1.0/)
 en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 
+## [Unreleased]
+
+### Opgelost
+- Een favoriet onderwerp verbergt de andere onderwerpen op Vandaag niet meer: alle onderwerpen doen mee en favorieten staan bovenaan, met een hartje (#154)
+
 ## [1.11.2] - 2026-09-27
 
 ### Toegevoegd
