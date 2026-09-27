@@ -10,6 +10,9 @@ en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 ### Toegevoegd
 - Gebruikershandleiding in `docs/handleiding.md`, met een verwijzing vanuit de README
 
+### Opgelost
+- Scrollen hapert minder tijdens het verversen: het wegschrijven van nieuwe artikelen, datumcorrectie en opruimen gebeurt in een achtergrondcontext in plaats van op de main thread. Gemeten op het toestel: van ongeveer 525 ms naar 6 ms verversingswerk op de main thread (#153)
+
 ### Gewijzigd
 - Het installatiecommando in `Workflow-feature.md` zoekt de aangesloten iPhone zelf op via de UDID, negeert simulators en stopt met een melding als er geen toestel is (#148)
 - Drie verouderde Xcode-handleidingen in de bronmap verwijderd; sinds XcodeGen overbodig (#147)

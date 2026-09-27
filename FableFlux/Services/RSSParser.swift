@@ -1,7 +1,7 @@
 import Foundation
 import OSLog
 
-struct ParsedFeedItem {
+struct ParsedFeedItem: Sendable {
     var title: String = ""
     var link: String = ""
     var description: String = ""
@@ -12,7 +12,7 @@ struct ParsedFeedItem {
     var imageURL: String? = nil
 }
 
-struct ParsedFeed {
+struct ParsedFeed: Sendable {
     var title: String = ""
     var description: String = ""
     var items: [ParsedFeedItem] = []

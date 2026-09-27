@@ -77,7 +77,7 @@ final class FeedRefreshFetchTests: XCTestCase {
             ParsedFeedItem(title: "Nieuw", link: "https://example.com/c", guid: "guid-c"),
         ]
 
-        FeedRefreshService().applyParsedFeed(parsed, to: feed, context: context)
+        FeedRefreshService.applyParsedFeed(parsed, to: feed, context: context)
         try context.save()
 
         XCTAssertEqual(try titels(feed, context), ["Alleen link", "Alleen titel", "Met guid", "Nieuw"])
@@ -93,7 +93,7 @@ final class FeedRefreshFetchTests: XCTestCase {
         var parsed = ParsedFeed()
         parsed.items = [ParsedFeedItem(title: "Gedeeld", guid: "guid-gedeeld")]
 
-        FeedRefreshService().applyParsedFeed(parsed, to: feed, context: context)
+        FeedRefreshService.applyParsedFeed(parsed, to: feed, context: context)
         try context.save()
 
         XCTAssertEqual(try titels(feed, context), ["Gedeeld"])
@@ -107,10 +107,9 @@ final class FeedRefreshFetchTests: XCTestCase {
             ParsedFeedItem(title: "Twee", link: "https://example.com/2"),
         ]
 
-        let service = FeedRefreshService()
-        service.applyParsedFeed(parsed, to: feed, context: context)
+        FeedRefreshService.applyParsedFeed(parsed, to: feed, context: context)
         try context.save()
-        service.applyParsedFeed(parsed, to: feed, context: context)
+        FeedRefreshService.applyParsedFeed(parsed, to: feed, context: context)
         try context.save()
 
         XCTAssertEqual(try titels(feed, context), ["Een", "Twee"])
@@ -130,7 +129,7 @@ final class FeedRefreshFetchTests: XCTestCase {
                 title: "Hacker", link: link, guid: "https://www.bbc.co.uk/sport/football/articles/cwywld5v28jo#9"),
         ]
 
-        FeedRefreshService().applyParsedFeed(parsed, to: feed, context: context)
+        FeedRefreshService.applyParsedFeed(parsed, to: feed, context: context)
         try context.save()
 
         XCTAssertEqual(try titels(feed, context), ["Hacker"])
@@ -146,7 +145,7 @@ final class FeedRefreshFetchTests: XCTestCase {
             ParsedFeedItem(title: "Hacker", guid: "https://www.bbc.co.uk/sport/football/articles/cwywld5v28jo#3")
         ]
 
-        FeedRefreshService().applyParsedFeed(parsed, to: feed, context: context)
+        FeedRefreshService.applyParsedFeed(parsed, to: feed, context: context)
         try context.save()
 
         XCTAssertEqual(try titels(feed, context), ["Hacker"])
@@ -165,7 +164,7 @@ final class FeedRefreshFetchTests: XCTestCase {
             ParsedFeedItem(title: "Aflevering 3", link: "https://podcast.example.com", guid: "ep-3"),
         ]
 
-        FeedRefreshService().applyParsedFeed(parsed, to: feed, context: context)
+        FeedRefreshService.applyParsedFeed(parsed, to: feed, context: context)
         try context.save()
 
         XCTAssertEqual(try titels(feed, context), ["Aflevering 1", "Aflevering 2", "Aflevering 3"])
@@ -244,7 +243,7 @@ final class FeedRefreshFetchTests: XCTestCase {
 
         var parsed = ParsedFeed()
         parsed.items = [ParsedFeedItem(title: "Nieuw", guid: "n")]
-        FeedRefreshService().applyParsedFeed(parsed, to: feed, context: context)
+        FeedRefreshService.applyParsedFeed(parsed, to: feed, context: context)
 
         XCTAssertTrue(gewijzigd)
         XCTAssertEqual(feed.items.count, 2)
