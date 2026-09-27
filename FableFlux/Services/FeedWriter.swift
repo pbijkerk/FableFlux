@@ -5,6 +5,9 @@ import SwiftData
 /// het SwiftData-werk (bestaande artikelen ophalen, invoegen, opruimen, opslaan) niet op de
 /// main thread met het scrollen concurreert (#153). De hoofdcontext neemt de opgeslagen
 /// wijzigingen daarna over; `@Query`-schermen werken zo vanzelf bij.
+///
+/// Maak hem buiten de main thread aan (zie `FeedRefreshService.writer(for:)`): anders hangt
+/// zijn context aan de main queue en draait het werk toch daar.
 @ModelActor
 actor FeedWriter {
     /// Verwerkt een geparste feed voor de feed met dit id en slaat op. Doet niets als de feed

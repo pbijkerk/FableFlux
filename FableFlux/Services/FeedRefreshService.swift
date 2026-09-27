@@ -127,9 +127,15 @@ class FeedRefreshService {
         }
     }
 
-    private func writer(for context: ModelContext) -> FeedWriter {
+    /// Maakt de schrijver buiten de main thread aan. Een `@ModelActor` die op de main thread
+    /// ontstaat, krijgt een context die aan de main queue hangt en voert zijn werk dan
+    /// alsnog daar uit — zo gemeten op het toestel (#153).
+    private func writer(for context: ModelContext) async -> FeedWriter {
         if let writer { return writer }
-        let nieuw = FeedWriter(modelContainer: context.container)
+        let container = context.container
+        let nieuw = await Task.detached(priority: .utility) { FeedWriter(modelContainer: container) }.value
+        // Een parallelle verversing kan intussen al een schrijver hebben gemaakt.
+        if let writer { return writer }
         writer = nieuw
         return nieuw
     }
