@@ -50,11 +50,11 @@ struct SummaryDetailView: View {
     private var topicHeader: some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
-                Text("\(cluster.items.count) articles")
+                Text("\(cluster.items.count) \(cluster.items.count == 1 ? "artikel" : "artikelen")")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                 if topicAlreadySaved {
-                    Label("Saved topic", systemImage: "checkmark.seal.fill")
+                    Label("Favoriet onderwerp", systemImage: "checkmark.seal.fill")
                         .font(.caption)
                         .foregroundStyle(.green)
                 }
@@ -64,7 +64,7 @@ struct SummaryDetailView: View {
                 Button {
                     removeTopic()
                 } label: {
-                    Label("Remove", systemImage: "heart.slash")
+                    Label("Onderwerp verwijderen", systemImage: "heart.slash")
                         .font(.caption)
                 }
                 .buttonStyle(.bordered)
@@ -75,7 +75,7 @@ struct SummaryDetailView: View {
 
     private var summarySection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Label("Summary", systemImage: "doc.text")
+            Label("Samenvatting", systemImage: "doc.text")
                 .font(.headline)
 
             HStack(spacing: 12) {
@@ -99,7 +99,7 @@ struct SummaryDetailView: View {
         // bouwt SwiftUI alle rijen én alle NavigationLink-destinations in één
         // main-thread-pass, wat bij grote topics een zichtbare hang oplevert.
         LazyVStack(alignment: .leading, spacing: 12) {
-            Label("Articles in this summary", systemImage: "list.bullet")
+            Label("Artikelen in deze samenvatting", systemImage: "list.bullet")
                 .font(.headline)
 
             ForEach(cluster.items) { item in
@@ -116,9 +116,9 @@ struct SummaryDetailView: View {
             Divider()
             HStack(spacing: 16) {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Do you like this topic?")
+                    Text("Interessant onderwerp?")
                         .font(.subheadline.bold())
-                    Text("Save \"\(cluster.topicName)\" for future summaries")
+                    Text("Maak \"\(cluster.topicName)\" favoriet; het komt dan bovenaan op Vandaag.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -129,7 +129,7 @@ struct SummaryDetailView: View {
                     Image(systemName: "xmark")
                         .foregroundStyle(.secondary)
                 }
-                Button("Save") {
+                Button("Favoriet maken") {
                     saveTopic()
                     withAnimation { showTopicPrompt = false }
                 }

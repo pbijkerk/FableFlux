@@ -111,7 +111,7 @@ private struct FeedItemsList: View {
         .opslagFoutmelding($opslagFout)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button("Refresh", systemImage: "arrow.clockwise") {
+                Button("Vernieuwen", systemImage: "arrow.clockwise") {
                     Task {
                         await refreshService.refresh(feed: feed, context: modelContext)
                     }

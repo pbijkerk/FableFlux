@@ -35,21 +35,21 @@ struct AddFeedView: View {
                         if isLoading {
                             HStack {
                                 ProgressView()
-                                Text("Verifying feed…")
+                                Text("Feed controleren…")
                             }
                         } else {
-                            Text("Add Feed")
+                            Text("Feed toevoegen")
                         }
                     }
                     .disabled(urlText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isLoading)
                     .frame(maxWidth: .infinity, alignment: .center)
                 }
             }
-            .navigationTitle("Add Feed")
+            .navigationTitle("Feed toevoegen")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button("Annuleren") { dismiss() }
                 }
             }
         }
@@ -62,13 +62,13 @@ struct AddFeedView: View {
         }
 
         guard URL(string: urlString) != nil else {
-            errorMessage = "Invalid URL. Please check and try again."
+            errorMessage = "Ongeldig adres. Controleer het en probeer het opnieuw."
             return
         }
 
         // Check duplicate
         if feeds.contains(where: { $0.url == urlString }) {
-            errorMessage = "This feed is already in your list."
+            errorMessage = "Deze feed staat al in je lijst."
             return
         }
 
@@ -85,7 +85,7 @@ struct AddFeedView: View {
                 onAdded()
                 dismiss()
             } catch {
-                errorMessage = "Could not load feed: \(error.localizedDescription)"
+                errorMessage = "Feed kon niet worden geladen: \(error.localizedDescription)"
             }
             isLoading = false
         }

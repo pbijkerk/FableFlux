@@ -10,6 +10,9 @@ en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 ### Opgelost
 - Een favoriet onderwerp verbergt de andere onderwerpen op Vandaag niet meer: alle onderwerpen doen mee en favorieten staan bovenaan, met een hartje (#154)
 
+### Gewijzigd
+- De laatste Engelstalige schermteksten in feed toevoegen, OPML-import, samenvattingsdetail en feedlijst zijn vertaald naar het Nederlands (#156)
+
 ## [1.11.2] - 2026-09-27
 
 ### Toegevoegd
