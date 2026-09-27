@@ -76,4 +76,18 @@ final class FeedBadgeCountTests: XCTestCase {
         let tellers = FeedBadgeCounter.counts(for: feeds, unreadOnly: true, context: context)
         XCTAssertEqual(tellers[feeds[3].id], 3)
     }
+
+    /// De telling op de achtergrond (#161) leest de opgeslagen stand via een eigen context
+    /// en moet dezelfde aantallen geven als de telling op de hoofdcontext.
+    func testAchtergrondtellingGelijkAanHoofdcontext() async throws {
+        let feeds = try maakFeeds()
+        let ids = feeds.map(\.id)
+
+        for unreadOnly in [false, true] {
+            let achtergrond = await FeedBadgeCounter.countsInBackground(
+                feedIDs: ids, unreadOnly: unreadOnly, container: container)
+            let hoofd = FeedBadgeCounter.counts(for: feeds, unreadOnly: unreadOnly, context: container.mainContext)
+            XCTAssertEqual(achtergrond, hoofd, "unreadOnly: \(unreadOnly)")
+        }
+    }
 }

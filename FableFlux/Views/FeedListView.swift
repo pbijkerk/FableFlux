@@ -26,6 +26,8 @@ struct FeedListView: View {
     @State private var badgeCounts: [UUID: Int] = [:]
     @State private var isVisible = false
     @State private var badgeUpdateTask: Task<Void, Never>?
+    /// De lopende telling op de achtergrond; een nieuwe telling annuleert de vorige (#161).
+    @State private var telTaak: Task<Void, Never>?
 
     var uncategorized: [Feed] {
         feeds.filter { $0.folder == nil }
@@ -105,6 +107,7 @@ struct FeedListView: View {
         .onDisappear {
             isVisible = false
             badgeUpdateTask?.cancel()
+            telTaak?.cancel()
         }
         .onChange(of: feedCountMode) { updateBadgeCounts() }
         .onChange(of: feeds.count) { updateBadgeCounts() }
@@ -127,10 +130,19 @@ struct FeedListView: View {
         }
     }
 
+    /// Telt op de achtergrond (#161). De oude tellers blijven staan tot de nieuwe binnen zijn,
+    /// zodat de badges niet even verdwijnen.
     private func updateBadgeCounts() {
-        badgeCounts = FeedBadgeCounter.counts(
-            for: feeds, unreadOnly: feedCountMode == "unread", context: modelContext
-        )
+        telTaak?.cancel()
+        let feedIDs = feeds.map(\.id)
+        let unreadOnly = feedCountMode == "unread"
+        let container = modelContext.container
+        telTaak = Task {
+            let tellers = await FeedBadgeCounter.countsInBackground(
+                feedIDs: feedIDs, unreadOnly: unreadOnly, container: container)
+            guard !Task.isCancelled else { return }
+            badgeCounts = tellers
+        }
     }
 
     private var emptyState: some View {
@@ -422,9 +434,24 @@ struct FeedRowView: View {
 /// artikel afzonderlijk, en dat bij elke wijziging opnieuw voor alle feeds.
 enum FeedBadgeCounter {
     static func counts(for feeds: [Feed], unreadOnly: Bool, context: ModelContext) -> [UUID: Int] {
+        counts(forFeedIDs: feeds.map(\.id), unreadOnly: unreadOnly, context: context)
+    }
+
+    /// Telt in een eigen `ModelContext` op een achtergrondthread, zodat tientallen
+    /// `fetchCount`-queries het openen van het feedoverzicht niet laten haperen (#161).
+    /// Bewust geen `@ModelActor`: die draaide zijn werk op het toestel alsnog op de main
+    /// thread (#153). De context ontstaat in de losse taak en wordt alleen daar gebruikt.
+    static func countsInBackground(feedIDs: [UUID], unreadOnly: Bool, container: ModelContainer) async
+        -> [UUID: Int]
+    {
+        await Task.detached(priority: .userInitiated) {
+            counts(forFeedIDs: feedIDs, unreadOnly: unreadOnly, context: ModelContext(container))
+        }.value
+    }
+
+    static func counts(forFeedIDs feedIDs: [UUID], unreadOnly: Bool, context: ModelContext) -> [UUID: Int] {
         var result: [UUID: Int] = [:]
-        for feed in feeds {
-            let feedID = feed.id
+        for feedID in feedIDs {
             let descriptor =
                 unreadOnly
                 ? FetchDescriptor<FeedItem>(predicate: #Predicate { $0.feed?.id == feedID && !$0.isRead })
