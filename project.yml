@@ -1,4 +1,4 @@
-name: RSSReader
+name: FableFlux
 options:
   bundleIdPrefix: com.rssreader
   deploymentTarget:
@@ -14,23 +14,24 @@ settings:
     CURRENT_PROJECT_VERSION: "1"
 
 targets:
-  RSSReader:
+  FableFlux:
     type: application
     platform: iOS
     deploymentTarget: "17.0"
     sources:
-      - path: RSSReader
+      - path: FableFlux
         excludes:
           - "**/*.md"
     settings:
       base:
+        # Bundle-ID bewust ongewijzigd: een nieuwe ID is voor iOS een andere app (gegevens kwijt), zie #145.
         PRODUCT_BUNDLE_IDENTIFIER: com.peterbijkerk.rssreader
         SWIFT_VERSION: "5.9"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         # Alternatieve FableFlux-iconen (AppIcon-<Thema>) voor de themakiezer in Instellingen.
         ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS: YES
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
-        INFOPLIST_FILE: RSSReader/Info.plist
+        INFOPLIST_FILE: FableFlux/Info.plist
         CODE_SIGN_STYLE: Automatic
         DEVELOPMENT_TEAM: 68K8BCC3DL
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.news
@@ -38,16 +39,16 @@ targets:
         SWIFT_EMIT_LOC_STRINGS: YES
     scheme:
       testTargets:
-        - RSSReaderTests
+        - FableFluxTests
 
-  RSSReaderTests:
+  FableFluxTests:
     type: bundle.unit-test
     platform: iOS
     deploymentTarget: "17.0"
     sources:
-      - path: RSSReaderTests
+      - path: FableFluxTests
     dependencies:
-      - target: RSSReader
+      - target: FableFlux
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.peterbijkerk.rssreader.tests

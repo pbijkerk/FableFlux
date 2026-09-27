@@ -1,12 +1,12 @@
 //
 //  ArticleFilterTests.swift
-//  RSSReaderTests
+//  FableFluxTests
 //
 
 import SwiftData
 import XCTest
 
-@testable import RSSReader
+@testable import FableFlux
 
 /// Voert het predicaat van de artikelenlijst uit tegen een echte in-memory store (#108).
 ///

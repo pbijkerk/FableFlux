@@ -36,10 +36,10 @@ jobs:
       - name: Opmaak
         run: |
           swift format --version
-          swift format -i -r RSSReader RSSReaderTests
+          swift format -i -r FableFlux FableFluxTests
           if ! git diff --exit-code -- '*.swift'; then
             echo "::error::De broncode is niet opgemaakt met swift-format."
-            echo "Draai lokaal 'swift format -i -r RSSReader RSSReaderTests' en commit het resultaat."
+            echo "Draai lokaal 'swift format -i -r FableFlux FableFluxTests' en commit het resultaat."
             exit 1
           fi
 
@@ -54,7 +54,7 @@ jobs:
       # een test kan dan in Xcode onzichtbaar zijn terwijl CI hem draait (#92).
       - name: Gegenereerd project is actueel
         run: |
-          if ! git diff --exit-code --stat RSSReader.xcodeproj/; then
+          if ! git diff --exit-code --stat FableFlux.xcodeproj/; then
             echo "::error::Het getrackte .xcodeproj loopt achter op project.yml."
             echo "Draai lokaal 'xcodegen generate' en commit het resultaat."
             exit 1
@@ -63,7 +63,7 @@ jobs:
       # Zonder toestelnaam, conform stap 2 van Workflow-feature.md.
       - name: Build-check
         run: |
-          xcodebuild -project RSSReader.xcodeproj -scheme RSSReader \
+          xcodebuild -project FableFlux.xcodeproj -scheme FableFlux \
             -destination 'generic/platform=iOS Simulator' build
 
       # Tests hebben wel een echt toestel nodig. Zoek er een op in plaats van een
@@ -88,5 +88,5 @@ jobs:
 
       - name: Tests
         run: |
-          xcodebuild -project RSSReader.xcodeproj -scheme RSSReader \
+          xcodebuild -project FableFlux.xcodeproj -scheme FableFlux \
             -destination "id=${{ steps.sim.outputs.udid }}" test

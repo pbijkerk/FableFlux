@@ -1,12 +1,12 @@
 //
 //  FeedBadgeCountTests.swift
-//  RSSReaderTests
+//  FableFluxTests
 //
 
 import SwiftData
 import XCTest
 
-@testable import RSSReader
+@testable import FableFlux
 
 /// Toetst dat de teller per feed via `fetchCount` dezelfde aantallen geeft als de oude
 /// telling over `feed.items`, in beide tellerstanden (#121).

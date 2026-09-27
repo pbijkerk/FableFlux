@@ -4,7 +4,7 @@
     {
       "name": "icon",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "7788", "--directory", "/Users/peterbijkerk/Documents/Claude projecten/RSSReader"],
+      "runtimeArgs": ["-m", "http.server", "7788", "--directory", "."],
       "port": 7788
     }
   ]

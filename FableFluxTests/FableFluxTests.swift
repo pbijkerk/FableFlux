@@ -1,19 +1,19 @@
 //
-//  RSSReaderTests.swift
-//  RSSReaderTests
+//  FableFluxTests.swift
+//  FableFluxTests
 //
 //  Created by Peter Bijkerk on 29/07/2026.
 //
 
 import XCTest
-@testable import RSSReader
+@testable import FableFlux
 
 /// Deterministische unit-tests voor de clustering-toewijzing. Ze toetsen de
 /// geïsoleerde, pure logica (`wordBoundaryText` + `assignedTopic`) zonder netwerk,
 /// Claude-call of live SwiftData-store. `TopicClusteringService` is `@MainActor`,
 /// dus alle tests draaien op de MainActor.
 @MainActor
-final class RSSReaderTests: XCTestCase {
+final class FableFluxTests: XCTestCase {
 
     /// Bouwt de genormaliseerde topics net als `cluster(...)`: elke trefwoord-frase
     /// wordt via `wordBoundaryText` op woordgrens omsloten.

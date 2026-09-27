@@ -1,4 +1,4 @@
-# Projectbrief — RSSReader
+# Projectbrief — FableFlux
 
 **Datum:** 2026-07-22
 **Status:** herijkt op 2026-07-22

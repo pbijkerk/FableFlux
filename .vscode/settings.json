@@ -1,6 +1,6 @@
 {
   // --- SweetPad: build/run/debug via het Xcode-project ---
-  "sweetpad.build.xcodeWorkspacePath": "RSSReader.xcodeproj/project.xcworkspace",
+  "sweetpad.build.xcodeWorkspacePath": "FableFlux.xcodeproj/project.xcworkspace",
 
   // --- Swift / SourceKit-LSP ---
   // Code-intelligence vereist buildServer.json (zie README / xcode-build-server).

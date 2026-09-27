@@ -1,12 +1,12 @@
 //
 //  PublicationDateSanityTests.swift
-//  RSSReaderTests
+//  FableFluxTests
 //
 
 import SwiftData
 import XCTest
 
-@testable import RSSReader
+@testable import FableFlux
 
 /// Toetst dat een publicatiedatum ver in de toekomst wordt geweigerd (#103).
 ///

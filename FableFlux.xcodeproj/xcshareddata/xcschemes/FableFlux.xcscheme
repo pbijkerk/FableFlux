@@ -15,10 +15,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "5DFE16F45D0C5EF4D6580911"
-               BuildableName = "RSSReader.app"
-               BlueprintName = "RSSReader"
-               ReferencedContainer = "container:RSSReader.xcodeproj">
+               BlueprintIdentifier = "E1C3FF45BE36C36641F69356"
+               BuildableName = "FableFlux.app"
+               BlueprintName = "FableFlux"
+               ReferencedContainer = "container:FableFlux.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -32,10 +32,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "5DFE16F45D0C5EF4D6580911"
-            BuildableName = "RSSReader.app"
-            BlueprintName = "RSSReader"
-            ReferencedContainer = "container:RSSReader.xcodeproj">
+            BlueprintIdentifier = "E1C3FF45BE36C36641F69356"
+            BuildableName = "FableFlux.app"
+            BlueprintName = "FableFlux"
+            ReferencedContainer = "container:FableFlux.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <Testables>
@@ -44,10 +44,10 @@
             parallelizable = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "967C54A52FA4F448C328B8E0"
-               BuildableName = "RSSReaderTests.xctest"
-               BlueprintName = "RSSReaderTests"
-               ReferencedContainer = "container:RSSReader.xcodeproj">
+               BlueprintIdentifier = "A8A7A6A0D9F2FAC617A774BE"
+               BuildableName = "FableFluxTests.xctest"
+               BlueprintName = "FableFluxTests"
+               ReferencedContainer = "container:FableFlux.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -68,10 +68,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "5DFE16F45D0C5EF4D6580911"
-            BuildableName = "RSSReader.app"
-            BlueprintName = "RSSReader"
-            ReferencedContainer = "container:RSSReader.xcodeproj">
+            BlueprintIdentifier = "E1C3FF45BE36C36641F69356"
+            BuildableName = "FableFlux.app"
+            BlueprintName = "FableFlux"
+            ReferencedContainer = "container:FableFlux.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <CommandLineArguments>
@@ -87,10 +87,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "5DFE16F45D0C5EF4D6580911"
-            BuildableName = "RSSReader.app"
-            BlueprintName = "RSSReader"
-            ReferencedContainer = "container:RSSReader.xcodeproj">
+            BlueprintIdentifier = "E1C3FF45BE36C36641F69356"
+            BuildableName = "FableFlux.app"
+            BlueprintName = "FableFlux"
+            ReferencedContainer = "container:FableFlux.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <CommandLineArguments>

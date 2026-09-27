@@ -1,10 +1,10 @@
-# RSSReader
+# FableFlux
 
 Een native iOS RSS-lezer met AI-gedreven samenvattingen, Mastodon-integratie en ondersteuning voor podcasts en video's.
 
 ## Doel
 
-RSSReader brengt al je informatiebronnen samen in één app: RSS-feeds, Mastodon-tijdlijnen, podcasts en videokanalen. De app groepeert artikelen automatisch per onderwerp en genereert samenvattingen — lokaal of via de Claude API — zodat je snel het nieuws kunt overzien zonder alles te hoeven lezen.
+FableFlux brengt al je informatiebronnen samen in één app: RSS-feeds, Mastodon-tijdlijnen, podcasts en videokanalen. De app groepeert artikelen automatisch per onderwerp en genereert samenvattingen — lokaal of via de Claude API — zodat je snel het nieuws kunt overzien zonder alles te hoeven lezen.
 
 ---
 
@@ -61,7 +61,7 @@ RSSReader brengt al je informatiebronnen samen in één app: RSS-feeds, Mastodon
 
 ### Architectuur
 ```
-RSSReader/
+FableFlux/
 ├── Models/          # SwiftData-modellen (Feed, FeedItem, MastodonAccount, Topic…)
 ├── Views/           # SwiftUI-views per scherm
 ├── Services/        # Businesslogica (parsing, refresh, clustering, Keychain)
@@ -87,7 +87,7 @@ Een sleutel is aan te maken op [console.anthropic.com](https://console.anthropic
 ## Installatie
 
 1. Clone de repository
-2. Open `RSSReader.xcodeproj` in Xcode
+2. Open `FableFlux.xcodeproj` in Xcode
 3. Selecteer een simulator of fysiek apparaat
 4. Build en run (`⌘R`)
 

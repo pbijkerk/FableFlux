@@ -1,11 +1,11 @@
 //
 //  RSSParserTests.swift
-//  RSSReaderTests
+//  FableFluxTests
 //
 
 import XCTest
 
-@testable import RSSReader
+@testable import FableFlux
 
 /// Toetst `RSSParser` op gedrag, via `parse(data:)` — niet op interne functies. Alles wat
 /// hier staat is pure logica: geen netwerk, geen SwiftData, geen Claude-call.

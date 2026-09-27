@@ -8,7 +8,7 @@
 ## Bevindingen
 
 ### 1. OPMLParser — mapfolders worden afgebroken na de eerste feed `[CRITICAL]`
-**Bestand:** `RSSReader/Services/OPMLParser.swift:63`
+**Bestand:** `FableFlux/Services/OPMLParser.swift:63`
 
 `didEndElement` wordt aangeroepen voor élk `<outline>`-element — zowel mapelementen als feedelementen. Alleen mapelementen verhogen `depth`, maar alle elementen verlagen het. Hierdoor wordt `currentFolderName` al genulld bij het sluiten van de eerste feed in een map.
 
@@ -24,7 +24,7 @@ Elke OPML-map met meer dan één feed is hierdoor stil gebroken.
 ---
 
 ### 2. TopicClusteringService — Claude API-fouten worden stil genegeerd `[HIGH]`
-**Bestand:** `RSSReader/Services/TopicClusteringService.swift:209`
+**Bestand:** `FableFlux/Services/TopicClusteringService.swift:209`
 
 De HTTP-statuscode van de Claude API-response wordt niet gecontroleerd. Een 401 (ongeldige API-sleutel) of 429 (limiet bereikt) retourneert een Anthropic-foutbody die niet past in de `Res`-struct, waardoor `JSONDecoder` een fout gooit — en de functie stilletjes terugvalt op `localSummary`.
 
@@ -35,7 +35,7 @@ De HTTP-statuscode van de Claude API-response wordt niet gecontroleerd. Een 401 
 ---
 
 ### 3. MastodonService — Image-URLs niet ge-escaped in HTML-attribuut `[MEDIUM]`
-**Bestand:** `RSSReader/Services/MastodonService.swift:273`
+**Bestand:** `FableFlux/Services/MastodonService.swift:273`
 
 Image-URLs uit de Mastodon API worden direct in een `src`-attribuut geïnterpoleerd zonder HTML-attribuut-escaping:
 
@@ -50,7 +50,7 @@ Een URL met een letterlijk `"` sluit het attribuut vroegtijdig, produceert misvo
 ---
 
 ### 4. MastodonService — MIME-type hardcoded als `image/jpeg` `[MEDIUM]`
-**Bestand:** `RSSReader/Services/MastodonService.swift:267`
+**Bestand:** `FableFlux/Services/MastodonService.swift:267`
 
 ```swift
 item.enclosureMIMEType = "image/jpeg"  // altijd, ongeacht het werkelijke formaat
@@ -63,7 +63,7 @@ Mastodon-bijlagen kunnen PNG, GIF, WebP of AVIF zijn. Het verkeerde MIME-type wo
 ---
 
 ### 5. ItemDetailView — `enclosureURL` niet ge-escaped in HTML `[MEDIUM]`
-**Bestand:** `RSSReader/Views/ItemDetailView.swift:225`
+**Bestand:** `FableFlux/Views/ItemDetailView.swift:225`
 
 ```swift
 rssHTML += "\n<img src=\"\(imgURL)\" alt=\"\" style=\"...\">"
@@ -76,7 +76,7 @@ Dezelfde escaping-omissie als bevinding #3, maar dan voor `item.enclosureURL` in
 ---
 
 ### 6. FeedRefreshService — Alleen de laatste Mastodon-fout wordt getoond `[LOW]`
-**Bestand:** `RSSReader/Services/FeedRefreshService.swift:61`
+**Bestand:** `FableFlux/Services/FeedRefreshService.swift:61`
 
 In de Mastodon-vernieuwingsloop wordt `lastError` bij elke account overschreven:
 
@@ -94,7 +94,7 @@ Als meerdere accounts mislukken, verdwijnt elke fout behalve de laatste stilletj
 ---
 
 ### 7. MastodonService — Pruning-logica gedupliceerd `[LOW]`
-**Bestand:** `RSSReader/Services/MastodonService.swift:344`
+**Bestand:** `FableFlux/Services/MastodonService.swift:344`
 
 De bewaarperiode-logica (lees UserDefaults, bereken cutoff, verwijder niet-opgeslagen items) is identiek geïmplementeerd in zowel `FeedRefreshService.pruneOldItems` als `MastodonService.refreshFeed`. Een toekomstige wijziging in één kopie zal de andere missen.
 

@@ -1,12 +1,12 @@
 //
 //  SummaryWindowTests.swift
-//  RSSReaderTests
+//  FableFluxTests
 //
 
 import SwiftData
 import XCTest
 
-@testable import RSSReader
+@testable import FableFlux
 
 /// Toetst het recentheidsvenster van de samenvatting en de terugval op `fetchedAt` (#89).
 ///

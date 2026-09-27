@@ -1,11 +1,11 @@
 //
 //  OPMLParserTests.swift
-//  RSSReaderTests
+//  FableFluxTests
 //
 
 import XCTest
 
-@testable import RSSReader
+@testable import FableFlux
 
 /// Toetst de mapindeling van `OPMLParser`. De teller die mappen bijhoudt mag niet
 /// door de sluitingstag van een feed worden verlaagd; anders belandt elke feed ná

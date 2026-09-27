@@ -5,6 +5,7 @@ import OSLog
 /// Eenvoudige Keychain-wrapper voor het veilig opslaan van gevoelige strings.
 enum KeychainService {
 
+    /// Bewust de oude naam: een andere service maakt de opgeslagen sleutels onvindbaar (#145).
     private static let service = "com.rssreader.app"
 
     private static let logger = Logger(

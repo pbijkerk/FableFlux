@@ -12,7 +12,7 @@ Voer deze stappen in volgorde uit zodra een feature af is. Sla geen stappen over
 - Faalt de build: eerst herstellen, daarna verder.
 - Gebruik een destination zonder toestelnaam; die hoeft voor een build-check niet:
   ```bash
-  xcodebuild -project RSSReader.xcodeproj -scheme RSSReader \
+  xcodebuild -project FableFlux.xcodeproj -scheme FableFlux \
     -destination 'generic/platform=iOS Simulator' build
   ```
 - Noem je toch een toestel, geef dan ook `OS=` mee. Zonder die sleutel kiest `xcodebuild`
@@ -69,7 +69,7 @@ doet dat zelf en meldt in gewone taal wat er mankeert. Ook de iCloud-valkuil hie
 al in: Xcode bouwt standaard naar `~/Library/Developer/Xcode/DerivedData`, buiten de projectmap.
 
 1. `xcodegen generate` in de terminal.
-2. `RSSReader.xcodeproj` openen; iPhone aangesloten en ontgrendeld.
+2. `FableFlux.xcodeproj` openen; iPhone aangesloten en ontgrendeld.
 3. **Product → Scheme → Edit Scheme → Run → Build Configuration: `Release`.** Sla je dit over,
    dan installeer je een Debug-build.
 4. Het toestel kiezen in de toolbar en `⌘R`. Daarna de debugger stoppen met `⌘.`; de app blijft
@@ -90,12 +90,12 @@ herkoppelen, een ander toestel of een andere Mac. De regel moet `available (pair
 xcodegen generate
 DEVICE=$(xcrun devicectl list devices | grep iPhone | grep 'available (paired)' \
   | grep -oE '[0-9A-F]{8}-([0-9A-F]{4}-){3}[0-9A-F]{12}' | head -1)
-DERIVED=~/Library/Developer/Xcode/DerivedData/RSSReader-device
-xcodebuild -project RSSReader.xcodeproj -scheme RSSReader -configuration Release \
+DERIVED=~/Library/Developer/Xcode/DerivedData/FableFlux-device
+xcodebuild -project FableFlux.xcodeproj -scheme FableFlux -configuration Release \
   -destination 'platform=iOS,name=iPhone van Peter' \
   -derivedDataPath "$DERIVED" -allowProvisioningUpdates build
 xcrun devicectl device install app --device "$DEVICE" \
-  "$DERIVED/Build/Products/Release-iphoneos/RSSReader.app"
+  "$DERIVED/Build/Products/Release-iphoneos/FableFlux.app"
 ```
 
 Heet het toestel anders, pas dan de naam aan; `xcrun devicectl list devices` toont hem.
@@ -103,7 +103,7 @@ Controleer na afloop het versienummer:
 
 ```bash
 /usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" \
-  "$DERIVED/Build/Products/Release-iphoneos/RSSReader.app/Info.plist"
+  "$DERIVED/Build/Products/Release-iphoneos/FableFlux.app/Info.plist"
 ```
 
 ### Bouw niet binnen de projectmap
@@ -119,10 +119,10 @@ niet worden ondertekend.
 Naast de handmatige stappen hierboven draait er een CI-workflow op elke pull request naar
 `main`. Die doet precies drie dingen:
 
-- **Opmaak** — draait swift-format over `RSSReader/` en `RSSReaderTests/` en faalt als dat
+- **Opmaak** — draait swift-format over `FableFlux/` en `FableFluxTests/` en faalt als dat
   een diff oplevert.
 - **Build-check** — dezelfde controle als stap 2, met `generic/platform=iOS Simulator`.
-- **Tests** — de unit-tests in `RSSReaderTests` op een simulator die de workflow zelf opzoekt.
+- **Tests** — de unit-tests in `FableFluxTests` op een simulator die de workflow zelf opzoekt.
 
 Dat is bewust smal gehouden: het valideert wat een agent of reviewer anders handmatig moet
 draaien, en niets meer.
@@ -161,7 +161,7 @@ minuten — orde van grootte 20–30 runs per maand. Daarom: alleen op PR's, en
 `cancel-in-progress` zodat een nieuwe push de vorige run afbreekt.
 
 ### Het gegenereerde project blijft actueel
-`RSSReader.xcodeproj` wordt uit `project.yml` gegenereerd, maar staat ook in Git. CI draait
+`FableFlux.xcodeproj` wordt uit `project.yml` gegenereerd, maar staat ook in Git. CI draait
 daarom `xcodegen generate` en faalt als dat een verschil oplevert. Voeg je een bestand toe,
 draai dan `xcodegen generate` en neem het resultaat mee in dezelfde commit.
 

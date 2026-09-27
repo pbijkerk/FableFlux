@@ -1,12 +1,12 @@
 //
 //  TopicClusteringOrderTests.swift
-//  RSSReaderTests
+//  FableFluxTests
 //
 
 import SwiftData
 import XCTest
 
-@testable import RSSReader
+@testable import FableFlux
 
 /// Legt vast dat de samenvatting op de **nieuwste** artikelen wordt gebaseerd (#65).
 /// `generateSummaryWithClaude` en `localSummary` knippen allebei met `prefix(...)`;
