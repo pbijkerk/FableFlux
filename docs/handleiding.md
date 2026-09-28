@@ -1,6 +1,6 @@
 # FableFlux — gebruikershandleiding
 
-Deze handleiding hoort bij FableFlux 1.11.1. FableFlux is een nieuwslezer voor de iPhone. De app
+FableFlux is een nieuwslezer voor de iPhone. De app
 haalt RSS- en Atom-feeds, podcasts, videokanalen en je Mastodon-tijdlijn op. Die artikelen
 groepeert hij per onderwerp, en elke ochtend (of wanneer je wilt) krijg je een samenvatting van
 wat er de afgelopen twee dagen speelde.
@@ -96,8 +96,9 @@ ook zelf uit.
 ### De detailpagina van een onderwerp
 Tik op de kop van een kaart. Je ziet dan de volledige samenvatting en de lijst met alle
 artikelen van dat onderwerp. Staat het onderwerp nog niet bij je onderwerpen, dan vraagt de
-banner onderin *"Do you like this topic?"*. Met **Save** wordt het een favoriet onderwerp.
-Let op wat dat betekent (zie [Favoriete onderwerpen](#favoriete-onderwerpen)).
+banner onderin *"Interessant onderwerp?"*. Met **Favoriet maken** wordt het een favoriet
+onderwerp. Dat komt dan bovenaan op **Vandaag** te staan (zie
+[Favoriete onderwerpen](#favoriete-onderwerpen)).
 
 ---
 
@@ -189,21 +190,19 @@ feed voor het laatst ververst is. Tik op een feed voor de artikelen van alleen d
 ### Een feed toevoegen
 1. Tik op **+ → Feed toevoegen**.
 2. Vul het adres van de feed in, bijvoorbeeld `nos.nl/feeds/...`. `https://` mag je weglaten.
-3. Tik op **Add Feed**. De app controleert of het adres een geldige feed is, neemt de naam
+3. Tik op **Feed toevoegen**. De app controleert of het adres een geldige feed is, neemt de naam
    over en haalt direct de artikelen op.
 
 Video- en podcastfeeds (YouTube, Vimeo, podcasts) herkent de app zelf.
 
-> Het toevoegscherm en het OPML-scherm zijn nog Engelstalig (**Add Feed**, **Import OPML**).
-
 ### OPML importeren
 Een OPML-bestand is een exportbestand met feeds, uit vrijwel elke andere RSS-lezer te halen.
 
-1. Tik op **+ → OPML importeren → Choose File** en kies het bestand (bijvoorbeeld uit
+1. Tik op **+ → OPML importeren → Bestand kiezen** en kies het bestand (bijvoorbeeld uit
    Bestanden of iCloud Drive).
 2. Je krijgt een lijst van alle gevonden feeds. Feeds die je al hebt, zijn gemarkeerd met
-   *Already added*. Vink aan wat je wilt (**Select All** / **Deselect All**).
-3. Tik op **Import (n)**.
+   *Al toegevoegd*. Vink aan wat je wilt (**Alles selecteren** / **Niets selecteren**).
+3. Tik op **Importeer (n)**.
 
 De mapindeling uit het OPML-bestand wordt overgenomen.
 
@@ -267,11 +266,17 @@ Onderwerpen bepalen hoe **Vandaag** is ingedeeld. Een onderwerp is een naam plus
 trefwoorden. Een artikel komt bij het onderwerp waarvan het de meeste trefwoorden bevat.
 
 ### Standaardonderwerpen
-Zolang je niets instelt, gebruikt de app acht ingebouwde onderwerpen: *Artificial Intelligence,
-Technology, Politics, Science, Business, Sports, Health* en *Entertainment*. De trefwoorden
-daarvan zijn Engels. Nederlandstalige artikelen passen daardoor vaak op geen enkel onderwerp en
-komen dan niet in de samenvatting. Voeg voor Nederlandstalige feeds dus eigen onderwerpen met
-Nederlandse trefwoorden toe.
+De app heeft acht ingebouwde onderwerpen: *Kunstmatige intelligentie, Technologie, Politiek,
+Wetenschap, Economie, Sport, Gezondheid* en *Cultuur & media*. Ze herkennen zowel Nederlandse als
+Engelse artikelen. De naam volgt de taal van de samenvatting (zie
+[Samenvattingen](#samenvattingen)): staat die op *English*, dan heet Politiek *Politics*.
+
+Een artikel dat op geen enkel onderwerp past, komt niet in de samenvatting. Mis je een
+onderwerp, maak dan een eigen onderwerp aan.
+
+Geef je een eigen onderwerp dezelfde naam als een ingebouwd onderwerp, bijvoorbeeld *Sport*, dan
+vervangt het dat ingebouwde onderwerp. Het houdt je eigen trefwoorden en krijgt die van het
+ingebouwde onderwerp erbij. Zo staat er nooit twee keer een kaart *Sport* op Vandaag.
 
 ### Eigen onderwerpen
 **Instellingen → Onderwerpen → Onderwerpen beheren → +**
@@ -287,17 +292,14 @@ In de lijst veeg je een onderwerp naar rechts voor **Favoriet maken** / **Favori
 verwijderen**, en naar links voor **Verwijderen**. Tik op een onderwerp om het te bewerken.
 
 ### Favoriete onderwerpen
-Dit werkt anders dan je misschien verwacht:
+Een favoriet onderwerp krijgt voorrang: het staat bovenaan op **Vandaag**, met een hartje voor
+de naam. Daaronder volgen de andere onderwerpen, gesorteerd op het aantal artikelen. Alle
+onderwerpen blijven meedoen: je eigen onderwerpen en de ingebouwde onderwerpen.
 
-- **Heb je géén favorieten**, dan gebruikt de app je eigen onderwerpen **plus** de acht
-  standaardonderwerpen.
-- **Heb je minstens één favoriet**, dan gebruikt de app **alleen je favorieten**. Je gewone
-  onderwerpen en de standaardonderwerpen doen dan niet meer mee.
-
-Tik je op de detailpagina van een onderwerp op **Save**, dan wordt dat onderwerp een favoriet.
-Na je eerste **Save** krijg je op **Vandaag** dus alleen nog dat onderwerp te zien. Wil je
-meerdere onderwerpen houden, maak ze dan allemaal favoriet of haal de favorietmarkering weer
-weg.
+Favoriet maken kan op drie manieren:
+- op de detailpagina van een onderwerp, met **Favoriet maken**
+- in **Onderwerpen beheren**, door een onderwerp naar rechts te vegen
+- bij het bewerken van een onderwerp, met **Markeer als favoriet**
 
 ---
 
@@ -317,10 +319,8 @@ accounts koppelen.
 - **Account verwijderen:** veeg het account naar links in **Instellingen → Mastodon**. De
   bijbehorende feed verdwijnt mee.
 - **Oranje waarschuwingsdriehoek** naast een account: de toegang is verlopen of ingetrokken.
-  Verwijder eerst het oude account (naar links vegen) en voeg het daarna opnieuw toe via
-  **Mastodon-account toevoegen**. Sla je het verwijderen over, dan staat het account er twee keer
-  en verschijnt elk bericht dubbel. Let op: met het oude account verdwijnen ook de berichten
-  van die tijdlijn, inclusief bewaarde.
+  Voeg het account opnieuw toe via **Mastodon-account toevoegen**. De app herkent het account
+  en werkt het bij. Je tijdlijn en bewaarde berichten blijven staan.
 
 Tip: een drukke tijdlijn overheerst de samenvatting al snel. Zet **Meenemen in samenvatting**
 voor die feed uit als je dat niet wilt.
@@ -434,15 +434,8 @@ De naam van de app en het versienummer.
 
 **Vandaag is leeg, maar Artikelen staat vol.**
 Vandaag kijkt 48 uur terug en toont alleen artikelen die op een onderwerp passen. Controleer of
-er recente artikelen zijn en of je onderwerpen bij je feeds passen. Nederlandstalige feeds
-hebben Nederlandse trefwoorden nodig (zie [Standaardonderwerpen](#standaardonderwerpen)). Heb je
-een favoriet onderwerp, dan doen alleen de favorieten mee
-(zie [Favoriete onderwerpen](#favoriete-onderwerpen)).
-
-**Na het bewaren van één onderwerp zie ik nog maar één kaart op Vandaag.**
-Dat komt door de favorietenregel (zie [Favoriete onderwerpen](#favoriete-onderwerpen)). Maak de
-andere onderwerpen die je wilt zien ook favoriet, of haal de favorietmarkering weg in
-**Onderwerpen beheren**.
+er recente artikelen zijn en of je onderwerpen bij je feeds passen. Mist er een onderwerp,
+maak dan een eigen onderwerp aan (zie [Onderwerpen](#9-onderwerpen)).
 
 **Eén feed overheerst de samenvatting.**
 Zet **Meenemen in samenvatting** uit voor die feed (lang indrukken → **Instellingen**).

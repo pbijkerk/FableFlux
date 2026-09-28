@@ -13,6 +13,7 @@ en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 - Opnieuw koppelen van een al gekoppeld Mastodon-account werkt dat account bij (nieuw token, waarschuwing weg) in plaats van een tweede account en feed aan te maken, waardoor berichten niet meer dubbel verschijnen (#159)
 
 ### Gewijzigd
+- Handleiding bijgewerkt voor favorieten met voorrang, Nederlandse onderwerpen, vertaalde schermen en opnieuw koppelen van Mastodon; besluit #154 vastgelegd in de projectbrief
 - De laatste Engelstalige schermteksten in feed toevoegen, OPML-import, samenvattingsdetail en feedlijst zijn vertaald naar het Nederlands (#156)
 - De standaardonderwerpen herkennen ook Nederlandse artikelen en tonen hun naam in de samenvattingstaal, zoals "Politiek" (#155)
 
