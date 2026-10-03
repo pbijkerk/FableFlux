@@ -5,6 +5,11 @@ Alle noemenswaardige wijzigingen aan dit project worden in dit bestand bijgehoud
 Het formaat is gebaseerd op [Keep a Changelog](https://keepachangelog.com/nl/1.1.0/)
 en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 
+## [Unreleased]
+
+### Opgelost
+- De feednaam bovenaan de artikelpager hoort weer bij het artikel dat in beeld is, ook na vegen (#174)
+
 ## [1.12.0] - 2026-09-28
 
 ### Opgelost

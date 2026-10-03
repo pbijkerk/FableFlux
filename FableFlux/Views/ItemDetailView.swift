@@ -10,8 +10,8 @@ struct ItemDetailView: View {
     /// Of dit de pagina is die de gebruiker daadwerkelijk bekijkt. De artikelpager bouwt de
     /// buurpagina's vooraf op, zodat hun tekst er al staat tijdens het vegen (#149). Wat
     /// niet voor een buurpagina hoort, hangt aan deze vlag: de knoppen in de navigatiebalk
-    /// (die stonden anders dubbel, #98), de fact-check — netwerkwerk voor een pagina die je
-    /// misschien nooit ziet (#106) — en de gelezen-markering.
+    /// (die stonden anders dubbel, #98), de titel (#174), de fact-check — netwerkwerk voor
+    /// een pagina die je misschien nooit ziet (#106) — en de gelezen-markering.
     ///
     /// `ArticlePageView` geeft alleen de zichtbare pagina `true` mee. Standaard `true`,
     /// zodat het scherm losstaand — vanuit de samenvatting — ongewijzigd werkt.
@@ -65,7 +65,16 @@ struct ItemDetailView: View {
         // achtergrondloze VStack de systeemstandaard in plaats van de appkleur.
         .background(Theme.background.ignoresSafeArea())
         .overlay(alignment: .top) { readingProgressBar }
-        .navigationTitle(item.feed?.title ?? "Artikel")
+        // De titel alleen voor de zichtbare pagina, net als de knoppen. De pager bouwt ook de
+        // buren op; zetten die alle drie een titel, dan is niet bepaald welke SwiftUI toont en
+        // liep de feednaam een artikel achter (#174). Via een lege achtergrond en niet met een
+        // `if` om de hele view: die zou bij elke veeg de pagina opnieuw opbouwen, webview en
+        // al. Een titel uit een achtergrond komt gewoon in de navigatiebalk terecht.
+        .background {
+            if isActive {
+                Color.clear.navigationTitle(item.feed?.title ?? "Artikel")
+            }
+        }
         .navigationBarTitleDisplayMode(.inline)
         // Geen eigen .toolbarBackground: op iOS 26 is de balk een zwevende capsule die
         // zelf een scroll-edge-effect over de inhoud legt. Een afgedwongen materiaal
