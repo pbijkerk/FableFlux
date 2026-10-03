@@ -368,10 +368,22 @@ struct ArticlePageView: View {
     /// achteraan de positie niet verschuiven.
     @State private var currentID: UUID?
 
+    /// Wat de `ScrollView` als zichtbaar meldt. Los van `currentID`: bij de eerste layout
+    /// staat hij op offset 0 en meldt hij het eerste artikel, ook als je een ander aantikte
+    /// (#175). Die tussenstand mag niet in `currentID` belanden, want dan wordt het eerste
+    /// artikel actief en dus als gelezen gemarkeerd.
+    @State private var scrollID: UUID?
+
+    /// Of de `ScrollView` het startartikel heeft bereikt. Pas daarna volgt `currentID` hem.
+    @State private var gepositioneerd: Bool
+
     init(items: [FeedItem], initialIndex: Int, onReachEnd: (() -> Void)? = nil) {
         self.items = items
         self.onReachEnd = onReachEnd
-        self._currentID = State(initialValue: items.indices.contains(initialIndex) ? items[initialIndex].id : nil)
+        let start = items.indices.contains(initialIndex) ? items[initialIndex].id : nil
+        self._currentID = State(initialValue: start)
+        // Op offset 0 staat de ScrollView vanzelf al goed; daar valt niets te corrigeren.
+        self._gepositioneerd = State(initialValue: start == nil || initialIndex == 0)
     }
 
     /// Hoe ver de uitgaande pagina meeschuift (0 = blijft staan, 1 = schuift gelijk op).
@@ -383,15 +395,42 @@ struct ArticlePageView: View {
     /// er staat zodra je veegt. De rest is een lege vlakte in de achtergrondkleur.
     private static let buren = 1
 
+    var body: some View {
+        ScrollViewReader { proxy in
+            pager
+                .scrollPosition(id: $scrollID)
+                // De beginwaarde van een `scrollPosition`-binding neemt de ScrollView bij de
+                // eerste layout niet over (#175). `scrollTo` op het id wel: de HStack is niet
+                // lazy, dus elke pagina bestaat al en het doel is altijd te vinden. Dat gebeurt
+                // in `onAppear`, vóór het eerste beeld, zodat er geen sprong te zien is.
+                .onAppear {
+                    if !gepositioneerd, let currentID { proxy.scrollTo(currentID, anchor: .leading) }
+                }
+                .onChange(of: scrollID) { _, id in
+                    guard let id else { return }
+                    if gepositioneerd {
+                        currentID = id
+                    } else if id == currentID {
+                        gepositioneerd = true
+                    }
+                }
+        }
+        .onChange(of: currentID, initial: true) { _, id in
+            if id != nil, id == items.last?.id { onReachEnd?() }
+        }
+        .background(Theme.background.ignoresSafeArea())
+        .ignoresSafeArea(edges: .bottom)
+    }
+
     // Geen pagina-TabView: die legt pagina's naast elkaar, en de naad daartussen liet een
     // smalle strook zien (#149). Hier overlappen pagina's: de volgende schuift óver de
     // vorige, die vertraagd meeschuift en donkerder wordt — het terugveeg-patroon van iOS.
     //
     // Geen LazyHStack: die bouwt een pagina pas als hij in beeld schuift, en dan verschijnt
     // de tekst pas tijdens de veeg. Een HStack met alleen de buren gevuld bouwt die vooraf.
-    var body: some View {
+    private var pager: some View {
         let huidige = items.firstIndex { $0.id == currentID } ?? 0
-        ScrollView(.horizontal) {
+        return ScrollView(.horizontal) {
             HStack(spacing: 0) {
                 ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
                     Group {
@@ -424,12 +463,6 @@ struct ArticlePageView: View {
             .scrollTargetLayout()
         }
         .scrollTargetBehavior(.paging)
-        .scrollPosition(id: $currentID)
         .scrollIndicators(.hidden)
-        .onChange(of: currentID, initial: true) { _, id in
-            if id != nil, id == items.last?.id { onReachEnd?() }
-        }
-        .background(Theme.background.ignoresSafeArea())
-        .ignoresSafeArea(edges: .bottom)
     }
 }
