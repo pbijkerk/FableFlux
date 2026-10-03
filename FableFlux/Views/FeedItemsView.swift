@@ -374,7 +374,8 @@ struct ArticlePageView: View {
     /// artikel actief en dus als gelezen gemarkeerd.
     @State private var scrollID: UUID?
 
-    /// Of de `ScrollView` het startartikel heeft bereikt. Pas daarna volgt `currentID` hem.
+    /// Of de `ScrollView` van het eerste artikel af is. Tot dan negeert `currentID` alleen
+    /// die tussenstand; elk ander gemeld artikel (het startartikel of een verdere veeg) telt.
     @State private var gepositioneerd: Bool
 
     init(items: [FeedItem], initialIndex: Int, onReachEnd: (() -> Void)? = nil) {
@@ -406,13 +407,19 @@ struct ArticlePageView: View {
                 .onAppear {
                     if !gepositioneerd, let currentID { proxy.scrollTo(currentID, anchor: .leading) }
                 }
+                // Vangnet als die `scrollTo` te vroeg kwam en niets deed: `.task` loopt na de
+                // eerste layout, en dan scrolt een schrijfactie op de binding wel. Liever dit dan
+                // een tweede `scrollTo`, omdat de binding zo ook direct het startartikel meldt
+                // en de pager niet op het eerste artikel kan blijven hangen.
+                .task {
+                    if !gepositioneerd { scrollID = currentID }
+                }
                 .onChange(of: scrollID) { _, id in
                     guard let id else { return }
-                    if gepositioneerd {
-                        currentID = id
-                    } else if id == currentID {
-                        gepositioneerd = true
-                    }
+                    // Alleen het eerste artikel kan de tussenstand van de eerste layout zijn.
+                    if !gepositioneerd, id == items.first?.id { return }
+                    gepositioneerd = true
+                    currentID = id
                 }
         }
         .onChange(of: currentID, initial: true) { _, id in
