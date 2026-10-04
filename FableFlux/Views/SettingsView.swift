@@ -45,6 +45,8 @@ struct SettingsView: View {
     @AppStorage(AppConfiguration.UserDefaultsKeys.feedCountMode) private var feedCountMode = "total"
     @AppStorage(AppConfiguration.UserDefaultsKeys.previewLineCount) private var previewLineCount = 2
     @AppStorage(AppConfiguration.UserDefaultsKeys.showArticleThumbnails) private var showArticleThumbnails = true
+    @AppStorage(AppConfiguration.UserDefaultsKeys.articleLoadLimit)
+    private var articleLoadLimit = AppConfiguration.defaultArticleLoadLimit
 
     @AppStorage(AppConfiguration.UserDefaultsKeys.feedListScale)
     private var feedListScale = AppConfiguration.defaultFeedListScale
@@ -280,7 +282,7 @@ struct SettingsView: View {
     // MARK: - 1. Weergave
 
     private var weergaveSection: some View {
-        Section("Weergave") {
+        Section {
             Toggle("Verberg gelezen artikelen", isOn: $hideReadArticles)
             Toggle("Toon miniatuurafbeeldingen", isOn: $showArticleThumbnails)
             Picker("Teller per feed", selection: $feedCountMode) {
@@ -288,6 +290,17 @@ struct SettingsView: View {
                 Text("Ongelezen artikelen").tag("unread")
             }
             Stepper("Regels voorvertoning: \(previewLineCount)", value: $previewLineCount, in: 1...5)
+            Picker("Artikelen in de lijst", selection: $articleLoadLimit) {
+                ForEach(AppConfiguration.articleLoadLimitOptions, id: \.self) { aantal in
+                    Text("Hooguit \(aantal)").tag(aantal)
+                }
+            }
+        } header: {
+            Text("Weergave")
+        } footer: {
+            if articleLoadLimit > AppConfiguration.defaultArticleLoadLimit {
+                Text("Langere lijsten kunnen minder soepel scrollen.")
+            }
         }
     }
 

@@ -1,10 +1,18 @@
-import SwiftUI
+import OSLog
 import SwiftData
+import SwiftUI
+
+private let articleListLogger = Logger(
+    subsystem: AppConfiguration.LogSubsystem.main,
+    category: AppConfiguration.LogSubsystem.Category.persistence
+)
 
 struct AllArticlesView: View {
     @Environment(\.modelContext) private var modelContext
     @AppStorage(AppConfiguration.UserDefaultsKeys.hideReadArticles) private var hideReadArticles = false
     @AppStorage(AppConfiguration.UserDefaultsKeys.articlesFolderFilter) private var folderFilterID = ""
+    @AppStorage(AppConfiguration.UserDefaultsKeys.articleLoadLimit)
+    private var maximum = AppConfiguration.defaultArticleLoadLimit
 
     @Query(sort: \FeedFolder.sortOrder) private var folders: [FeedFolder]
     @Query private var feeds: [Feed]
@@ -14,8 +22,9 @@ struct AllArticlesView: View {
 
     @State private var showFeedManagement = false
 
-    /// Hoeveel artikelen de lijst nu ophaalt. Groeit terwijl je naar beneden scrolt en
-    /// begint opnieuw zodra een filter wijzigt — dan kijk je immers naar een andere lijst.
+    /// Hoeveel artikelen de lijst nu ophaalt. Groeit terwijl je naar beneden scrolt, tot
+    /// hooguit `maximum`, en begint opnieuw zodra een filter wijzigt — dan kijk je immers
+    /// naar een andere lijst.
     @State private var limit = AppConfiguration.articlePageSize
 
     /// Lege string of een verwijderde map betekent: geen filter.
@@ -40,12 +49,18 @@ struct AllArticlesView: View {
                 hideRead: hideReadArticles,
                 feedIDs: activeFeedIDs,
                 limit: limit,
-                onReachEnd: { limit += AppConfiguration.articlePageSize },
+                maximum: maximum,
+                onReachEnd: {
+                    limit = ArticleFilter.nextLimit(
+                        after: limit, pageSize: AppConfiguration.articlePageSize, maximum: maximum)
+                },
                 onRefresh: { await refreshFeeds() },
                 emptyState: { emptyState }
             )
             .onChange(of: hideReadArticles) { limit = AppConfiguration.articlePageSize }
             .onChange(of: folderFilterID) { limit = AppConfiguration.articlePageSize }
+            // Een lager maximum geldt meteen, ook voor wat al geladen is.
+            .onChange(of: maximum) { limit = min(limit, maximum) }
             .safeAreaInset(edge: .top, spacing: 0) {
                 if !folders.isEmpty {
                     filterBar
@@ -185,21 +200,34 @@ private struct ArticleListView<EmptyState: View>: View {
     /// De gevraagde limiet. Zijn er precies zoveel artikelen geladen, dan kunnen er meer
     /// zijn; is het er minder, dan is dit het einde van de lijst.
     private let limit: Int
+    private let maximum: Int
+    private let predicate: Predicate<FeedItem>
+    /// Wanneer `hasOlderArticles` opnieuw bepaald moet worden: bij een ander aantal, een
+    /// ander filter of een ander maximum, en wanneer er bovenaan nieuwe artikelen bijkomen.
+    private let olderArticlesCheck: OlderArticlesCheck
     private let onReachEnd: () -> Void
     private let onRefresh: () async -> Void
     private let emptyState: () -> EmptyState
 
     @State private var opslagFout: OpslagFoutmelding?
 
+    /// Of er achter het maximum nog artikelen zijn. Pas bepaald als het maximum bereikt is;
+    /// een lijst die vanzelf korter is, krijgt geen verwijzing naar oudere artikelen.
+    @State private var hasOlderArticles = false
+
     init(
         hideRead: Bool,
         feedIDs: [UUID]?,
         limit: Int,
+        maximum: Int,
         onReachEnd: @escaping () -> Void,
         onRefresh: @escaping () async -> Void,
         @ViewBuilder emptyState: @escaping () -> EmptyState
     ) {
         self.limit = limit
+        self.maximum = maximum
+        self.predicate = ArticleFilter.predicate(hideRead: hideRead, feedIDs: feedIDs)
+        self.olderArticlesCheck = OlderArticlesCheck(hideRead: hideRead, feedIDs: feedIDs, maximum: maximum)
         self.onReachEnd = onReachEnd
         self.onRefresh = onRefresh
         self.emptyState = emptyState
@@ -229,7 +257,7 @@ private struct ArticleListView<EmptyState: View>: View {
                 // dat de database er precies zoveel gaf als gevraagd; dan zijn er
                 // waarschijnlijk meer. Gaf hij er minder, dan is dit het einde.
                 .onAppear {
-                    if item.id == items.last?.id, items.count == limit {
+                    if item.id == items.last?.id, items.count == limit, limit < maximum {
                         onReachEnd()
                     }
                 }
@@ -258,8 +286,22 @@ private struct ArticleListView<EmptyState: View>: View {
                     .tint(Theme.accentSecondary)
                 }
             }
+
+            if hasOlderArticles {
+                Text("Oudere artikelen vind je via een map of feed.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity)
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
+                    .padding(.vertical, 12)
+            }
         }
         .listStyle(.plain)
+        .task(id: olderArticlesCheck.with(count: items.count, firstID: items.first?.id)) {
+            hasOlderArticles = ArticleFilter.hasMore(
+                than: items.count, maximum: maximum, predicate: predicate, in: modelContext)
+        }
         .scrollContentBackground(.hidden)
         // Eén bestemming voor de hele lijst in plaats van één per rij. De index wordt
         // pas opgezocht wanneer er daadwerkelijk genavigeerd wordt; dat is één keer
@@ -279,6 +321,22 @@ private struct ArticleListView<EmptyState: View>: View {
             }
         }
         .opslagFoutmelding($opslagFout)
+    }
+}
+
+/// De sleutel voor het opnieuw bepalen van `hasOlderArticles` in `ArticleListView`.
+private struct OlderArticlesCheck: Hashable {
+    let hideRead: Bool
+    let feedIDs: [UUID]?
+    let maximum: Int
+    var count = 0
+    var firstID: UUID?
+
+    func with(count: Int, firstID: UUID?) -> Self {
+        var copy = self
+        copy.count = count
+        copy.firstID = firstID
+        return copy
     }
 }
 
@@ -317,6 +375,30 @@ enum ArticleFilter {
         descriptor.relationshipKeyPathsForPrefetching = [\FeedItem.feed, \FeedItem.factCheckResults]
         descriptor.fetchLimit = limit
         return descriptor
+    }
+
+    /// De limiet na een bijlaadstap: één pagina erbij, maar nooit boven het maximum.
+    static func nextLimit(after limit: Int, pageSize: Int, maximum: Int) -> Int {
+        min(limit + pageSize, maximum)
+    }
+
+    /// Of de database achter de getoonde artikelen nog meer heeft. Telt alleen als het
+    /// maximum bereikt is: daaronder laadt de lijst gewoon bij. `fetchCount` is één
+    /// `COUNT`-query, zonder objecten in te laden.
+    static func hasMore(
+        than loaded: Int,
+        maximum: Int,
+        predicate: Predicate<FeedItem>,
+        in context: ModelContext
+    ) -> Bool {
+        guard loaded >= maximum else { return false }
+        do {
+            return try context.fetchCount(FetchDescriptor(predicate: predicate)) > loaded
+        } catch {
+            articleListLogger.error(
+                "Tellen van artikelen mislukt: \(error.localizedDescription, privacy: .public)")
+            return false
+        }
     }
 
     /// - Parameters:

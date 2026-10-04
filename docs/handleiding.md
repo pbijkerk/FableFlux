@@ -105,7 +105,9 @@ onderwerp. Dat komt dan bovenaan op **Vandaag** te staan (zie
 ## 4. Artikelen
 
 **Artikelen** toont alle artikelen uit al je feeds, nieuwste bovenaan. Tijdens het scrollen
-laadt de lijst er steeds vijftig bij.
+laadt de lijst er steeds vijftig bij, tot het maximum dat je onder [Weergave](#weergave) kiest
+(standaard 300). Zijn er daarna nog oudere artikelen, dan staat onderaan *"Oudere artikelen
+vind je via een map of feed."* Die weergaven tonen alle artikelen van de bewaarperiode.
 
 - **Mapfilter:** als je mappen hebt, staat bovenaan een balk met **Alle** en een knop per map.
   Je keuze blijft bewaard, ook na het afsluiten van de app.
@@ -375,6 +377,7 @@ niet, tik dan nog een keer op hetzelfde logo.
 | Toon miniatuurafbeeldingen | Afbeeldingen in de artikellijst aan of uit |
 | Teller per feed | *Totaal aantal artikelen* of *Ongelezen artikelen* |
 | Regels voorvertoning | 1 tot 5 regels tekst per artikel in de lijst |
+| Artikelen in de lijst | Hoeveel artikelen **Artikelen** hooguit laadt: 100, 200, 300 (standaard) of 500. Langere lijsten kunnen minder soepel scrollen |
 
 ### Tekstgrootte
 Drie schuifregelaars van 80% tot 150%: **Feeds-lijst**, **Artikelen** (de leestekst) en

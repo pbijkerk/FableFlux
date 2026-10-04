@@ -30,6 +30,17 @@ enum AppConfiguration {
     /// op I/O. Vijftig is ruim een schermvulling, zodat je de grens zelden voelt.
     static let articlePageSize = 50
 
+    /// Hoeveel artikelen de lijst hooguit laadt. `List` houdt per update een administratie
+    /// over al zijn rijen bij, en die groeit mee met het aantal geladen rijen: de meting bij
+    /// #165 liet per cel ruim 10× zoveel werk zien bij 300 rijen als bij 50. Tot 300 bleef dat
+    /// klein; daarboven is niet gemeten. Oudere artikelen blijven bereikbaar via de map- en
+    /// feedweergaven, die niet pagineren.
+    static let defaultArticleLoadLimit = 300
+
+    /// De keuzes in Instellingen. Veelvouden van `articlePageSize`, zodat het bijladen
+    /// precies op het maximum uitkomt.
+    static let articleLoadLimitOptions = [100, 200, 300, 500]
+
     /// Hoeveel een publicatiedatum vóór mag lopen op de klok voordat hij ongeloofwaardig is.
     /// Een uitgever met een afwijkende klok of een tijdzone die net verkeerd wordt opgegeven
     /// scheelt hooguit uren; een datum die verder in de toekomst ligt komt uit een verkeerd
@@ -108,6 +119,8 @@ enum AppConfiguration {
         static let analysisTextSize = "analysisTextSize"
         /// UUID-string van de actieve mapfilter op de artikelstroom; leeg = alle mappen.
         static let articlesFolderFilter = "articlesFolderFilter"
+        /// Maximum aantal artikelen dat de artikelenlijst laadt (#180).
+        static let articleLoadLimit = "articleLoadLimit"
         /// Gekozen `AppTheme` (rawValue): bepaalt app-icoon en accentkleur.
         static let appTheme = "appTheme"
     }
