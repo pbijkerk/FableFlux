@@ -70,6 +70,8 @@ Afgeleid van de gewenste uitkomst; geprioriteerd volgens MoSCoW. Elke actionable
 - R9: Het aantal Claude-API-calls per samenvatting blijft binnen een nader te bepalen kostenkader — reden: kostenbeheersing; het kader moet eerst onderzocht worden (#12). (#12)
 - R16: Alle zichtbare tekst in de app is Nederlands — reden: consistentie; de functie werkt ook met de Engelse restanten. (#156)
 - R17: De uitleg bij een instelling beschrijft wat er werkelijk gebeurt (bewaarperiode per feed ruimt direct op) — reden: voorkomt onverwacht verlies van artikelen; raakt de samenvatting niet. (#158)
+- R18: Artikelen laadt bij doorscrollen hooguit een instelbaar maximum aantal rijen (100/200/300/500, standaard 300), zodat het lijstwerk per cel begrensd blijft — reden: gemeten groei van de `List`-administratie met het aantal rijen (#165); Artikelen ondersteunt de hoofdpagina, die er niet van afhangt. (#180)
+- R19: Het uitmeten van een kaart in Artikelen kost minder main-thread-tijd per cel dan bij de meting van 2026-10-04; de maatstaf volgt uit het onderzoek — reden: grootste lijstkost bij scrollen (40–70 ms/s), maar scrollen is nu acceptabel. (#181)
 
 ### Won't — nu bewust niet (sluit aan op Scope → Niet)
 - Geen iPad-versie — reden: persoonlijk iOS-gebruik, geen behoefte.
