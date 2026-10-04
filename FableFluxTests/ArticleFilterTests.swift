@@ -308,4 +308,60 @@ final class ArticleFilterTests: XCTestCase {
 
         XCTAssertEqual(lijst.map(\.title), ["A0", "A1", "A2", "A3", "A4"])
     }
+
+    // MARK: - Bovengrens (#180)
+
+    func testBijladenGroeitMetEenPagina() {
+        XCTAssertEqual(ArticleFilter.nextLimit(after: 50, pageSize: 50, maximum: 300), 100)
+    }
+
+    func testBijladenStoptOpHetMaximum() {
+        XCTAssertEqual(ArticleFilter.nextLimit(after: 300, pageSize: 50, maximum: 300), 300)
+    }
+
+    /// Een maximum dat geen veelvoud van de paginagrootte is, wordt precies gehaald,
+    /// niet overschreden.
+    func testBijladenSchietNietVoorbijHetMaximum() {
+        XCTAssertEqual(ArticleFilter.nextLimit(after: 100, pageSize: 50, maximum: 120), 120)
+    }
+
+    func testOudereArtikelenAlsHetMaximumBereiktIsEnErMeerZijn() {
+        maakOplopendeArtikelen(5)
+        XCTAssertTrue(
+            ArticleFilter.hasMore(
+                than: 3, maximum: 3,
+                predicate: ArticleFilter.predicate(hideRead: false, feedIDs: nil),
+                in: container.mainContext))
+    }
+
+    /// Precies het maximum en niets daarachter: geen verwijzing naar oudere artikelen.
+    func testGeenOudereArtikelenAlsDeVoorraadPreciesOpIs() {
+        maakOplopendeArtikelen(3)
+        XCTAssertFalse(
+            ArticleFilter.hasMore(
+                than: 3, maximum: 3,
+                predicate: ArticleFilter.predicate(hideRead: false, feedIDs: nil),
+                in: container.mainContext))
+    }
+
+    /// Onder het maximum laadt de lijst gewoon bij; dan hoort er geen verwijzing te staan.
+    func testGeenOudereArtikelenOnderHetMaximum() {
+        maakOplopendeArtikelen(5)
+        XCTAssertFalse(
+            ArticleFilter.hasMore(
+                than: 3, maximum: 300,
+                predicate: ArticleFilter.predicate(hideRead: false, feedIDs: nil),
+                in: container.mainContext))
+    }
+
+    /// De telling volgt het filter: gelezen artikelen tellen niet mee als ze verborgen zijn.
+    func testOudereArtikelenVolgenHetFilter() {
+        maakTestdata()
+        XCTAssertFalse(
+            ArticleFilter.hasMore(
+                than: 3, maximum: 3,
+                predicate: ArticleFilter.predicate(hideRead: true, feedIDs: nil),
+                in: container.mainContext),
+            "Drie ongelezen artikelen en een maximum van drie: er zijn geen oudere artikelen")
+    }
 }

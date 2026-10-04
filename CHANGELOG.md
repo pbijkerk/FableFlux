@@ -5,6 +5,11 @@ Alle noemenswaardige wijzigingen aan dit project worden in dit bestand bijgehoud
 Het formaat is gebaseerd op [Keep a Changelog](https://keepachangelog.com/nl/1.1.0/)
 en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 
+## [Unreleased]
+
+### Toegevoegd
+- Instelbaar maximum voor het aantal artikelen dat Artikelen laadt (100/200/300/500, standaard 300), met een verwijzing naar map- en feedweergaven voor oudere artikelen (#180)
+
 ## [1.12.1] - 2026-10-04
 
 ### Opgelost
