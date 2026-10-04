@@ -20,6 +20,7 @@ geen `mcp__xcodebuildmcp__*`-tools.
   xcode-build-server config -project FableFlux.xcodeproj -scheme FableFlux
   ```
 - **Aanbevolen VS Code-extensies:** zie `.vscode/extensions.json`.
+- **Prestaties meten op het toestel:** zie `docs/meten-op-toestel.md` (`xctrace` met `--launch`).
 
 ### Bouwen voor een fysiek apparaat
 Laat de buildoutput **buiten de projectmap** vallen. Die staat in iCloud Drive;
