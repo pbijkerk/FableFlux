@@ -59,8 +59,16 @@ struct AllArticlesView: View {
             )
             .onChange(of: hideReadArticles) { limit = AppConfiguration.articlePageSize }
             .onChange(of: folderFilterID) { limit = AppConfiguration.articlePageSize }
-            // Een lager maximum geldt meteen, ook voor wat al geladen is.
-            .onChange(of: maximum) { limit = min(limit, maximum) }
+            // Een lager maximum geldt meteen, ook voor wat al geladen is. Een hoger maximum
+            // laadt meteen een pagina bij als het oude al bereikt was: de laatste rij is dan
+            // al verschenen, dus zijn `onAppear` vraagt niet vanzelf om meer.
+            .onChange(of: maximum) { oudMaximum, nieuwMaximum in
+                limit =
+                    limit >= oudMaximum && nieuwMaximum > oudMaximum
+                    ? ArticleFilter.nextLimit(
+                        after: limit, pageSize: AppConfiguration.articlePageSize, maximum: nieuwMaximum)
+                    : min(limit, nieuwMaximum)
+            }
             .safeAreaInset(edge: .top, spacing: 0) {
                 if !folders.isEmpty {
                     filterBar
