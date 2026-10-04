@@ -9,6 +9,7 @@ en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 
 ### Opgelost
 - De artikelpager opent weer bij het aangetikte artikel in plaats van bij het eerste uit de lijst, en markeert alleen dat artikel als gelezen (#175)
+- De feednaam bovenaan de artikelpager hoort weer bij het artikel dat in beeld is, ook na vegen (#174)
 
 ## [1.12.0] - 2026-09-28
 
