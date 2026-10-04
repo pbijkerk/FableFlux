@@ -5,6 +5,12 @@ Alle noemenswaardige wijzigingen aan dit project worden in dit bestand bijgehoud
 Het formaat is gebaseerd op [Keep a Changelog](https://keepachangelog.com/nl/1.1.0/)
 en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 
+## [1.12.1] - 2026-10-04
+
+### Opgelost
+- De artikelpager opent weer bij het aangetikte artikel in plaats van bij het eerste uit de lijst, en markeert alleen dat artikel als gelezen (#175)
+- De feednaam bovenaan de artikelpager hoort weer bij het artikel dat in beeld is, ook na vegen (#174)
+
 ## [1.12.0] - 2026-09-28
 
 ### Opgelost
