@@ -1,7 +1,7 @@
 # Projectbrief — FableFlux
 
 **Datum:** 2026-07-22
-**Status:** herijkt op 2026-07-22; requirements aangevuld op 2026-09-27 (R13–R17)
+**Status:** herijkt op 2026-07-22; requirements aangevuld op 2026-09-27 (R13–R17), 2026-10-04 (R18–R19) en 2026-10-15 (R20–R23)
 
 ## Doel
 Een native iOS RSS-lezer die nieuws per onderwerp samenvat met AI (Claude API), gebouwd voor eigen gebruik. Reden om zelf te bouwen: geen bestaande RSS-lezer maakte samenvattingen per onderwerp naar wens. De app wordt dagelijks gebruikt (ochtend en late middag) voor zowel de Mastodon social feed als losse RSS-feeds.
@@ -72,11 +72,16 @@ Afgeleid van de gewenste uitkomst; geprioriteerd volgens MoSCoW. Elke actionable
 - R17: De uitleg bij een instelling beschrijft wat er werkelijk gebeurt (bewaarperiode per feed ruimt direct op) — reden: voorkomt onverwacht verlies van artikelen; raakt de samenvatting niet. (#158)
 - R18: Artikelen laadt bij doorscrollen hooguit een instelbaar maximum aantal rijen (100/200/300/500, standaard 300), zodat het lijstwerk per cel begrensd blijft — reden: gemeten groei van de `List`-administratie met het aantal rijen (#165); Artikelen ondersteunt de hoofdpagina, die er niet van afhangt. (#180)
 - R19: Het uitmeten van een kaart in Artikelen kost minder main-thread-tijd per cel dan bij de meting van 2026-10-04; de maatstaf volgt uit het onderzoek — reden: grootste lijstkost bij scrollen (40–70 ms/s), maar scrollen is nu acceptabel. (#181)
+- R20: Herhaald tikken op de actieve tab Artikelen of op de actieve mapchip scrolt de lijst naar het nieuwste artikel; Vandaag en Bewaard veranderen niet — reden: gemak bij dagelijks lezen, raakt de hoofdpagina niet. (#185)
+- R21: Een Mastodon-post toont het profielicoon van de auteur naast de naam — reden: herkenbaarheid van de auteur; de API levert de avatar al. (#186)
+- R22: Een Mastodon-post met een link toont de linkcard (titel, omschrijving, afbeelding) die de Mastodon-API meelevert — reden: context zonder de link te openen; de posttekst blijft bruikbaar zonder. (#186)
+- R23: E-mailnieuwsbrieven kunnen als bron worden toegevoegd en verschijnen als artikel in de lijst — reden: veel content komt alleen per mail; eerst te beslissen of de scope wordt verbreed en via welk mechanisme (geen IMAP-framework in iOS, geen externe packages, geen eigen server). (#187)
 
 ### Won't — nu bewust niet (sluit aan op Scope → Niet)
 - Geen iPad-versie — reden: persoonlijk iOS-gebruik, geen behoefte.
 - Geen App Store-distributie — reden: uitsluitend eigen gebruik.
 - Geen ondersteuning voor andere gebruikers dan de maker — reden: persoonlijk project zonder externe belanghebbenden.
+- Geen eigen OpenGraph-fetch voor een linkpreview als de Mastodon-API geen `card` levert — reden: extra netwerkverzoek per link en extra complexiteit voor een Could-eis (R22). (#186)
 
 ## Randvoorwaarden & aannames
 - **Techniek:** native iOS (iOS 17+, Xcode 15+, Swift 5.9+), SwiftData, uitsluitend Apple-frameworks. AI via de Anthropic REST API (`claude-haiku-4-5`); API-sleutel in de Keychain.
