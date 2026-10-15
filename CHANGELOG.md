@@ -5,6 +5,11 @@ Alle noemenswaardige wijzigingen aan dit project worden in dit bestand bijgehoud
 Het formaat is gebaseerd op [Keep a Changelog](https://keepachangelog.com/nl/1.1.0/)
 en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 
+## [Unreleased]
+
+### Toegevoegd
+- Mastodon-berichten tonen het profielicoon van de auteur naast de naam en een linkpreview onder de tekst (#186)
+
 ## [1.13.0] - 2026-10-04
 
 ### Toegevoegd

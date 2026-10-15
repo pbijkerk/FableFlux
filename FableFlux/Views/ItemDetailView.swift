@@ -465,6 +465,13 @@ enum ArticleHTMLBuilder {
             .article-title-link { text-decoration: none; color: inherit; display: block; }
             .article-title-link:active .article-title { opacity: 0.6; }
             .read-full-hint { font-family: -apple-system, sans-serif; font-size: 13px; font-weight: 600; color: var(--accent); margin-top: 2px; margin-bottom: 18px; border: none; }
+            /* Linkpreview onder een Mastodon-bericht (#186) */
+            a.link-card { display: block; color: inherit; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin: 1em 0; background: var(--card); }
+            .link-card img { width: 100%; max-height: 220px; object-fit: cover; margin: 0; border-radius: 0; }
+            .link-card-body { display: block; padding: 10px 14px; font-family: -apple-system, sans-serif; font-size: 0.85em; line-height: 1.4; }
+            .link-card-title { display: block; font-weight: 700; }
+            .link-card-description { display: block; color: var(--secondary); margin-top: 2px; }
+            .link-card-host { display: block; color: var(--secondary); font-size: 0.85em; margin-top: 4px; }
             </style>
             </head>
             <body>
