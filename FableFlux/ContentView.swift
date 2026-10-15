@@ -11,6 +11,8 @@ struct ContentView: View {
 
     @State private var clusters: [TopicCluster] = []
     @State private var selectedTab = 0
+    /// Telt op bij een herhaalde tik op de tab Artikelen; de lijst scrolt dan naar boven.
+    @State private var articlesScrollToTop = 0
     @State private var lastClusteredAt: Date? = nil
 
     var body: some View {
@@ -24,6 +26,7 @@ struct ContentView: View {
 
             AllArticlesView(
                 refreshService: refreshService,
+                scrollToTopTrigger: articlesScrollToTop,
                 onRefreshComplete: { await regenerateSummaries() }
             )
             .tag(1)
@@ -31,7 +34,9 @@ struct ContentView: View {
             SavedArticlesView()
                 .tag(2)
         }
-        .floatingTabBar(selection: $selectedTab)
+        .floatingTabBar(selection: $selectedTab) { tab in
+            if tab == 1 { articlesScrollToTop += 1 }
+        }
         .appThemeTint()
         .task {
             await refreshAndCluster()

@@ -5,6 +5,11 @@ Alle noemenswaardige wijzigingen aan dit project worden in dit bestand bijgehoud
 Het formaat is gebaseerd op [Keep a Changelog](https://keepachangelog.com/nl/1.1.0/)
 en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 
+## [Unreleased]
+
+### Toegevoegd
+- Herhaald tikken op de tab Artikelen of op de actieve mapchip scrolt de lijst terug naar het nieuwste artikel (#185)
+
 ## [1.13.0] - 2026-10-04
 
 ### Toegevoegd
