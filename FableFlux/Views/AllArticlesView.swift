@@ -18,6 +18,8 @@ struct AllArticlesView: View {
     @Query private var feeds: [Feed]
 
     var refreshService: FeedRefreshService
+    /// Wijzigt bij een herhaalde tik op de tab; de lijst scrolt dan naar het nieuwste artikel.
+    var scrollToTopTrigger = 0
     var onRefreshComplete: () async -> Void
 
     @State private var showFeedManagement = false
@@ -26,6 +28,9 @@ struct AllArticlesView: View {
     /// hooguit `maximum`, en begint opnieuw zodra een filter wijzigt — dan kijk je immers
     /// naar een andere lijst.
     @State private var limit = AppConfiguration.articlePageSize
+
+    /// Telt op bij een herhaalde tik op de actieve mapchip.
+    @State private var chipScrollToTop = 0
 
     /// Lege string of een verwijderde map betekent: geen filter.
     private var activeFolder: FeedFolder? {
@@ -50,6 +55,7 @@ struct AllArticlesView: View {
                 feedIDs: activeFeedIDs,
                 limit: limit,
                 maximum: maximum,
+                scrollToTop: scrollToTopTrigger + chipScrollToTop,
                 onReachEnd: {
                     limit = ArticleFilter.nextLimit(
                         after: limit, pageSize: AppConfiguration.articlePageSize, maximum: maximum)
@@ -174,6 +180,7 @@ struct AllArticlesView: View {
         let isActive = (activeFolder?.id.uuidString ?? "") == id
 
         return Button {
+            if isActive { chipScrollToTop += 1 }
             folderFilterID = id
         } label: {
             Text(title)
@@ -209,6 +216,7 @@ private struct ArticleListView<EmptyState: View>: View {
     /// zijn; is het er minder, dan is dit het einde van de lijst.
     private let limit: Int
     private let maximum: Int
+    private let scrollToTop: Int
     private let predicate: Predicate<FeedItem>
     /// Wanneer `hasOlderArticles` opnieuw bepaald moet worden: bij een ander aantal, een
     /// ander filter of een ander maximum, en wanneer er bovenaan nieuwe artikelen bijkomen.
@@ -228,12 +236,14 @@ private struct ArticleListView<EmptyState: View>: View {
         feedIDs: [UUID]?,
         limit: Int,
         maximum: Int,
+        scrollToTop: Int,
         onReachEnd: @escaping () -> Void,
         onRefresh: @escaping () async -> Void,
         @ViewBuilder emptyState: @escaping () -> EmptyState
     ) {
         self.limit = limit
         self.maximum = maximum
+        self.scrollToTop = scrollToTop
         self.predicate = ArticleFilter.predicate(hideRead: hideRead, feedIDs: feedIDs)
         self.olderArticlesCheck = OlderArticlesCheck(hideRead: hideRead, feedIDs: feedIDs, maximum: maximum)
         self.onReachEnd = onReachEnd
@@ -244,6 +254,16 @@ private struct ArticleListView<EmptyState: View>: View {
     }
 
     var body: some View {
+        ScrollViewReader { proxy in
+            list
+                .onChange(of: scrollToTop) {
+                    guard let first = items.first else { return }
+                    withAnimation { proxy.scrollTo(first.id, anchor: .top) }
+                }
+        }
+    }
+
+    private var list: some View {
         List {
             ForEach(items, id: \.id) { item in
                 ZStack {

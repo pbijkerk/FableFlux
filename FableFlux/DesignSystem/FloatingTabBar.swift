@@ -20,6 +20,8 @@ let appTabs: [FloatingTab] = [
 /// Geselecteerde tab krijgt een gevulde pill in de accentkleur + haptische feedback.
 struct FloatingTabBar: View {
     @Binding var selection: Int
+    /// Wordt aangeroepen als je op de al geselecteerde tab tikt.
+    var onReselect: (Int) -> Void = { _ in }
 
     var body: some View {
         HStack(spacing: 4) {
@@ -42,7 +44,10 @@ struct FloatingTabBar: View {
     private func tabButton(_ tab: FloatingTab) -> some View {
         let isSelected = selection == tab.id
         Button {
-            guard selection != tab.id else { return }
+            guard selection != tab.id else {
+                onReselect(tab.id)
+                return
+            }
             let generator = UIImpactFeedbackGenerator(style: .soft)
             generator.impactOccurred()
             withAnimation(.spring(response: 0.32, dampingFraction: 0.7)) {
@@ -76,18 +81,19 @@ struct FloatingTabBar: View {
 /// zodat scroll-content netjes boven de bar eindigt.
 struct FloatingTabBarContainer: ViewModifier {
     @Binding var selection: Int
+    var onReselect: (Int) -> Void
 
     func body(content: Content) -> some View {
         content
             .toolbar(.hidden, for: .tabBar)
             .safeAreaInset(edge: .bottom, spacing: 0) {
-                FloatingTabBar(selection: $selection)
+                FloatingTabBar(selection: $selection, onReselect: onReselect)
             }
     }
 }
 
 extension View {
-    func floatingTabBar(selection: Binding<Int>) -> some View {
-        modifier(FloatingTabBarContainer(selection: selection))
+    func floatingTabBar(selection: Binding<Int>, onReselect: @escaping (Int) -> Void = { _ in }) -> some View {
+        modifier(FloatingTabBarContainer(selection: selection, onReselect: onReselect))
     }
 }
