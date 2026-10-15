@@ -13,6 +13,8 @@ struct MastodonStatus: Codable {
     let account: MastodonStatusAccount
     let mediaAttachments: [MastodonMediaAttachment]
     let spoilerText: String
+    /// Linkpreview die de instantie voor de eerste link in het bericht heeft opgehaald (#186).
+    let card: MastodonPreviewCard?
 }
 
 /// Afzonderlijk type voor reblog om recursief Codable-probleem te vermijden
@@ -24,6 +26,7 @@ struct MastodonStatusReblog: Codable {
     let account: MastodonStatusAccount
     let mediaAttachments: [MastodonMediaAttachment]
     let spoilerText: String
+    let card: MastodonPreviewCard?
 }
 
 struct MastodonStatusAccount: Codable {
@@ -31,6 +34,15 @@ struct MastodonStatusAccount: Codable {
     let username: String
     let displayName: String
     let avatar: String
+}
+
+/// De `card` van een Mastodon-status: titel, omschrijving en afbeelding van de gedeelde link.
+/// Alles optioneel: een card die anders is opgebouwd mag het ophalen van de tijdlijn niet breken.
+struct MastodonPreviewCard: Codable {
+    let url: String?
+    let title: String?
+    let description: String?
+    let image: String?
 }
 
 struct MastodonMediaAttachment: Codable {
@@ -281,7 +293,46 @@ class MastodonService {
             item.itemDescription = (item.itemDescription ?? "") + "\n" + imgHTML
         }
 
+        // Profielicoon van wie het bericht schreef; bij een boost de oorspronkelijke auteur (#186)
+        let author = status.reblog?.account ?? status.account
+        if !author.avatar.isEmpty {
+            item.authorAvatarURL = author.avatar
+        }
+
+        // Linkpreview onder de tekst. Bij een boost hangt de card aan het originele bericht.
+        // Ontbreekt de card, dan halen we zelf niets op (#186, Won't).
+        let card = status.reblog != nil ? status.reblog?.card : status.card
+        if let card, let cardHTML = Self.linkCardHTML(card) {
+            item.itemDescription = (item.itemDescription ?? "") + "\n" + cardHTML
+        }
+
         return item
+    }
+
+    /// HTML voor de linkpreview van een bericht, opgemaakt door `.link-card` in
+    /// `ArticleHTMLBuilder`. `nil` als de link geen http(s)-adres is.
+    static func linkCardHTML(_ card: MastodonPreviewCard) -> String? {
+        guard let link = card.url, let url = URL(string: link), let host = url.host,
+            ["http", "https"].contains(url.scheme?.lowercased() ?? "")
+        else { return nil }
+
+        let title = (card.title ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        let description = (card.description ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+
+        var html = "<a class=\"link-card\" href=\"\(escapeHTML(link))\">"
+        if let image = card.image, let imageURL = URL(string: image),
+            ["http", "https"].contains(imageURL.scheme?.lowercased() ?? "")
+        {
+            html += "<img src=\"\(escapeHTML(image))\" alt=\"\">"
+        }
+        html += "<span class=\"link-card-body\">"
+        html += "<span class=\"link-card-title\">\(escapeHTML(title.isEmpty ? host : title))</span>"
+        if !description.isEmpty {
+            html += "<span class=\"link-card-description\">\(escapeHTML(description))</span>"
+        }
+        html += "<span class=\"link-card-host\">\(escapeHTML(host))</span>"
+        html += "</span></a>"
+        return html
     }
 
     private func buildTitle(_ status: MastodonStatus) -> String {
@@ -305,6 +356,10 @@ class MastodonService {
     }
 
     private func escape(_ text: String) -> String {
+        Self.escapeHTML(text)
+    }
+
+    private static func escapeHTML(_ text: String) -> String {
         text.replacingOccurrences(of: "&", with: "&amp;")
             .replacingOccurrences(of: "<", with: "&lt;")
             .replacingOccurrences(of: ">", with: "&gt;")

@@ -24,6 +24,10 @@ class FeedItem {
     /// `nil` bij rijen van vóór deze wijziging; die blijven zich gedragen als voorheen.
     var fetchedAt: Date?
 
+    /// Profielicoon van de auteur van een Mastodon-bericht (#186). `nil` voor RSS-artikelen
+    /// en voor berichten die vóór deze wijziging zijn opgehaald.
+    var authorAvatarURL: String?
+
     // Transient cache — niet bewaard, opnieuw berekend na SwiftData fault
     @Transient private var _cachedPlainDescription: String? = nil
 

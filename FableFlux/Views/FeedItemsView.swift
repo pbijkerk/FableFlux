@@ -190,12 +190,15 @@ struct FeedItemCard: View {
                     }
                 }
 
-                // Titel in Charter (serif magazine-look)
-                Text(item.title)
-                    .font(Theme.title(titleSize + 1, relativeTo: .headline))
-                    .foregroundStyle(Theme.text)
-                    .lineLimit(3)
-                    .fixedSize(horizontal: false, vertical: true)
+                // Titel in Charter (serif magazine-look); bij Mastodon met het profielicoon ervoor
+                if let avatarURL = item.authorAvatarURL.flatMap({ URL(string: $0) }) {
+                    HStack(alignment: .center, spacing: 8) {
+                        authorAvatar(url: avatarURL)
+                        titleText
+                    }
+                } else {
+                    titleText
+                }
 
                 // Korte beschrijving
                 if previewLineCount > 0, !item.plainDescription.isEmpty {
@@ -258,6 +261,28 @@ struct FeedItemCard: View {
             Self.kaartvorm.strokeBorder(Color.primary.opacity(0.05), lineWidth: 0.5)
                 .allowsHitTesting(false)
         )
+    }
+
+    private var titleText: some View {
+        Text(item.title)
+            .font(Theme.title(titleSize + 1, relativeTo: .headline))
+            .foregroundStyle(Theme.text)
+            .lineLimit(3)
+            .fixedSize(horizontal: false, vertical: true)
+    }
+
+    /// Rond profielicoon van de auteur van een Mastodon-bericht (#186).
+    private func authorAvatar(url: URL) -> some View {
+        AsyncImage(url: url) { phase in
+            if case .success(let image) = phase {
+                image.resizable().aspectRatio(contentMode: .fill)
+            } else {
+                brand.opacity(0.12)
+            }
+        }
+        .frame(width: titleSize + 11, height: titleSize + 11)
+        .clipShape(Circle())
+        .accessibilityHidden(true)
     }
 
     private static let kaartvorm = RoundedRectangle(cornerRadius: Theme.cardCornerRadius, style: .continuous)

@@ -283,3 +283,106 @@ final class MastodonAccountLinkerTests: XCTestCase {
         XCTAssertEqual(try mastodonFeeds().count, 3)
     }
 }
+
+/// Toetst het profielicoon en de linkpreview van een Mastodon-bericht (#186): de `card`
+/// uit de API wordt gedecodeerd, als veilige HTML onder de tekst gezet, en de avatar komt
+/// van wie het bericht schreef.
+@MainActor
+final class MastodonLinkCardTests: XCTestCase {
+
+    private func status(json: String) throws -> MastodonStatus {
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        decoder.dateDecodingStrategy = .iso8601
+        return try decoder.decode(MastodonStatus.self, from: Data(json.utf8))
+    }
+
+    private let accountJSON = """
+        {"id": "1", "username": "auteur", "display_name": "Auteur", "avatar": "https://m.example/a.png"}
+        """
+
+    private let cardJSON = """
+        {"url": "https://nieuws.example/artikel", "title": "Kop <b>vet</b>",
+         "description": "Omschrijving", "type": "link", "image": "https://nieuws.example/beeld.jpg"}
+        """
+
+    func testCardWordtGedecodeerd() throws {
+        let json = """
+            {"id": "10", "created_at": "2026-10-15T08:00:00Z", "url": null, "content": "<p>Hoi</p>",
+             "reblog": null, "account": \(accountJSON), "media_attachments": [], "spoiler_text": "",
+             "card": \(cardJSON)}
+            """
+        let s = try status(json: json)
+        XCTAssertEqual(s.card?.title, "Kop <b>vet</b>")
+        XCTAssertEqual(s.card?.image, "https://nieuws.example/beeld.jpg")
+    }
+
+    func testZonderCardIsNil() throws {
+        let json = """
+            {"id": "11", "created_at": "2026-10-15T08:00:00Z", "url": null, "content": "<p>Hoi</p>",
+             "reblog": null, "account": \(accountJSON), "media_attachments": [], "spoiler_text": ""}
+            """
+        let s = try status(json: json)
+        XCTAssertNil(s.card)
+    }
+
+    func testOnvolledigeCardBreektTijdlijnNiet() throws {
+        let json = """
+            {"id": "14", "created_at": "2026-10-15T08:00:00Z", "url": null, "content": "<p>Hoi</p>",
+             "reblog": null, "account": \(accountJSON), "media_attachments": [], "spoiler_text": "",
+             "card": {"url": "https://nieuws.example/x"}}
+            """
+        let s = try status(json: json)
+        XCTAssertEqual(s.card?.url, "https://nieuws.example/x")
+        XCTAssertNil(s.card?.title)
+    }
+
+    func testLinkCardHTMLIsGeescaped() throws {
+        let card = MastodonPreviewCard(
+            url: "https://nieuws.example/artikel", title: "Kop <b>vet</b>",
+            description: "Omschrijving", image: "https://nieuws.example/beeld.jpg")
+        let html = try XCTUnwrap(MastodonService.linkCardHTML(card))
+        XCTAssertTrue(html.contains("href=\"https://nieuws.example/artikel\""))
+        XCTAssertTrue(html.contains("Kop &lt;b&gt;vet&lt;/b&gt;"))
+        XCTAssertTrue(html.contains("<img src=\"https://nieuws.example/beeld.jpg\""))
+        XCTAssertTrue(html.contains("nieuws.example</span>"))
+    }
+
+    func testLinkCardZonderTitelToontHost() throws {
+        let card = MastodonPreviewCard(url: "https://nieuws.example/x", title: " ", description: "", image: nil)
+        let html = try XCTUnwrap(MastodonService.linkCardHTML(card))
+        XCTAssertTrue(html.contains("<span class=\"link-card-title\">nieuws.example</span>"))
+        XCTAssertFalse(html.contains("<img"))
+        XCTAssertFalse(html.contains("link-card-description"))
+    }
+
+    func testLinkCardWeigertAndereSchemes() {
+        let card = MastodonPreviewCard(url: "javascript:alert(1)", title: "x", description: "", image: nil)
+        XCTAssertNil(MastodonService.linkCardHTML(card))
+    }
+
+    func testBoostKrijgtAvatarEnCardVanOrigineel() throws {
+        let container = try ModelContainer(
+            for: Feed.self, FeedItem.self, FeedFolder.self, Topic.self,
+            TopicSummary.self, FactCheckResult.self, MastodonAccount.self,
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+        )
+        let context = ModelContext(container)
+        let feed = Feed(url: "mastodon://m.example/@ik", title: "Mastodon")
+        context.insert(feed)
+
+        let json = """
+            {"id": "12", "created_at": "2026-10-15T08:00:00Z", "url": null, "content": "",
+             "account": {"id": "2", "username": "booster", "display_name": "Booster",
+                         "avatar": "https://m.example/booster.png"},
+             "media_attachments": [], "spoiler_text": "", "card": null,
+             "reblog": {"id": "13", "created_at": "2026-10-15T07:00:00Z", "url": null,
+                        "content": "<p>Origineel</p>", "account": \(accountJSON),
+                        "media_attachments": [], "spoiler_text": "", "card": \(cardJSON)}}
+            """
+        let s = try status(json: json)
+        let item = MastodonService.shared.mapToFeedItem(status: s, feed: feed)
+        XCTAssertEqual(item.authorAvatarURL, "https://m.example/a.png")
+        XCTAssertTrue(item.itemDescription?.contains("class=\"link-card\"") == true)
+    }
+}
