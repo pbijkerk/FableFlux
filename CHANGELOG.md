@@ -11,6 +11,9 @@ en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 - Herhaald tikken op de tab Artikelen of op de actieve mapchip scrolt de lijst terug naar het nieuwste artikel (#185)
 - Mastodon-berichten tonen het profielicoon van de auteur naast de naam en een linkpreview onder de tekst (#186)
 
+### Opgelost
+- `ArticleExtractorService` vangt `self` in de mislukt-callbacks van de webview nu zwak, consistent met `didFinish` en de timeout (#191)
+
 ## [1.13.0] - 2026-10-04
 
 ### Toegevoegd
