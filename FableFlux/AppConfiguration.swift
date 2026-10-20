@@ -74,6 +74,10 @@ enum AppConfiguration {
     /// Standaard lettertypefamilie voor artikel-weergave
     static let defaultArticleFontFamily = "charter"
 
+    /// Standaard lettertypefamilie voor de feedlijst (#194) — los van articleFontFamily,
+    /// zodat lijst en leesscherm onafhankelijk van elkaar instelbaar zijn.
+    static let defaultFeedListFontFamily = "system"
+
     /// Standaard schaalfactor voor de Feeds-lijst (tekst + iconen)
     static let defaultFeedListScale: Double = 1.0
 
@@ -108,6 +112,7 @@ enum AppConfiguration {
         static let claudeAPIKey = "claudeAPIKey"  // legacy – gebruik Keychain
         static let articleFontSize = "articleFontSize"
         static let articleFontFamily = "articleFontFamily"
+        static let feedListFontFamily = "feedListFontFamily"
         static let hideReadArticles = "hideReadArticles"
         static let feedCountMode = "feedCountMode"
         static let previewLineCount = "previewLineCount"
