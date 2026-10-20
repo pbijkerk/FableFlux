@@ -74,6 +74,18 @@ enum Theme {
         .system(size: size, weight: .bold, design: .rounded)
     }
 
+    /// Lettertype voor de feedlijst (#194) — instelbaar los van `articleFontFamily`.
+    /// `"system"` behoudt de oorspronkelijke `.rounded`-look van de lijst; de overige
+    /// opties matchen de keuzes van de artikelen-instelling (Charter/New York/Georgia).
+    static func feedListFont(size: CGFloat, weight: Font.Weight, family: String) -> Font {
+        switch family {
+        case "charter": return .custom("Charter", size: size).weight(weight)
+        case "newyork": return .custom("New York", size: size).weight(weight)
+        case "georgia": return .custom("Georgia", size: size).weight(weight)
+        default: return .system(size: size, weight: weight, design: .rounded)
+        }
+    }
+
     // MARK: - Brand color per feed
 
     /// Warme accentkleuren-palet dat past bij het Retro Future-thema.
