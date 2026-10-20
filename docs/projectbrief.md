@@ -76,6 +76,8 @@ Afgeleid van de gewenste uitkomst; geprioriteerd volgens MoSCoW. Elke actionable
 - R21: Een Mastodon-post toont het profielicoon van de auteur naast de naam — reden: herkenbaarheid van de auteur; de API levert de avatar al. (#186)
 - R22: Een Mastodon-post met een link toont de linkcard (titel, omschrijving, afbeelding) die de Mastodon-API meelevert — reden: context zonder de link te openen; de posttekst blijft bruikbaar zonder. (#186)
 - R23: E-mailnieuwsbrieven kunnen als bron worden toegevoegd en verschijnen als artikel in de lijst — reden: veel content komt alleen per mail; eerst te beslissen of de scope wordt verbreed en via welk mechanisme (geen IMAP-framework in iOS, geen externe packages, geen eigen server). (#187)
+- R24: Het lettertype van de feedlijst is apart instelbaar in Instellingen (nu vast op systeemfont) — reden: meerwaarde voor leesbaarheid/voorkeur; geen van de kernfuncties hangt hiervan af. (sub-issue onder #193)
+- R25: Een lettertype-wijziging in Instellingen werkt door op een al geopend artikelscherm, niet alleen na heropenen — reden: cosmetisch; het werkt al correct na heropenen van het scherm. (sub-issue onder #193)
 
 ### Won't — nu bewust niet (sluit aan op Scope → Niet)
 - Geen iPad-versie — reden: persoonlijk iOS-gebruik, geen behoefte.
