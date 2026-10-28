@@ -54,6 +54,7 @@ Afgeleid van de gewenste uitkomst; geprioriteerd volgens MoSCoW. Elke actionable
 - R3: Vanuit de samenvatting kan de gebruiker naar de onderliggende feed/het artikel navigeren én terugkeren (inline bronverwijzingen) — reden: verifieerbaarheid en het besloten heen/terug-navigeren. (sub-issue onder #14)
 - R11: Elke bewering in de samenvatting is herleidbaar naar minstens één gelinkte bron (geen ongefundeerde beweringen) — reden: maakt "betrouwbaarder" toetsbaar. (sub-issue onder #14)
 - R8: De feeds blijven volledig leesbaar wanneer de AI niet beschikbaar is (geen sleutel, API onbereikbaar, fout) — reden: harde randvoorwaarde; de app mag niet onbruikbaar worden zonder AI. (#15) — **geverifieerd op device (2026-07-29): structureel geborgd; RSS-refresh is Claude-onafhankelijk en elke AI-faalroute valt terug op `localSummary`.**
+- R26: Na een Mastodon-OAuth-login keert de gebruiker terug in de Mastodon-setup-flow met het koppelresultaat (gelukt/mislukt) zichtbaar, niet onverwacht op het Vandaag-tabblad — reden: door Peter als Must aangemerkt; een falende terugkeer in de setup-flow maakt het koppelen van een Mastodon-account onbetrouwbaar in gebruik. (#205)
 
 ### Should — belangrijk, maar niet fataal bij uitstel
 - R4: Per onderwerp toont de app een bronduiding op twee assen — betrouwbaarheid (high/mixed/low) en politieke kleur (bias −2…+2) — reden: kern van de betrouwbaarheidsduiding, maar de hoofdpagina functioneert er ook zonder. (sub-issue onder #11)
