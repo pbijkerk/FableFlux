@@ -66,6 +66,18 @@ class FeedItem {
         return result
     }
 
+    /// Platte-tekstversie van dit artikel om te delen: titel, dan de artikelinhoud als
+    /// platte tekst — via `plainText(from:)` op de gesaneerde HTML, dus zonder
+    /// script/style/iframe-rommel — en de link als laatste regel. Zo krijgen apps als
+    /// Notes of Drafts bij 'Delen' de inhoud zelf, niet alleen een link (#204).
+    var shareText: String {
+        var parts = [title]
+        let body = Self.plainText(from: sanitisedHTML)
+        if !body.isEmpty { parts.append(body) }
+        if let link, !link.isEmpty { parts.append(link) }
+        return parts.joined(separator: "\n\n")
+    }
+
     /// De al gestripte tekst uit de transient cache, of `nil` zolang die leeg is.
     /// Anders dan `plainDescription` voert dit géén strip-transformatie uit; bedoeld
     /// om op de MainActor goedkoop te kunnen zien of het dure werk al gedaan is.

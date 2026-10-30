@@ -91,8 +91,8 @@ private struct FeedItemsList: View {
                             item.isRead ? "Markeer als ongelezen" : "Markeer als gelezen",
                             systemImage: item.isRead ? "envelope.badge" : "envelope.open")
                     }
-                    if let link = item.link, let url = URL(string: link) {
-                        ShareLink(item: url) { Label("Delen", systemImage: "square.and.arrow.up") }
+                    if item.link != nil {
+                        ShareLink(item: item.shareText) { Label("Delen", systemImage: "square.and.arrow.up") }
                     }
                 }
             }

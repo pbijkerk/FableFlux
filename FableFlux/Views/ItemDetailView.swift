@@ -259,12 +259,26 @@ struct ItemDetailView: View {
                         Label("Open in browser", systemImage: "safari")
                     }
 
-                    ShareLink(item: url) {
+                    ShareLink(item: shareText) {
                         Label("Delen", systemImage: "square.and.arrow.up")
                     }
                 }
             }
         }
+    }
+
+    /// Platte-tekstversie voor 'Delen': titel + de volledige artikeltekst (geëxtraheerd
+    /// web-artikel indien geladen, anders de RSS-samenvatting) als platte tekst, met de
+    /// link als laatste regel. Zo krijgen apps als Notes of Drafts bij 'Delen' de inhoud
+    /// zelf, niet alleen een link (#204). `currentContent` is de HTML die ook `displayHTML`
+    /// voedt — dus bij een al uitgeklapt artikel gaat de volledige tekst mee, niet alleen
+    /// de samenvatting.
+    private var shareText: String {
+        var parts = [item.title]
+        let body = FeedItem.plainText(from: currentContent ?? item.sanitisedHTML)
+        if !body.isEmpty { parts.append(body) }
+        if let url = articleURL { parts.append(url.absoluteString) }
+        return parts.joined(separator: "\n\n")
     }
 
     // MARK: - HTML helpers
