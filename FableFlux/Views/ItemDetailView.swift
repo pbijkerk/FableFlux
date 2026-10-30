@@ -24,6 +24,11 @@ struct ItemDetailView: View {
     @AppStorage(AppConfiguration.UserDefaultsKeys.showBiasIndicators) private var showBiasIndicators = true
 
     @State private var displayHTML: String = ""
+    /// Laatst opgebouwde body-inhoud (RSS of geëxtraheerd web-artikel), los van het lettertype.
+    /// Zo kan een wijziging in Instellingen de HTML herbouwen zonder opnieuw te extraheren en
+    /// zonder een geëxtraheerd artikel terug te zetten naar de RSS-samenvatting (#195).
+    @State private var currentContent: String? = nil
+    @State private var currentArticleLink: String? = nil
     @State private var isExtracting = false
     @State private var extractionFailed = false
     @State private var showingVideoPlayer = false
@@ -100,6 +105,10 @@ struct ItemDetailView: View {
             item.isRead = true
             modelContext.saveOrLog("de gelezen-markering te bewaren")
         }
+        // Een lettertype- of tekstgrootte-wijziging in Instellingen moet ook doorwerken op
+        // een al geopend artikelscherm, niet alleen bij een volgende keer openen (#195).
+        .onChange(of: articleFontFamily) { rebuildDisplayHTML() }
+        .onChange(of: articleFontSize) { rebuildDisplayHTML() }
     }
 
     // MARK: - Audio layout
@@ -305,32 +314,12 @@ struct ItemDetailView: View {
             rssHTML +=
                 "\n<img src=\"\(escapeHTML(imgURL))\" alt=\"\" style=\"max-width:100%;border-radius:8px;margin:8px 0;display:block;\">"
         }
-        if !rssHTML.isEmpty {
-            displayHTML = ArticleHTMLBuilder.build(
-                content: rssHTML,
-                title: item.title,
-                feedName: item.feed?.title,
-                date: item.pubDate,
-                articleLink: articleLink,
-                authorAvatarURL: item.authorAvatarURL,
-                fontSize: articleFontSize,
-                fontFamily: articleFontFamily,
-                topPadding: htmlTopPadding
-            )
-        } else {
-            displayHTML = ArticleHTMLBuilder.build(
-                content:
-                    "<p><em>Geen samenvatting beschikbaar. Tik op de titel om het volledige artikel te lezen.</em></p>",
-                title: item.title,
-                feedName: item.feed?.title,
-                date: item.pubDate,
-                articleLink: articleLink,
-                authorAvatarURL: item.authorAvatarURL,
-                fontSize: articleFontSize,
-                fontFamily: articleFontFamily,
-                topPadding: htmlTopPadding
-            )
-        }
+        currentArticleLink = articleLink
+        currentContent =
+            rssHTML.isEmpty
+            ? "<p><em>Geen samenvatting beschikbaar. Tik op de titel om het volledige artikel te lezen.</em></p>"
+            : rssHTML
+        rebuildDisplayHTML()
     }
 
     private func extractFromWeb(url: URL? = nil) async {
@@ -339,20 +328,32 @@ struct ItemDetailView: View {
         extractionFailed = false
         do {
             let html = try await extractor.extract(from: url)
-            displayHTML = ArticleHTMLBuilder.build(
-                content: html.isEmpty ? "<p><em>Geen inhoud gevonden.</em></p>" : html,
-                title: item.title,
-                feedName: item.feed?.title,
-                date: item.pubDate,
-                authorAvatarURL: item.authorAvatarURL,
-                fontSize: articleFontSize,
-                fontFamily: articleFontFamily,
-                topPadding: htmlTopPadding
-            )
+            currentArticleLink = nil
+            currentContent = html.isEmpty ? "<p><em>Geen inhoud gevonden.</em></p>" : html
+            rebuildDisplayHTML()
         } catch {
             extractionFailed = true
         }
         isExtracting = false
+    }
+
+    /// Herbouwt `displayHTML` uit de laatst geladen inhoud (`currentContent`), zonder opnieuw
+    /// te laden of te extraheren. Nodig zodat een lettertype-/tekstgrootte-wijziging in
+    /// Instellingen ook doorwerkt op een al geopend artikelscherm (#195), zonder een
+    /// geëxtraheerd web-artikel terug te zetten naar de RSS-samenvatting.
+    private func rebuildDisplayHTML() {
+        guard let currentContent else { return }
+        displayHTML = ArticleHTMLBuilder.build(
+            content: currentContent,
+            title: item.title,
+            feedName: item.feed?.title,
+            date: item.pubDate,
+            articleLink: currentArticleLink,
+            authorAvatarURL: item.authorAvatarURL,
+            fontSize: articleFontSize,
+            fontFamily: articleFontFamily,
+            topPadding: htmlTopPadding
+        )
     }
 }
 
