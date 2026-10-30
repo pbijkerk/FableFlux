@@ -127,6 +127,12 @@ struct SettingsView: View {
                     Button("Gereed") { dismiss() }
                 }
             }
+            // Aan de Form, niet aan de Mastodon-sectie: die sectie krijgt een rij erbij zodra
+            // het account is opgeslagen, en een sheet aan een rij in een lazy Form kan dan
+            // sluiten vóórdat het resultaat in beeld is (#205).
+            .sheet(isPresented: $showMastodonSetup) {
+                MastodonSetupView()
+            }
         }
         .appThemeTint()
         .onAppear(perform: loadStoredValues)
@@ -450,9 +456,6 @@ struct SettingsView: View {
             } label: {
                 Label("Mastodon-account toevoegen", systemImage: "plus")
             }
-        }
-        .sheet(isPresented: $showMastodonSetup) {
-            MastodonSetupView()
         }
     }
 

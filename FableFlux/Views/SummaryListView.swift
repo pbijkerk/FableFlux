@@ -29,9 +29,12 @@ struct SummaryListView: View {
                     }
                 }
             }
-            .sheet(isPresented: $showSettings) {
-                SettingsView()
-            }
+        }
+        // Aan de NavigationStack, niet aan de Group: een modifier op de Group komt op de
+        // actieve tak terecht, en die wisselt zodra `isLoading` of `clusters` verandert.
+        // De sheet sloot dan mee, met de Mastodon-setup die erin openstond (#205).
+        .sheet(isPresented: $showSettings) {
+            SettingsView()
         }
     }
 
