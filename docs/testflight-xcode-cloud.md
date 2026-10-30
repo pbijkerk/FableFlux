@@ -52,3 +52,13 @@ nieuwe build vervolgens zelf op via de TestFlight-app.
 - Bij app-structuurwijzigingen (nieuwe targets, apparaatondersteuning) altijd rekening houden met
   extra App Store Connect-validaties zoals ITMS-90474 — deze verschijnen pas bij de eerste
   upload na de wijziging, niet lokaal bij het bouwen.
+- **Workflow-trigger controleren na elke herconfiguratie:** Xcode → Product → Xcode Cloud →
+  Manage Workflows → Start Conditions → Branch Changes. Is tijdens het instellen per ongeluk op
+  een specifieke feature-branch blijven staan in plaats van `main` — merges naar `main` triggerden
+  dan geen enkele build, zonder foutmelding. Check dit bij twijfel altijd eerst.
+- **Automatische distributie naar de testgroep is geen standaard:** een succesvolle build
+  ("Ready to Test", groen vinkje, geen Missing Compliance) verschijnt niet automatisch bij
+  testers tot hij aan een interne testgroep is toegevoegd. "Enable automatic distribution"
+  is (in de huidige ASC-UI) alleen instelbaar **bij het aanmaken** van een nieuwe groep, niet
+  achteraf voor een bestaande groep te wijzigen. Was dat vinkje gemist, dan is een nieuwe groep
+  aanmaken met de optie aan simpeler dan zoeken naar een niet-bestaande edit-knop.
