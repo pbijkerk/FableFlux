@@ -311,8 +311,8 @@ struct ItemDetailView: View {
                 title: item.title,
                 feedName: item.feed?.title,
                 date: item.pubDate,
-                authorAvatarURL: item.authorAvatarURL,
                 articleLink: articleLink,
+                authorAvatarURL: item.authorAvatarURL,
                 fontSize: articleFontSize,
                 fontFamily: articleFontFamily,
                 topPadding: htmlTopPadding
@@ -324,8 +324,8 @@ struct ItemDetailView: View {
                 title: item.title,
                 feedName: item.feed?.title,
                 date: item.pubDate,
-                authorAvatarURL: item.authorAvatarURL,
                 articleLink: articleLink,
+                authorAvatarURL: item.authorAvatarURL,
                 fontSize: articleFontSize,
                 fontFamily: articleFontFamily,
                 topPadding: htmlTopPadding
