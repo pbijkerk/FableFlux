@@ -57,6 +57,9 @@ struct SettingsView: View {
     @AppStorage(AppConfiguration.UserDefaultsKeys.articleFontFamily)
     private var articleFontFamily = AppConfiguration.defaultArticleFontFamily
 
+    @AppStorage(AppConfiguration.UserDefaultsKeys.feedListFontFamily)
+    private var feedListFontFamily = AppConfiguration.defaultFeedListFontFamily
+
     @AppStorage(AppConfiguration.UserDefaultsKeys.summaryLanguage)
     private var summaryLanguage = "nl"
 
@@ -320,6 +323,12 @@ struct SettingsView: View {
             Picker("Lettertype artikelen", selection: $articleFontFamily) {
                 Text("Charter").tag("charter")
                 Text("SF Pro").tag("system")
+                Text("New York").tag("newyork")
+                Text("Georgia").tag("georgia")
+            }
+            Picker("Lettertype feedlijst", selection: $feedListFontFamily) {
+                Text("SF Pro").tag("system")
+                Text("Charter").tag("charter")
                 Text("New York").tag("newyork")
                 Text("Georgia").tag("georgia")
             }
