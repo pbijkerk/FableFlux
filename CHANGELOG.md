@@ -11,6 +11,9 @@ en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 - Herhaald tikken op de tab Artikelen of op de actieve mapchip scrolt de lijst terug naar het nieuwste artikel (#185)
 - Mastodon-berichten tonen het profielicoon van de auteur naast de naam en een linkpreview onder de tekst (#186)
 
+### Opgelost
+- Na het inloggen bij Mastodon blijft de setup open en toont die het resultaat, in plaats van terug te springen naar Vandaag (#205)
+
 ## [1.13.0] - 2026-10-04
 
 ### Toegevoegd

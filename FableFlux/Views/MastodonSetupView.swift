@@ -360,5 +360,8 @@ struct MastodonSetupView: View {
                 }
             }
         }
+        // Net als Annuleren: tijdens de koppeling niet wegvegen, anders verdwijnt het resultaat
+        // terwijl het account wel wordt opgeslagen (#205).
+        .interactiveDismissDisabled(viewModel.isWorking)
     }
 }
