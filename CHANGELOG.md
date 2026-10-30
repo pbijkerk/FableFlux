@@ -8,6 +8,7 @@ en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 ## [Unreleased]
 
 ### Toegevoegd
+- URL-schema `rssreader://add?url=<feed-url>` voegt een feed direct toe (bv. vanuit Spotlight, Snelkoppelingen of een geplakte link), zonder tussenscherm, met een duidelijke melding bij succes of fout (#203)
 - Share Extension: een RSS/Atom-feed-link kan via de Share-knop van Safari (of een andere browser) direct aan FableFlux worden toegevoegd, zonder tussenscherm (#201)
 - 'Delen' vanuit een artikel (en via het contextmenu in de feedlijst) geeft nu ook de artikeltekst mee, niet alleen de link — Notes en Drafts krijgen zo titel en inhoud (#204)
 - Herhaald tikken op de tab Artikelen of op de actieve mapchip scrolt de lijst terug naar het nieuwste artikel (#185)
