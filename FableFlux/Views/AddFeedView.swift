@@ -4,7 +4,6 @@ import SwiftData
 struct AddFeedView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
-    @Query private var feeds: [Feed]
 
     var refreshService: FeedRefreshService
     var onAdded: () -> Void
@@ -56,34 +55,21 @@ struct AddFeedView: View {
     }
 
     private func addFeed() {
-        var urlString = urlText.trimmingCharacters(in: .whitespacesAndNewlines)
-        if !urlString.hasPrefix("http://") && !urlString.hasPrefix("https://") {
-            urlString = "https://" + urlString
-        }
-
-        guard URL(string: urlString) != nil else {
-            errorMessage = "Ongeldig adres. Controleer het en probeer het opnieuw."
-            return
-        }
-
-        // Check duplicate
-        if feeds.contains(where: { $0.url == urlString }) {
-            errorMessage = "Deze feed staat al in je lijst."
-            return
-        }
-
         isLoading = true
         errorMessage = nil
 
         Task {
             do {
-                let title = try await refreshService.fetchFeedTitle(url: urlString)
-                let feed = Feed(url: urlString, title: title)
-                modelContext.insert(feed)
-                try modelContext.save()
+                // FeedAddingService (#201) doet validatie + opslag; dezelfde functie wordt
+                // gebruikt door FableFluxShareExtension en kan door #203 worden hergebruikt.
+                let feed = try await FeedAddingService.addFeed(from: urlText, context: modelContext)
+                // Volledige verversing erbovenop: bronbeoordeling, mapindeling en consistente
+                // ontdubbeling, zoals bij elke reguliere refresh.
                 await refreshService.refresh(feed: feed, context: modelContext)
                 onAdded()
                 dismiss()
+            } catch let error as FeedAddError {
+                errorMessage = error.errorDescription
             } catch {
                 errorMessage = "Feed kon niet worden geladen: \(error.localizedDescription)"
             }
