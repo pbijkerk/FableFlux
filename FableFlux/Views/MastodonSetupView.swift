@@ -38,10 +38,12 @@ struct SafariBrowserView: UIViewControllerRepresentable {
             if let obs = callbackObserver { NotificationCenter.default.removeObserver(obs) }
         }
 
-        @MainActor func safariViewControllerDidFinish(_ controller: SFSafariViewController) {
+        nonisolated func safariViewControllerDidFinish(_ controller: SFSafariViewController) {
             // Gebruiker sluit browser handmatig → annuleer de OAuth-aanvraag
-            OAuthCallbackHandler.shared.cancel()
-            isPresented = false
+            Task { @MainActor in
+                OAuthCallbackHandler.shared.cancel()
+                self.isPresented = false
+            }
         }
     }
 }

@@ -277,6 +277,7 @@ struct ItemDetailView: View {
             title: item.title,
             feedName: item.feed?.title,
             date: item.pubDate,
+            authorAvatarURL: item.authorAvatarURL,
             fontSize: articleFontSize,
             fontFamily: articleFontFamily,
             topPadding: htmlTopPadding
@@ -348,6 +349,7 @@ struct ItemDetailView: View {
             feedName: item.feed?.title,
             date: item.pubDate,
             articleLink: currentArticleLink,
+            authorAvatarURL: item.authorAvatarURL,
             fontSize: articleFontSize,
             fontFamily: articleFontFamily,
             topPadding: htmlTopPadding
@@ -367,6 +369,7 @@ enum ArticleHTMLBuilder {
         feedName: String?,
         date: Date?,
         articleLink: String? = nil,
+        authorAvatarURL: String? = nil,
         fontSize: Int = AppConfiguration.defaultArticleFontSize,
         fontFamily: String = AppConfiguration.defaultArticleFontFamily,
         topPadding: Int = AppConfiguration.floatingNavBarClearance
@@ -391,10 +394,15 @@ enum ArticleHTMLBuilder {
         default: bodyFont = "-apple-system, 'SF Pro Text', sans-serif"
         }
 
-        // Categorie-/bron-label boven de titel in de accentkleur van de bron
+        // Categorie-/bron-label boven de titel in de accentkleur van de bron; bij een
+        // Mastodon-bericht met het profielicoon van de auteur ervoor (#192, zelfde patroon
+        // als de artikelkaart, #186).
+        let avatarHTML =
+            authorAvatarURL.flatMap { $0.isEmpty ? nil : $0 }
+            .map { "<img class=\"category-avatar\" src=\"\(escape($0))\" alt=\"\">" } ?? ""
         let categoryHTML =
             (feedName?.isEmpty == false)
-            ? "<p class=\"category-label\">\(escape(feedName!.uppercased()))</p>"
+            ? "<p class=\"category-label\">\(avatarHTML)\(escape(feedName!.uppercased()))</p>"
             : ""
 
         return """
@@ -444,7 +452,8 @@ enum ArticleHTMLBuilder {
                 word-break: break-word;
                 -webkit-text-size-adjust: 100%;
             }
-            .category-label { font-family: -apple-system, sans-serif; font-size: 0.72em; font-weight: 800; letter-spacing: 0.12em; color: var(--accent); margin-bottom: 0.5em; }
+            .category-label { font-family: -apple-system, sans-serif; font-size: 0.72em; font-weight: 800; letter-spacing: 0.12em; color: var(--accent); margin-bottom: 0.5em; display: flex; align-items: center; gap: 6px; }
+            .category-avatar { width: 18px; height: 18px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
             .article-title { font-family: Charter, Georgia, serif; font-size: 1.7em; font-weight: 900; line-height: 1.18; margin-bottom: 0.35em; letter-spacing: -0.01em; }
             .article-meta { font-size: 0.8em; color: var(--secondary); margin-bottom: 1.8em; padding-bottom: 1.2em; border-bottom: 1px solid var(--border); }
             h1, h2, h3, h4, h5, h6 { font-family: Charter, Georgia, serif; font-weight: 800; line-height: 1.3; margin: 1.5em 0 0.45em; }
