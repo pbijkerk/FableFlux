@@ -7,44 +7,60 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		02C4AD687085E33824F2C8BC /* Topic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C98FEFE71B2067592669964 /* Topic.swift */; };
 		057815C4B5D53E1F228BEE96 /* SourceRatingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09E1B156BFC764A1EB0D2881 /* SourceRatingService.swift */; };
 		0B1A5CEACF0BCFDD8199C04D /* AddFeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6AB1ECA0BC1873C3B0371AB /* AddFeedView.swift */; };
+		11E6786B2C6B526DF3F2800E /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEC8866960D30E90B8FDE40 /* ShareViewController.swift */; };
 		12908DBDFFAACAC2FF2BD54E /* MastodonAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 692B61660E43827445C1F9B0 /* MastodonAccount.swift */; };
 		148B5ED95C643E7AF04A3F5B /* FeedItemsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F6F0AEAAD772D3A13E7B06E /* FeedItemsView.swift */; };
 		1947170DC0F08E1A8D960351 /* OPMLImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE8EE1DCAD5716F39F5B212B /* OPMLImportView.swift */; };
 		1B84FDE11086A1E4AE49A4F1 /* FactCheckChipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C67C1EFB6AEEEB0CB4D6C583 /* FactCheckChipView.swift */; };
+		1DB6620D77AED3A0B649C929 /* FeedFolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8029AF0B18F5CE3C8D8D8E25 /* FeedFolder.swift */; };
 		1F2192FDE381CBBD6D399C63 /* PersistenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0795CEE7F157D0AF65C6F175 /* PersistenceService.swift */; };
+		20D3BEDE292E1CE0244E16D8 /* FeedItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F59B0E87C4A3EDC0B41CCF /* FeedItem.swift */; };
+		225FFA6443AF760A037917BC /* Feed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97B86E33AA2E766303AEFB93 /* Feed.swift */; };
 		24398C80A627EC95ADBB645A /* StatementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CB2102D166C8C6759D5F40F /* StatementView.swift */; };
 		246A564AFBDDB9244EF1F315 /* ArticleExtractorService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA1D00C60853F439E589A38 /* ArticleExtractorService.swift */; };
+		2887DA0BAD70BF4F4E684F13 /* RSSParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1CC56F10F1CB08CDC17B15D /* RSSParser.swift */; };
 		2BEB8B428857B1535F01706F /* ClaudeKeyValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C63A40D3ED9694FBE9F71E /* ClaudeKeyValidator.swift */; };
 		2DCB322984321B149CE716F0 /* FeedItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F59B0E87C4A3EDC0B41CCF /* FeedItem.swift */; };
+		2FCB131819D9FA835B520B34 /* SharedStoreMigration.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91291717E1223727A2EE128 /* SharedStoreMigration.swift */; };
 		339DFDCE1734CDCA9C09C81F /* FeedBadgeCountTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 943795920C28CDAE1703704C /* FeedBadgeCountTests.swift */; };
 		35678F0207828E1477D2BB07 /* TopicEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7647A2C926E2BE12B95FE2E8 /* TopicEditView.swift */; };
+		3B9E7A91578BFA5164BDCDC2 /* FableFluxShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 9AF47CE603D887B3E408B6A8 /* FableFluxShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4483D26015E5ABA14E9D9B21 /* TopicClusteringOrderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBC34685F5B48A95F26AAB98 /* TopicClusteringOrderTests.swift */; };
 		45A386B07D0DF92E6B9D8273 /* OPMLParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E1E1D3114793C39ADCE25E9 /* OPMLParserTests.swift */; };
 		475720E57174BD1BD2ECA0F5 /* FactCheckWarningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECF49324E4069A4A1C27BBFC /* FactCheckWarningView.swift */; };
 		4A97337BA58548D05999A022 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10F3C425232B32663716100 /* SettingsView.swift */; };
+		4ECE8B8E5CE236ADFE458974 /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41EC6A362AAEB1F8AB0C3171 /* AppConfiguration.swift */; };
 		4FE9CE1A1E1942DE36BC4EC4 /* FeedFolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8029AF0B18F5CE3C8D8D8E25 /* FeedFolder.swift */; };
 		50627C37FAB3B1A47EC441B8 /* SummaryWindowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51946DD84EDD730618ECC2C /* SummaryWindowTests.swift */; };
 		525776C534A242EA36DD5220 /* ClaudeKeyMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D108EABE3F35CB4264E68658 /* ClaudeKeyMigrationTests.swift */; };
 		5435B7C5B9239ADE68FD5AAC /* FactCheckService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B902A62F5F865C0217E26BAC /* FactCheckService.swift */; };
 		5DC9CFC0F499771C9800CE41 /* RSSParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1CC56F10F1CB08CDC17B15D /* RSSParser.swift */; };
+		5EFD79AED32A78517FA02D8F /* FeedAddingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6224F551A008651BB5A8995 /* FeedAddingService.swift */; };
 		638CAF0BCEC3054960CE69E5 /* FeedSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5B4373B22C6033790E7D91C /* FeedSettingsView.swift */; };
 		6600E124366BD01ECE49A500 /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41EC6A362AAEB1F8AB0C3171 /* AppConfiguration.swift */; };
+		6756EED5CE68346ABC4415BF /* MastodonAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 692B61660E43827445C1F9B0 /* MastodonAccount.swift */; };
 		67B4E85669D652D376B83F6B /* BiasBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 190545F72EBE2674D6C76BB4 /* BiasBarView.swift */; };
+		67B5E51AB6A6D3470AEAF41F /* FactCheckResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD9F54B4509EE712150F2A19 /* FactCheckResult.swift */; };
+		67CE55DED4D14DF478206A2B /* SharedModelContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB776663C0A9D19834DDBA45 /* SharedModelContainer.swift */; };
 		6BEC3CCF413150F8658EEE5E /* SavedArticlesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1D96E26EBDF48E13829674E /* SavedArticlesView.swift */; };
 		6DC5C632C36B24FA1C059DD6 /* ClaudeKeyMigration.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A35D43EF245902EBD077B /* ClaudeKeyMigration.swift */; };
 		70566EC056306BC4269B329F /* AppThemeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0174440B92DB514ED5D547 /* AppThemeTests.swift */; };
 		73CFEF4BD46405BB98812832 /* PublicationDateSanityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD011C9711BFD7B55F2D7F45 /* PublicationDateSanityTests.swift */; };
+		76468507FFC67E30FE998C05 /* FeedAddingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6224F551A008651BB5A8995 /* FeedAddingService.swift */; };
 		7CEAF9C73CEAD66EE4FF2C3A /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B90C7386AE8EAEE62D0C74 /* AppTheme.swift */; };
 		7CFFFE4FAF29C0BE7FE1FE1D /* FeedRefreshService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5F21875FD78822261F12D4 /* FeedRefreshService.swift */; };
 		7DAE8A19DE5798B12ED6D863 /* OPMLParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1896821B603AC95EB51AF24 /* OPMLParser.swift */; };
 		827EE4D15B651C252EFAC9C4 /* FactCheckResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD9F54B4509EE712150F2A19 /* FactCheckResult.swift */; };
 		855F7077749646E805B1AFD9 /* TopicSourceRatingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18637943D8603DEC0D2DCB27 /* TopicSourceRatingView.swift */; };
+		86604E3AC99C6A9A758F9753 /* SharedModelContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB776663C0A9D19834DDBA45 /* SharedModelContainer.swift */; };
 		9027629D3A660AEA7EFD602C /* FloatingTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A2D99283E4A6A631349DA1D /* FloatingTabBar.swift */; };
 		907343B55D36BDE567B5D12B /* TopicClusteringService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72743C374A98D7FDC9546B88 /* TopicClusteringService.swift */; };
 		915E34F1AFF84AC7B6CC2605 /* AnthropicClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFC5F43C7E9C41B80FC55B49 /* AnthropicClient.swift */; };
 		92ED8B08FAED172B0D0834DD /* FolderManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99533A5862F4BD9AE0EC62EF /* FolderManagementView.swift */; };
+		9C3A8205F4A210165BAC455D /* ShareExtensionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00150C450824BF4E84B06AB1 /* ShareExtensionView.swift */; };
 		9C62128274E73048828C0A19 /* OAuthCallbackHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8754BDAB353218E9F083CA63 /* OAuthCallbackHandler.swift */; };
 		9CF591720872641D56BEFEA0 /* FableFluxTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22BF9A433834F4E60C38ACCE /* FableFluxTests.swift */; };
 		AC3A1D5DDAB660485EAAA0CD /* Topic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C98FEFE71B2067592669964 /* Topic.swift */; };
@@ -81,9 +97,31 @@
 			remoteGlobalIDString = E1C3FF45BE36C36641F69356;
 			remoteInfo = FableFlux;
 		};
+		9405DDB423A5C4DF47057BF6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EBF8A1026FC877F315E75C31 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C46F751705FFFF8CE1425242;
+			remoteInfo = FableFluxShareExtension;
+		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		D802CFF29DF0C2497197595C /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				3B9E7A91578BFA5164BDCDC2 /* FableFluxShareExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		00150C450824BF4E84B06AB1 /* ShareExtensionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareExtensionView.swift; sourceTree = "<group>"; };
 		05C63A40D3ED9694FBE9F71E /* ClaudeKeyValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeKeyValidator.swift; sourceTree = "<group>"; };
 		0795CEE7F157D0AF65C6F175 /* PersistenceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceService.swift; sourceTree = "<group>"; };
 		09E1B156BFC764A1EB0D2881 /* SourceRatingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceRatingService.swift; sourceTree = "<group>"; };
@@ -100,6 +138,7 @@
 		31B90C7386AE8EAEE62D0C74 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
 		36D59593122FDE0A55B8B10B /* SummaryDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryDetailView.swift; sourceTree = "<group>"; };
 		41EC6A362AAEB1F8AB0C3171 /* AppConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfiguration.swift; sourceTree = "<group>"; };
+		4817FDEC93A87F8D028F023C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		4E1E1D3114793C39ADCE25E9 /* OPMLParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OPMLParserTests.swift; sourceTree = "<group>"; };
 		4E7AAFA9CFE94EF461C6BE48 /* FableFluxApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FableFluxApp.swift; sourceTree = "<group>"; };
 		4EB52796FB747C4FD83ADAE9 /* FableFluxTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = FableFluxTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -117,7 +156,9 @@
 		947FE53DC4292B060AC1AC89 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		97B86E33AA2E766303AEFB93 /* Feed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Feed.swift; sourceTree = "<group>"; };
 		99533A5862F4BD9AE0EC62EF /* FolderManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderManagementView.swift; sourceTree = "<group>"; };
+		9AF47CE603D887B3E408B6A8 /* FableFluxShareExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = FableFluxShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		9CB2102D166C8C6759D5F40F /* StatementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatementView.swift; sourceTree = "<group>"; };
+		9E3B33DEEB4AFFC6B0E9E7FC /* FableFluxShareExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FableFluxShareExtension.entitlements; sourceTree = "<group>"; };
 		9FA1D00C60853F439E589A38 /* ArticleExtractorService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleExtractorService.swift; sourceTree = "<group>"; };
 		A1CC56F10F1CB08CDC17B15D /* RSSParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RSSParser.swift; sourceTree = "<group>"; };
 		A93E4A781B20B293AD34B415 /* FolderItemsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderItemsView.swift; sourceTree = "<group>"; };
@@ -129,9 +170,11 @@
 		B5B4373B22C6033790E7D91C /* FeedSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedSettingsView.swift; sourceTree = "<group>"; };
 		B902A62F5F865C0217E26BAC /* FactCheckService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FactCheckService.swift; sourceTree = "<group>"; };
 		BA4860D1170957B8318A6F82 /* StoryGroupHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryGroupHeaderView.swift; sourceTree = "<group>"; };
+		BB776663C0A9D19834DDBA45 /* SharedModelContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedModelContainer.swift; sourceTree = "<group>"; };
 		BC4803886B23CF6C97CD1417 /* MastodonService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MastodonService.swift; sourceTree = "<group>"; };
 		BD42AACE577A9618CFBADE05 /* ArticleFilterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleFilterTests.swift; sourceTree = "<group>"; };
 		C140A655FA7F7F5D0F17E7A5 /* EventClusteringService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventClusteringService.swift; sourceTree = "<group>"; };
+		C6224F551A008651BB5A8995 /* FeedAddingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedAddingService.swift; sourceTree = "<group>"; };
 		C67C1EFB6AEEEB0CB4D6C583 /* FactCheckChipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FactCheckChipView.swift; sourceTree = "<group>"; };
 		C83002285B9777D6C4729D13 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		CBC34685F5B48A95F26AAB98 /* TopicClusteringOrderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicClusteringOrderTests.swift; sourceTree = "<group>"; };
@@ -141,11 +184,14 @@
 		D108EABE3F35CB4264E68658 /* ClaudeKeyMigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeKeyMigrationTests.swift; sourceTree = "<group>"; };
 		D158F5F78757391A2AE1102B /* source_ratings.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = source_ratings.json; sourceTree = "<group>"; };
 		D1D96E26EBDF48E13829674E /* SavedArticlesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedArticlesView.swift; sourceTree = "<group>"; };
+		D26A48D94465C2A79DB3A0F8 /* FableFlux.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FableFlux.entitlements; sourceTree = "<group>"; };
 		DB5F21875FD78822261F12D4 /* FeedRefreshService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedRefreshService.swift; sourceTree = "<group>"; };
 		DE8EE1DCAD5716F39F5B212B /* OPMLImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OPMLImportView.swift; sourceTree = "<group>"; };
 		E62F97429C0C7094818F071B /* TopicsManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicsManagementView.swift; sourceTree = "<group>"; };
 		E73A4B34632B08FAD1B6F359 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		E91291717E1223727A2EE128 /* SharedStoreMigration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedStoreMigration.swift; sourceTree = "<group>"; };
 		ECF49324E4069A4A1C27BBFC /* FactCheckWarningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FactCheckWarningView.swift; sourceTree = "<group>"; };
+		EEEC8866960D30E90B8FDE40 /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
 		F10F3C425232B32663716100 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		F50DCE1DB7EB3A71837AB5D1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F6AB1ECA0BC1873C3B0371AB /* AddFeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddFeedView.swift; sourceTree = "<group>"; };
@@ -158,6 +204,7 @@
 			isa = PBXGroup;
 			children = (
 				71A3CDAF70B9EB2A73B1FFD3 /* FableFlux */,
+				DB47B0F70BB0A4FACB92E01C /* FableFluxShareExtension */,
 				56332DD0759A750D08F1A1E1 /* FableFluxTests */,
 				A125F6A0927E49D9CF97ED41 /* Products */,
 			);
@@ -241,6 +288,7 @@
 				41EC6A362AAEB1F8AB0C3171 /* AppConfiguration.swift */,
 				F50DCE1DB7EB3A71837AB5D1 /* Assets.xcassets */,
 				C83002285B9777D6C4729D13 /* ContentView.swift */,
+				D26A48D94465C2A79DB3A0F8 /* FableFlux.entitlements */,
 				4E7AAFA9CFE94EF461C6BE48 /* FableFluxApp.swift */,
 				E73A4B34632B08FAD1B6F359 /* Info.plist */,
 				D158F5F78757391A2AE1102B /* source_ratings.json */,
@@ -256,6 +304,7 @@
 			isa = PBXGroup;
 			children = (
 				1AB4A10A522CBDB2DFF9067E /* FableFlux.app */,
+				9AF47CE603D887B3E408B6A8 /* FableFluxShareExtension.appex */,
 				4EB52796FB747C4FD83ADAE9 /* FableFluxTests.xctest */,
 			);
 			name = Products;
@@ -270,6 +319,7 @@
 				05C63A40D3ED9694FBE9F71E /* ClaudeKeyValidator.swift */,
 				C140A655FA7F7F5D0F17E7A5 /* EventClusteringService.swift */,
 				B902A62F5F865C0217E26BAC /* FactCheckService.swift */,
+				C6224F551A008651BB5A8995 /* FeedAddingService.swift */,
 				DB5F21875FD78822261F12D4 /* FeedRefreshService.swift */,
 				D096640302E7A67B3AF1E4D7 /* KeychainService.swift */,
 				BC4803886B23CF6C97CD1417 /* MastodonService.swift */,
@@ -277,10 +327,23 @@
 				B1896821B603AC95EB51AF24 /* OPMLParser.swift */,
 				0795CEE7F157D0AF65C6F175 /* PersistenceService.swift */,
 				A1CC56F10F1CB08CDC17B15D /* RSSParser.swift */,
+				BB776663C0A9D19834DDBA45 /* SharedModelContainer.swift */,
+				E91291717E1223727A2EE128 /* SharedStoreMigration.swift */,
 				09E1B156BFC764A1EB0D2881 /* SourceRatingService.swift */,
 				72743C374A98D7FDC9546B88 /* TopicClusteringService.swift */,
 			);
 			path = Services;
+			sourceTree = "<group>";
+		};
+		DB47B0F70BB0A4FACB92E01C /* FableFluxShareExtension */ = {
+			isa = PBXGroup;
+			children = (
+				9E3B33DEEB4AFFC6B0E9E7FC /* FableFluxShareExtension.entitlements */,
+				4817FDEC93A87F8D028F023C /* Info.plist */,
+				00150C450824BF4E84B06AB1 /* ShareExtensionView.swift */,
+				EEEC8866960D30E90B8FDE40 /* ShareViewController.swift */,
+			);
+			path = FableFluxShareExtension;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -304,16 +367,35 @@
 			productReference = 4EB52796FB747C4FD83ADAE9 /* FableFluxTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		C46F751705FFFF8CE1425242 /* FableFluxShareExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CD41ED590F185898A49AE29C /* Build configuration list for PBXNativeTarget "FableFluxShareExtension" */;
+			buildPhases = (
+				4B1ABA9F42C75BA85F6840D2 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FableFluxShareExtension;
+			packageProductDependencies = (
+			);
+			productName = FableFluxShareExtension;
+			productReference = 9AF47CE603D887B3E408B6A8 /* FableFluxShareExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		E1C3FF45BE36C36641F69356 /* FableFlux */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = BB15CF0F36BF2E4A317FAA50 /* Build configuration list for PBXNativeTarget "FableFlux" */;
 			buildPhases = (
 				18E2F3442D75EE64A6989913 /* Sources */,
 				4C4087979733801644C36608 /* Resources */,
+				D802CFF29DF0C2497197595C /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				B48AECF571561464992690A9 /* PBXTargetDependency */,
 			);
 			name = FableFlux;
 			packageProductDependencies = (
@@ -332,6 +414,10 @@
 				LastUpgradeCheck = 1500;
 				TargetAttributes = {
 					A8A7A6A0D9F2FAC617A774BE = {
+						DevelopmentTeam = 68K8BCC3DL;
+						ProvisioningStyle = Automatic;
+					};
+					C46F751705FFFF8CE1425242 = {
 						DevelopmentTeam = 68K8BCC3DL;
 						ProvisioningStyle = Automatic;
 					};
@@ -356,6 +442,7 @@
 			projectRoot = "";
 			targets = (
 				E1C3FF45BE36C36641F69356 /* FableFlux */,
+				C46F751705FFFF8CE1425242 /* FableFluxShareExtension */,
 				A8A7A6A0D9F2FAC617A774BE /* FableFluxTests */,
 			);
 		};
@@ -395,6 +482,7 @@
 				5435B7C5B9239ADE68FD5AAC /* FactCheckService.swift in Sources */,
 				475720E57174BD1BD2ECA0F5 /* FactCheckWarningView.swift in Sources */,
 				DBA91F2469D5E13A42119FDB /* Feed.swift in Sources */,
+				5EFD79AED32A78517FA02D8F /* FeedAddingService.swift in Sources */,
 				4FE9CE1A1E1942DE36BC4EC4 /* FeedFolder.swift in Sources */,
 				2DCB322984321B149CE716F0 /* FeedItem.swift in Sources */,
 				148B5ED95C643E7AF04A3F5B /* FeedItemsView.swift in Sources */,
@@ -417,6 +505,8 @@
 				BD6633817601B0B0C3C0B398 /* ReliabilityBadgeView.swift in Sources */,
 				6BEC3CCF413150F8658EEE5E /* SavedArticlesView.swift in Sources */,
 				4A97337BA58548D05999A022 /* SettingsView.swift in Sources */,
+				67CE55DED4D14DF478206A2B /* SharedModelContainer.swift in Sources */,
+				2FCB131819D9FA835B520B34 /* SharedStoreMigration.swift in Sources */,
 				057815C4B5D53E1F228BEE96 /* SourceRatingService.swift in Sources */,
 				24398C80A627EC95ADBB645A /* StatementView.swift in Sources */,
 				C6A43AE2DE39A386ED4EA13F /* StoryGroupHeaderView.swift in Sources */,
@@ -429,6 +519,25 @@
 				855F7077749646E805B1AFD9 /* TopicSourceRatingView.swift in Sources */,
 				C1283EDC82D5F5860B6C31ED /* TopicsManagementView.swift in Sources */,
 				E395149129401DBD8249F25F /* VideoPlayerView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4B1ABA9F42C75BA85F6840D2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4ECE8B8E5CE236ADFE458974 /* AppConfiguration.swift in Sources */,
+				67B5E51AB6A6D3470AEAF41F /* FactCheckResult.swift in Sources */,
+				225FFA6443AF760A037917BC /* Feed.swift in Sources */,
+				76468507FFC67E30FE998C05 /* FeedAddingService.swift in Sources */,
+				1DB6620D77AED3A0B649C929 /* FeedFolder.swift in Sources */,
+				20D3BEDE292E1CE0244E16D8 /* FeedItem.swift in Sources */,
+				6756EED5CE68346ABC4415BF /* MastodonAccount.swift in Sources */,
+				2887DA0BAD70BF4F4E684F13 /* RSSParser.swift in Sources */,
+				9C3A8205F4A210165BAC455D /* ShareExtensionView.swift in Sources */,
+				11E6786B2C6B526DF3F2800E /* ShareViewController.swift in Sources */,
+				86604E3AC99C6A9A758F9753 /* SharedModelContainer.swift in Sources */,
+				02C4AD687085E33824F2C8BC /* Topic.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -457,6 +566,11 @@
 			isa = PBXTargetDependency;
 			target = E1C3FF45BE36C36641F69356 /* FableFlux */;
 			targetProxy = 12516A989A1D39FC154EF06A /* PBXContainerItemProxy */;
+		};
+		B48AECF571561464992690A9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C46F751705FFFF8CE1425242 /* FableFluxShareExtension */;
+			targetProxy = 9405DDB423A5C4DF47057BF6 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -541,12 +655,36 @@
 			};
 			name = Debug;
 		};
+		2D8A84299E40C959F19DA318 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = FableFluxShareExtension/FableFluxShareExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 68K8BCC3DL;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = FableFluxShareExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.peterbijkerk.rssreader.ShareExtension;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
 		65A5EB9AB4E0B0719278D2AB /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_ENTITLEMENTS = FableFlux/FableFlux.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 68K8BCC3DL;
@@ -638,6 +776,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_ENTITLEMENTS = FableFlux/FableFlux.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 68K8BCC3DL;
@@ -656,6 +795,29 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
+		};
+		E8B1688968BD3E66872A8B1B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = FableFluxShareExtension/FableFluxShareExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 68K8BCC3DL;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = FableFluxShareExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.peterbijkerk.rssreader.ShareExtension;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
 		};
 		F59F8FA141FD467185D133C8 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -695,6 +857,15 @@
 			buildConfigurations = (
 				1119B7D1C6DCCF79BFD73BEA /* Debug */,
 				F59F8FA141FD467185D133C8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		CD41ED590F185898A49AE29C /* Build configuration list for PBXNativeTarget "FableFluxShareExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2D8A84299E40C959F19DA318 /* Debug */,
+				E8B1688968BD3E66872A8B1B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

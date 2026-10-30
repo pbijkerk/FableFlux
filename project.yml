@@ -34,12 +34,43 @@ targets:
         INFOPLIST_FILE: FableFlux/Info.plist
         CODE_SIGN_STYLE: Automatic
         DEVELOPMENT_TEAM: 68K8BCC3DL
+        # App Group (#201): deelt de SwiftData-store met FableFluxShareExtension.
+        CODE_SIGN_ENTITLEMENTS: FableFlux/FableFlux.entitlements
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.news
         ENABLE_PREVIEWS: YES
         SWIFT_EMIT_LOC_STRINGS: YES
+    dependencies:
+      - target: FableFluxShareExtension
+        embed: true
     scheme:
       testTargets:
         - FableFluxTests
+
+  FableFluxShareExtension:
+    type: app-extension
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      # Eigen extensie-UI.
+      - path: FableFluxShareExtension
+      # Gedeeld met de hoofdapp: modellen plus de kernlogica om een feed te valideren en
+      # op te slaan (#201). Geen Mastodon/Keychain-afhankelijkheden nodig in de extensie.
+      - path: FableFlux/Models
+      - path: FableFlux/AppConfiguration.swift
+      - path: FableFlux/Services/RSSParser.swift
+      - path: FableFlux/Services/FeedAddingService.swift
+      - path: FableFlux/Services/SharedModelContainer.swift
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.peterbijkerk.rssreader.ShareExtension
+        SWIFT_VERSION: "5.9"
+        INFOPLIST_FILE: FableFluxShareExtension/Info.plist
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: 68K8BCC3DL
+        CODE_SIGN_ENTITLEMENTS: FableFluxShareExtension/FableFluxShareExtension.entitlements
+        SWIFT_EMIT_LOC_STRINGS: YES
+        SKIP_INSTALL: YES
+        GENERATE_INFOPLIST_FILE: NO
 
   FableFluxTests:
     type: bundle.unit-test

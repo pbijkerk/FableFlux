@@ -197,6 +197,15 @@ enum AppConfiguration {
         }
     }
 
+    // MARK: - App Group
+
+    /// Identifier van de App Group die de hoofdapp en FableFluxShareExtension delen (#201),
+    /// zodat ze dezelfde SwiftData-store kunnen lezen/schrijven. Moet overeenkomen met de
+    /// group in `FableFlux.entitlements` en `FableFluxShareExtension.entitlements`.
+    enum AppGroup {
+        static let identifier = "group.com.peterbijkerk.rssreader"
+    }
+
     // MARK: - Logging
 
     enum LogSubsystem {
