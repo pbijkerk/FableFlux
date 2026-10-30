@@ -126,7 +126,8 @@ class ArticleExtractorService: NSObject, ObservableObject, WKNavigationDelegate 
     }
 
     nonisolated func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        Task { @MainActor in
+        Task { @MainActor [weak self] in
+            guard let self else { return }
             logger.error("Navigation failed: \(error.localizedDescription)")
             self.cleanup(with: error)
         }
@@ -135,7 +136,8 @@ class ArticleExtractorService: NSObject, ObservableObject, WKNavigationDelegate 
     nonisolated func webView(
         _ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error
     ) {
-        Task { @MainActor in
+        Task { @MainActor [weak self] in
+            guard let self else { return }
             logger.error("Provisional navigation failed: \(error.localizedDescription)")
             self.cleanup(with: error)
         }

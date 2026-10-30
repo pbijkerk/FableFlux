@@ -14,6 +14,7 @@ en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 
 ### Opgelost
 - Na het inloggen bij Mastodon blijft de setup open en toont die het resultaat, in plaats van terug te springen naar Vandaag (#205)
+- ArticleExtractorService: delegate-callbacks didFail/didFailProvisionalNavigation vangen self nu consequent als [weak self] (#191)
 
 ## [1.13.0] - 2026-10-04
 
