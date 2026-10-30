@@ -79,6 +79,9 @@ Afgeleid van de gewenste uitkomst; geprioriteerd volgens MoSCoW. Elke actionable
 - R23: E-mailnieuwsbrieven kunnen als bron worden toegevoegd en verschijnen als artikel in de lijst — reden: veel content komt alleen per mail; eerst te beslissen of de scope wordt verbreed en via welk mechanisme (geen IMAP-framework in iOS, geen externe packages, geen eigen server). (#187)
 - R24: Het lettertype van de feedlijst is apart instelbaar in Instellingen (nu vast op systeemfont) — reden: meerwaarde voor leesbaarheid/voorkeur; geen van de kernfuncties hangt hiervan af. (sub-issue onder #193)
 - R25: Een lettertype-wijziging in Instellingen werkt door op een al geopend artikelscherm, niet alleen na heropenen — reden: cosmetisch; het werkt al correct na heropenen van het scherm. (sub-issue onder #193)
+- R26: Een RSS/Atom-feed-URL kan vanuit de browser via de Share-knop direct aan FableFlux worden toegevoegd (Share Extension) — reden: iOS laat geen klik-onderschepping van willekeurige browserlinks toe (alleen Universal Links op eigen domein); de Share Extension is de dichtstbijzijnde haalbare vorm, zoals ook Reeder dat oplost. (#201)
+- R27: Een feed kan ook via het bestaande URL-schema (`rssreader://add?url=...`) handmatig in één stap worden toegevoegd (bv. via Shortcuts of adresbalk) — reden: extra gemak naast de Share Extension, naar het voorbeeld van Reeders "URL Scheme"-functie; geen vervanging van #201. (#203)
+- R28: Bij Delen vanuit een artikel wordt ook de artikelinhoud meegegeven (niet alleen de link), zodat apps als Notes/Drafts de tekst zelf ontvangen — reden: de link alleen is onbruikbaar als je de tekst wilt overnemen in een notitie. (#204)
 
 ### Won't — nu bewust niet (sluit aan op Scope → Niet)
 - Geen iPad-versie — reden: persoonlijk iOS-gebruik, geen behoefte.
