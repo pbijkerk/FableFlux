@@ -1,6 +1,6 @@
-# TestFlight via Xcode Cloud — openstaande actie
+# TestFlight via Xcode Cloud
 
-**Status:** besloten, nog niet geconfigureerd. Vervolgstap moet op de MacBook (Xcode-koppeling kan niet op Linux).
+**Status:** afgerond. Eerste build staat in TestFlight, interne testgroep is aangemaakt.
 
 ## Besluit
 FableFlux via **TestFlight** laten lopen in plaats van rechtstreeks installeren via kabel/MacBook.
@@ -11,32 +11,44 @@ macOS-minuten; Xcode Cloud heeft een eigen, apart gratis budget van 25 compute-u
 (inclusief in het Apple Developer Program, €99/jaar — geen extra kosten). Xcode Cloud regelt
 signing (certificaat + provisioning profile) ook automatisch, GitHub Actions zou dat handmatig
 vereisen. Beide pipelines blijven naast elkaar bestaan: GitHub Actions voor PR-build/test-checks,
-Xcode Cloud alleen voor de TestFlight-upload (trigger op bv. een tag of push naar `main`).
+Xcode Cloud alleen voor de TestFlight-upload (trigger op push naar `main`).
 
-## Voorwaarden (al voldaan)
-- Apple Developer Program-lidmaatschap — aanwezig.
+## Voorwaarden
+- Apple Developer Program-lidmaatschap — aanwezig (geen extra kosten t.o.v. de bestaande €99/jaar).
 - Git-repo (GitHub) — aanwezig.
 - `.xcodeproj` wordt via XcodeGen gegenereerd en blijft in sync met `project.yml`
-  (al geborgd door CI-stap "Gegenereerd project is actueel").
+  (geborgd door de CI-stap "Gegenereerd project is actueel").
 - Geen secrets nodig in de build: de Anthropic API-sleutel wordt pas runtime door de gebruiker
   in de Keychain gezet, niet ingebakken tijdens build.
 
-## Nog te doen (op de MacBook, eenmalig in Xcode)
-1. App Store Connect-record voor FableFlux aanmaken (bundle-ID, naam, SKU) als dat nog niet bestaat.
-2. In het Xcode-project: **Automatically manage signing** aanzetten, zodat Xcode Cloud
-   certificaat/provisioning profile zelf kan regelen.
-3. `Info.plist`: `ITSAppUsesNonExemptEncryption` expliciet instellen (waarschijnlijk `NO`),
-   anders blijft elke upload hangen op "Missing Compliance" omdat niemand de vraag interactief
-   kan beantwoorden in een geautomatiseerde pipeline.
-4. Xcode Cloud-workflow configureren (Xcode → Product → Xcode Cloud / Report-navigator):
-   - Repo autoriseren (GitHub-app-koppeling, eenmalige Apple-autorisatie).
-   - Workflow: archive-actie, trigger op tag of push naar `main`.
-   - Automatisch build-nummer (`CFBundleVersion`) laten ophogen in de workflow-instellingen.
-5. Interne testgroep aanmaken in App Store Connect → TestFlight, jezelf toevoegen als tester
+## Uitgevoerde stappen (op de MacBook, in Xcode)
+1. App Store Connect-record voor FableFlux aangemaakt (bundle-ID, naam, SKU).
+2. **Automatically manage signing** aangezet in het Xcode-project — Xcode Cloud regelt
+   certificaat en provisioning profile zelf.
+3. `Info.plist`: `ITSAppUsesNonExemptEncryption` op `false` gezet (commit `38a3231`).
+   App gebruikt alleen standaard-HTTPS en Keychain, dus geen extra encryptie-verklaring nodig.
+   Zonder deze zet blijft elke geautomatiseerde upload hangen op "Missing Compliance", omdat
+   niemand de vraag interactief kan beantwoorden in een cloud-build.
+4. Xcode Cloud-workflow geconfigureerd (repo geautoriseerd, archive-actie, trigger op push naar
+   `main`, automatische verhoging van het build-nummer).
+5. Eerste upload liep tegen een onvoorziene validatiefout aan: **ITMS-90474** — FableFlux is ook
+   een iPad-target en miste `UIInterfaceOrientationPortraitUpsideDown` in
+   `UISupportedInterfaceOrientations~ipad`. Opgelost door alle oriëntaties voor iPad te
+   ondersteunen (commit `ec9db1d`); iPhone-gedrag blijft ongewijzigd.
+6. Interne testgroep aangemaakt in App Store Connect → TestFlight, Peter toegevoegd als tester
    (eigen Apple ID) — geen Beta App Review nodig voor interne testers (max. 100).
-6. TestFlight-app installeren op de iPhone (vereist iOS 17+, voldoet al), uitnodiging accepteren.
+7. Eerste build succesvol via Xcode Cloud geüpload en beschikbaar in TestFlight. TestFlight-app
+   op de iPhone geïnstalleerd (iOS 17+, voldoet).
+
+## Resultaat
+Geen kabel/MacBook meer nodig om een nieuwe build op de iPhone te krijgen: een push naar `main`
+triggert Xcode Cloud, die bouwt, ondertekent en naar TestFlight uploadt; de iPhone haalt de
+nieuwe build vervolgens zelf op via de TestFlight-app.
 
 ## Aandachtspunten
 - Builds verlopen na 90 dagen in TestFlight — bij stilstand opnieuw uploaden.
 - Externe testers (indien ooit nodig) vereisen Beta App Review (uren tot ~15 uur wachttijd,
-  medio 2026); voor eigen gebruik is interne testgroep voldoende en instant.
+  medio 2026); voor eigen gebruik is de interne testgroep voldoende en instant.
+- Bij app-structuurwijzigingen (nieuwe targets, apparaatondersteuning) altijd rekening houden met
+  extra App Store Connect-validaties zoals ITMS-90474 — deze verschijnen pas bij de eerste
+  upload na de wijziging, niet lokaal bij het bouwen.
