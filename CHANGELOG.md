@@ -8,6 +8,7 @@ en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 ## [Unreleased]
 
 ### Toegevoegd
+- 'Delen' vanuit een artikel (en via het contextmenu in de feedlijst) geeft nu ook de artikeltekst mee, niet alleen de link — Notes en Drafts krijgen zo titel en inhoud (#204)
 - Herhaald tikken op de tab Artikelen of op de actieve mapchip scrolt de lijst terug naar het nieuwste artikel (#185)
 - Mastodon-berichten tonen het profielicoon van de auteur naast de naam en een linkpreview onder de tekst (#186)
 - Mastodon-berichten tonen het profielicoon van de auteur ook op de artikelkaart in de reader-weergave (#192)
