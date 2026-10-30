@@ -317,7 +317,9 @@ struct SectionHeaderView: View {
 
     private var iconSize: CGFloat { 15 * feedListScale }
     private var iconFrame: CGFloat { 20 * feedListScale }
-    private var titleFont: Font { Theme.feedListFont(size: 15 * feedListScale, weight: .bold, family: feedListFontFamily) }
+    private var titleFont: Font {
+        Theme.feedListFont(size: 15 * feedListScale, weight: .bold, family: feedListFontFamily)
+    }
     private var captionFont: Font { .system(size: 12 * feedListScale, weight: .regular) }
     private var captionBoldFont: Font { .system(size: 12 * feedListScale, weight: .bold) }
 
@@ -381,7 +383,9 @@ struct FeedRowView: View {
 
     private var faviconSize: CGFloat { 30 * feedListScale }
     private var faviconRadius: CGFloat { 7 * feedListScale }
-    private var titleFont: Font { Theme.feedListFont(size: 17 * feedListScale, weight: .semibold, family: feedListFontFamily) }
+    private var titleFont: Font {
+        Theme.feedListFont(size: 17 * feedListScale, weight: .semibold, family: feedListFontFamily)
+    }
     private var urlFont: Font { .system(size: 12 * feedListScale) }
     private var badgeFont: Font { .system(size: 12 * feedListScale, weight: .bold) }
     private var dateFont: Font { .system(size: 11 * feedListScale) }
