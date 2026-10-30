@@ -259,7 +259,14 @@ struct ItemDetailView: View {
                         Label("Open in browser", systemImage: "safari")
                     }
 
-                    ShareLink(item: shareText) {
+                    Menu {
+                        ShareLink(item: url) {
+                            Text("Alleen link")
+                        }
+                        ShareLink(item: shareText) {
+                            Text("Link + tekst")
+                        }
+                    } label: {
                         Label("Delen", systemImage: "square.and.arrow.up")
                     }
                 }
