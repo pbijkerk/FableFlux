@@ -52,7 +52,8 @@ enum TagService {
         var tags = item.effectiveTags
         guard !tags.contains(where: { $0.caseInsensitiveCompare(trimmed) == .orderedSame }) else { return false }
 
-        let canonical = allKnownTags(context: context)
+        let canonical =
+            allKnownTags(context: context)
             .first { $0.caseInsensitiveCompare(trimmed) == .orderedSame } ?? trimmed
         tags.append(canonical)
         item.tags = tags

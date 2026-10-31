@@ -44,7 +44,8 @@ struct SavedArticlesView: View {
                         ForEach(Array(filteredItems.enumerated()), id: \.element.id) { index, item in
                             ZStack {
                                 FeedItemCard(item: item)
-                                NavigationLink(destination: ArticlePageView(items: filteredItems, initialIndex: index)) {
+                                NavigationLink(destination: ArticlePageView(items: filteredItems, initialIndex: index))
+                                {
                                     EmptyView()
                                 }
                                 .opacity(0)
