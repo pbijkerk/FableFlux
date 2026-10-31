@@ -11,6 +11,14 @@ class FeedItem {
     var isRead: Bool
     var isSaved: Bool = false
     var guid: String?
+
+    /// Vrije tags, alleen toe te kennen vanuit het detailscherm wanneer het item bewaard
+    /// is (#215). Blijven bij het item staan ook nadat het 'unsaved' wordt — alleen de
+    /// zichtbaarheid/doorzoekbaarheid in Bewaard valt dan weg, niet de data zelf.
+    /// Hoofdletterongevoelig genormaliseerd via `TagService`; dit veld bewaart de
+    /// weergavevorm (eerst-gebruikte schrijfwijze). `nil` bij rijen van vóór deze
+    /// wijziging; die gedragen zich als een lege lijst.
+    var tags: [String]? = []
     var enclosureURL: String?
     var enclosureMIMEType: String?
     var imageURL: String?
@@ -58,6 +66,10 @@ class FeedItem {
     /// De leeftijd waarop de app dit artikel beoordeelt: de publicatiedatum, en anders
     /// het moment van ophalen. `nil` bij rijen van vóór #89 die geen van beide hebben.
     var effectiveDate: Date? { pubDate ?? fetchedAt }
+
+    /// `tags` zonder optionaliteit — rijen van vóór #215 hebben `nil` in plaats van een
+    /// lege lijst; die gedragen zich hiermee als een item zonder tags.
+    var effectiveTags: [String] { tags ?? [] }
 
     var plainDescription: String {
         if let cached = _cachedPlainDescription { return cached }
