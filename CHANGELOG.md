@@ -8,6 +8,7 @@ en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 ## [Unreleased]
 
 ### Toegevoegd
+- Bewaarde artikelen kunnen vrije tags krijgen (met autocomplete op eerder gebruikte tags) in het artikel-detailscherm; Bewaard heeft een zoekbalk om op tag te filteren (#215)
 - Delen-knop biedt nu een keuze tussen 'Alleen link' en 'Link + tekst', zowel in de artikelweergave als in het contextmenu van de feedlijst (#212)
 - URL-schema `rssreader://add?url=<feed-url>` voegt een feed direct toe (bv. vanuit Spotlight, Snelkoppelingen of een geplakte link), zonder tussenscherm, met een duidelijke melding bij succes of fout (#203)
 - Share Extension: een RSS/Atom-feed-link kan via de Share-knop van Safari (of een andere browser) direct aan FableFlux worden toegevoegd, zonder tussenscherm (#201)

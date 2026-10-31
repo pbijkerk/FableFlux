@@ -13,6 +13,21 @@ struct SavedArticlesView: View {
 
     @State private var opslagFout: OpslagFoutmelding?
 
+    /// Zoektekst voor het filteren van bewaarde items op tag (#215). Matcht op items
+    /// waarvan minstens één tag de zoektekst bevat, hoofdletterongevoelig.
+    @State private var searchText = ""
+
+    /// Bewaarde items gefilterd op `searchText`. Filteren gebeurt in Swift, niet in de
+    /// SwiftData-`#Predicate` van `@Query`: die ondersteunt geen `contains`-closure op
+    /// een array-eigenschap. De lijst is persoonlijk-gebruik-schaal, dus dat kost niets.
+    private var filteredItems: [FeedItem] {
+        let trimmed = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return savedItems }
+        return savedItems.filter { item in
+            item.effectiveTags.contains { $0.localizedCaseInsensitiveContains(trimmed) }
+        }
+    }
+
     var body: some View {
         NavigationStack {
             Group {
@@ -22,12 +37,15 @@ struct SavedArticlesView: View {
                         systemImage: "bookmark",
                         description: Text("Swipe een artikel naar rechts om het te bewaren.")
                     )
+                } else if filteredItems.isEmpty {
+                    ContentUnavailableView.search(text: searchText)
                 } else {
                     List {
-                        ForEach(Array(savedItems.enumerated()), id: \.element.id) { index, item in
+                        ForEach(Array(filteredItems.enumerated()), id: \.element.id) { index, item in
                             ZStack {
                                 FeedItemCard(item: item)
-                                NavigationLink(destination: ArticlePageView(items: savedItems, initialIndex: index)) {
+                                NavigationLink(destination: ArticlePageView(items: filteredItems, initialIndex: index))
+                                {
                                     EmptyView()
                                 }
                                 .opacity(0)
@@ -53,6 +71,7 @@ struct SavedArticlesView: View {
             }
             .navigationTitle("Bewaard")
             .navigationBarTitleDisplayMode(.inline)
+            .searchable(text: $searchText, prompt: "Zoek op tag")
             .opslagFoutmelding($opslagFout)
         }
     }

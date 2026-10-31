@@ -56,6 +56,9 @@ struct ItemDetailView: View {
     var body: some View {
         VStack(spacing: 0) {
             sourceRatingStrip
+            if isActive, item.isSaved {
+                TagEditorStrip(item: item)
+            }
             Group {
                 if item.isAudioItem {
                     audioLayout
@@ -529,6 +532,101 @@ enum ArticleHTMLBuilder {
 }
 
 // MARK: - Hulp-views
+
+/// Chip-editor voor tags op een bewaard item (#215): bestaande tags als verwijderbare
+/// chips, een invoerveld, en autocomplete-suggesties uit eerder gebruikte tags over alle
+/// artikelen. Alleen getoond wanneer het item bewaard is (zie `ItemDetailView.body`).
+private struct TagEditorStrip: View {
+    @Environment(\.modelContext) private var modelContext
+    let item: FeedItem
+
+    @State private var inputText = ""
+    @State private var opslagFout: OpslagFoutmelding?
+
+    private var suggestions: [String] {
+        TagService.suggestions(for: inputText, excluding: item, context: modelContext)
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 8) {
+                if !item.effectiveTags.isEmpty {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 6) {
+                            ForEach(item.effectiveTags, id: \.self) { tag in
+                                tagChip(tag)
+                            }
+                        }
+                    }
+                }
+                HStack(spacing: 4) {
+                    Image(systemName: "tag")
+                        .foregroundStyle(.secondary)
+                        .font(.caption)
+                    TextField("Tag toevoegen…", text: $inputText)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                        .font(.caption)
+                        .onSubmit(commitInput)
+                }
+                .frame(minWidth: 120)
+            }
+
+            if !suggestions.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 6) {
+                        ForEach(suggestions, id: \.self) { suggestion in
+                            Button {
+                                addTag(suggestion)
+                            } label: {
+                                Text(suggestion)
+                                    .font(.caption2)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 3)
+                                    .background(.secondary.opacity(0.15), in: Capsule())
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                }
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
+        .background(Theme.card)
+        .overlay(alignment: .bottom) { Divider() }
+        .opslagFoutmelding($opslagFout)
+    }
+
+    private func tagChip(_ tag: String) -> some View {
+        HStack(spacing: 4) {
+            Text(tag)
+                .font(.caption2)
+            Button {
+                TagService.removeTag(tag, from: item)
+                modelContext.saveOrReport("de tag te verwijderen", melding: &opslagFout)
+            } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.caption2)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 3)
+        .background(.blue.opacity(0.15), in: Capsule())
+        .foregroundStyle(.blue)
+    }
+
+    private func commitInput() {
+        addTag(inputText)
+        inputText = ""
+    }
+
+    private func addTag(_ raw: String) {
+        guard TagService.addTag(raw, to: item, context: modelContext) else { return }
+        modelContext.saveOrReport("de tag op te slaan", melding: &opslagFout)
+    }
+}
 
 private struct VideoPlayButton: View {
     @Binding var isPresented: Bool
