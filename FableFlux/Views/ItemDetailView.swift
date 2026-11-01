@@ -139,9 +139,10 @@ struct ItemDetailView: View {
         if let audioURL = item.directAudioURL {
             VStack(spacing: 0) {
                 // Vrij van de zwevende iOS 26-balk: de speler staat bovenaan en werd
-                // er anders door afgesneden (#63).
+                // er anders door afgesneden (#63). Alleen de volle marge nodig als er
+                // geen strip (bronduiding/tags) boven staat die dat al regelt (#215).
                 AudioPlayerView(url: audioURL)
-                    .padding(.top, CGFloat(AppConfiguration.floatingNavBarClearance))
+                    .padding(.top, showsTopStrip ? 0 : CGFloat(AppConfiguration.floatingNavBarClearance))
                 ReaderWebView(
                     html: displayHTML,
                     baseURL: articleURL,
@@ -168,7 +169,7 @@ struct ItemDetailView: View {
     private func safariPlayerLayout(playerURL: URL) -> some View {
         VStack(spacing: 0) {
             VideoPlayButton(isPresented: $showingVideoPlayer, playerURL: playerURL)
-                .padding(.top, CGFloat(AppConfiguration.floatingNavBarClearance))
+                .padding(.top, showsTopStrip ? 0 : CGFloat(AppConfiguration.floatingNavBarClearance))
             ReaderWebView(html: descriptionHTML, baseURL: articleURL, onOpenURL: openInAppBrowser)
         }
         .ignoresSafeArea(edges: .bottom)
@@ -178,7 +179,7 @@ struct ItemDetailView: View {
         VStack(spacing: 0) {
             NativeVideoPlayer(url: videoURL)
                 .frame(height: UIScreen.main.bounds.width * 9 / 16)
-                .padding(.top, CGFloat(AppConfiguration.floatingNavBarClearance))
+                .padding(.top, showsTopStrip ? 0 : CGFloat(AppConfiguration.floatingNavBarClearance))
             if !displayHTML.isEmpty {
                 ReaderWebView(html: displayHTML, baseURL: articleURL, onOpenURL: openInAppBrowser)
             }
@@ -327,9 +328,12 @@ struct ItemDetailView: View {
     }
 
     /// De webview staat alleen bij de reader-layout bovenaan; bij audio en video zit er
-    /// een speler boven die de balk al vrijhoudt.
+    /// een speler boven die de balk al vrijhoudt. Staat er al een strip (bronduiding/tags)
+    /// boven de hele pagina, dan heeft die de marge al geregeld — anders ontstaat er een
+    /// dubbele, te grote witruimte boven de titel (#215).
     private var htmlTopPadding: Int {
-        (item.isAudioItem || item.isVideoItem) ? 16 : AppConfiguration.floatingNavBarClearance
+        if item.isAudioItem || item.isVideoItem { return 16 }
+        return showsTopStrip ? 16 : AppConfiguration.floatingNavBarClearance
     }
 
     // MARK: - Content laden
