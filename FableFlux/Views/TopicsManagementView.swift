@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import UniformTypeIdentifiers
 
 struct TopicsManagementView: View {
     @Environment(\.modelContext) private var modelContext
@@ -8,6 +9,8 @@ struct TopicsManagementView: View {
     @State private var showAddTopic = false
     @State private var topicToEdit: Topic?
     @State private var opslagFout: OpslagFoutmelding?
+    @State private var showImportPicker = false
+    @State private var importMelding: String?
 
     var body: some View {
         Group {
@@ -24,6 +27,21 @@ struct TopicsManagementView: View {
                     showAddTopic = true
                 }
             }
+            ToolbarItem(placement: .topBarTrailing) {
+                Menu {
+                    ShareLink(
+                        item: TopicExportDocument(data: TopicIO.export(topics)),
+                        preview: SharePreview("fableflux-onderwerpen.json")
+                    ) {
+                        Label("Onderwerpen exporteren", systemImage: "square.and.arrow.up")
+                    }
+                    Button("Onderwerpen importeren", systemImage: "square.and.arrow.down") {
+                        showImportPicker = true
+                    }
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                }
+            }
         }
         .sheet(isPresented: $showAddTopic) {
             TopicEditView(topic: nil)
@@ -31,7 +49,39 @@ struct TopicsManagementView: View {
         .sheet(item: $topicToEdit) { topic in
             TopicEditView(topic: topic)
         }
+        .fileImporter(
+            isPresented: $showImportPicker,
+            allowedContentTypes: [.json],
+            allowsMultipleSelection: false
+        ) { result in
+            handleImport(result)
+        }
+        .alert(
+            "Onderwerpen importeren",
+            isPresented: Binding(get: { importMelding != nil }, set: { if !$0 { importMelding = nil } })
+        ) {
+            Button("Oké", role: .cancel) {}
+        } message: {
+            Text(importMelding ?? "")
+        }
         .opslagFoutmelding($opslagFout)
+    }
+
+    private func handleImport(_ result: Result<[URL], Error>) {
+        guard let url = try? result.get().first else { return }
+        let accessing = url.startAccessingSecurityScopedResource()
+        defer { if accessing { url.stopAccessingSecurityScopedResource() } }
+
+        guard let data = try? Data(contentsOf: url) else {
+            importMelding = "Het bestand kon niet worden gelezen."
+            return
+        }
+        let added = TopicIO.importTopics(from: data, existing: topics, context: modelContext)
+        guard modelContext.saveOrReport("de onderwerpen te importeren", melding: &opslagFout) else { return }
+        importMelding =
+            added == 0
+            ? "Geen nieuwe onderwerpen gevonden — mogelijk stonden ze al in de lijst."
+            : "\(added) onderwerp\(added == 1 ? "" : "en") geïmporteerd."
     }
 
     private var emptyState: some View {
