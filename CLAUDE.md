@@ -40,6 +40,11 @@ Simulatorbuilds hebben er geen last van (die worden niet ondertekend).
 
 Geen externe Swift-packages; uitsluitend Apple-frameworks en de Anthropic REST API (`claude-haiku-4-5`). API-sleutel wordt opgeslagen in de Keychain via `KeychainService`.
 
+## Bekende valkuilen
+- **Zwevende iOS 26-navigatiebalk (#63, #215):** in `ItemDetailView` reserveert het systeem geen ruimte voor de navigatiebalk — die zweeft als een losse capsule bovenop de inhoud. Een nieuw element dat als eerste in de `VStack` staat (vóór de video/audio-player of het web-artikel) tekent zich anders achter de statusbalk/notch. Gebruik `AppConfiguration.floatingNavBarClearance` als topmarge, en pas 'm **maar op één plek** toe — zet je een strip (zoals `TagEditorStrip`) vóór de bestaande inhoud, maak dan de bestaande marge daar conditioneel (`showsTopStrip`) anders krijg je een dubbele, te grote marge.
+- **`.swift-format`-configbestand (`orderedImports`):** sommige (nieuwere, lokaal via Xcode geïnstalleerde) `swift-format`-versies eisen dat *alle* sleutels van een deels ingevuld configobject aanwezig zijn, anders breekt elk bestand met "missing key". Vul een object als `orderedImports` altijd volledig in (zie `Documentation/Configuration.md` van swift-format voor de defaults), ook als een deel ervan voor dit project niet relevant is.
+- **CI draait alleen op `pull_request`, niet op een directe push naar `main`** (`.github/workflows/ci.yml`). Een hotfix rechtstreeks op `main` wordt dus niet automatisch geverifieerd door de build-check — verifieer in dat geval lokaal of via een losse PR.
+
 ## Swift best practices en richtlijnen
 @IOS_Swift.md
 
