@@ -72,8 +72,11 @@ struct ItemDetailView: View {
             // om onder de zwevende navigatiebalk vrij te komen (#63) — zonder deze marge
             // tekent de eerste strip zich achter de statusbalk/notch, onleesbaar (#215).
             // Alleen toegepast als er écht een strip staat: anders krijgt de inhoud
-            // hieronder dubbele marge (die regelt zijn eigen top-ruimte al zelf).
-            .padding(.top, showsTopStrip ? CGFloat(AppConfiguration.floatingNavBarClearance) : 0)
+            // hieronder dubbele marge (die regelt zijn eigen top-ruimte al zelf). Een
+            // kleine extra marge (+12) omdat de strip anders direct tegen de onderrand
+            // van de zwevende balk aan plakt — de video/audio/web-inhoud heeft zelf nog
+            // wat eigen witruimte (kop, speler-chrome) die dat verschil opvangt.
+            .padding(.top, showsTopStrip ? CGFloat(AppConfiguration.floatingNavBarClearance) + 12 : 0)
             Group {
                 if item.isAudioItem {
                     audioLayout
