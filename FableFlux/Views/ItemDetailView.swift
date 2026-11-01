@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 import WebKit
 import AVKit
 import SafariServices
