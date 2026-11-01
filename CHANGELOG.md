@@ -8,6 +8,7 @@ en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 ## [Unreleased]
 
 ### Toegevoegd
+- OPML-export van alle feeds (met mapindeling, exclusief Mastodon-koppelingen) via de systeem-Share-sheet, naast de bestaande OPML-import (#217)
 - Bewaarde artikelen kunnen vrije tags krijgen (met autocomplete op eerder gebruikte tags) in het artikel-detailscherm; Bewaard heeft een zoekbalk om op tag te filteren (#215)
 - Delen-knop biedt nu een keuze tussen 'Alleen link' en 'Link + tekst', zowel in de artikelweergave als in het contextmenu van de feedlijst (#212)
 - URL-schema `rssreader://add?url=<feed-url>` voegt een feed direct toe (bv. vanuit Spotlight, Snelkoppelingen of een geplakte link), zonder tussenscherm, met een duidelijke melding bij succes of fout (#203)

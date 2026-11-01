@@ -67,6 +67,12 @@ struct FeedListView: View {
                     Button("OPML importeren", systemImage: "square.and.arrow.down") {
                         showOPMLImport = true
                     }
+                    ShareLink(
+                        item: OPMLDocument(content: OPMLExporter.export(feeds: feeds, folders: folders)),
+                        preview: SharePreview("fableflux-feeds.opml")
+                    ) {
+                        Label("OPML exporteren", systemImage: "square.and.arrow.up")
+                    }
                     Divider()
                     Button("Folders beheren", systemImage: "folder.badge.gear") {
                         showFolderManagement = true
