@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import UniformTypeIdentifiers
 
 struct SavedArticlesView: View {
     @Environment(\.modelContext) private var modelContext
@@ -12,6 +13,8 @@ struct SavedArticlesView: View {
     private var savedItems: [FeedItem]
 
     @State private var opslagFout: OpslagFoutmelding?
+    @State private var showImportPicker = false
+    @State private var importMelding: String?
 
     /// Zoektekst voor het filteren van bewaarde items op tag (#215). Matcht op items
     /// waarvan minstens één tag de zoektekst bevat, hoofdletterongevoelig.
@@ -72,7 +75,56 @@ struct SavedArticlesView: View {
             .navigationTitle("Bewaard")
             .navigationBarTitleDisplayMode(.inline)
             .searchable(text: $searchText, prompt: "Zoek op tag")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        ShareLink(
+                            item: SavedArticlesExportDocument(data: SavedArticleIO.export(savedItems)),
+                            preview: SharePreview("fableflux-bewaard.json")
+                        ) {
+                            Label("Bewaarde artikelen exporteren", systemImage: "square.and.arrow.up")
+                        }
+                        Button("Bewaarde artikelen importeren", systemImage: "square.and.arrow.down") {
+                            showImportPicker = true
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                    }
+                }
+            }
+            .fileImporter(
+                isPresented: $showImportPicker,
+                allowedContentTypes: [.json],
+                allowsMultipleSelection: false
+            ) { result in
+                handleImport(result)
+            }
+            .alert(
+                "Bewaarde artikelen importeren",
+                isPresented: Binding(get: { importMelding != nil }, set: { if !$0 { importMelding = nil } })
+            ) {
+                Button("Oké", role: .cancel) {}
+            } message: {
+                Text(importMelding ?? "")
+            }
             .opslagFoutmelding($opslagFout)
         }
+    }
+
+    private func handleImport(_ result: Result<[URL], Error>) {
+        guard let url = try? result.get().first else { return }
+        let accessing = url.startAccessingSecurityScopedResource()
+        defer { if accessing { url.stopAccessingSecurityScopedResource() } }
+
+        guard let data = try? Data(contentsOf: url) else {
+            importMelding = "Het bestand kon niet worden gelezen."
+            return
+        }
+        let added = SavedArticleIO.importArticles(from: data, context: modelContext)
+        guard modelContext.saveOrReport("de bewaarde artikelen te importeren", melding: &opslagFout) else { return }
+        importMelding =
+            added == 0
+            ? "Geen nieuwe artikelen gevonden — mogelijk stonden ze al in Bewaard."
+            : "\(added) artikel\(added == 1 ? "" : "en") geïmporteerd."
     }
 }
