@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="nl"><head><meta charset="utf-8">
+<style>
+.wrap{max-width:900px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px}
+.tabs label{border:1px solid var(--border,#ccc);background:transparent;color:var(--foreground);padding:6px 12px;border-radius:999px;cursor:pointer;font:inherit;font-size:13px}
+.tabsX{background:var(--accent,#1E7BF0);color:#fff;border-color:var(--accent,#1E7BF0)}
+.legend{font-size:11.5px;color:var(--muted-foreground,#666);margin:0 0 14px;line-height:1.6}
+.legend b{color:var(--foreground);font-weight:600}
+.screen{display:none}
+input[name=scr]{position:absolute;opacity:0;pointer-events:none}
+#r1:checked~.tabs .l1,#r2:checked~.tabs .l2,#r3:checked~.tabs .l3,#r4:checked~.tabs .l4{background:var(--accent,#1E7BF0);color:#fff;border-color:var(--accent,#1E7BF0)}
+#r1:checked~#s1,#r2:checked~#s2,#r3:checked~#s3,#r4:checked~#s4{display:block}
+
+.intro{font-size:13px;color:var(--muted-foreground,#666);margin:0 0 12px}
+.grid{display:flex;flex-wrap:wrap;gap:22px}
+.card{width:262px}
+.card h3{font-size:14px;margin:10px 0 4px}
+.card p{font-size:12px;margin:0 0 6px;color:var(--muted-foreground,#666);line-height:1.45}
+.card p b{color:var(--foreground);font-weight:600}
+.tags{display:flex;gap:4px;flex-wrap:wrap;margin:4px 0 8px}
+.tag{font-size:10.5px;border:1px solid var(--border,#ccc);border-radius:6px;padding:1px 6px}
+.go{font:inherit;font-size:12px;border:1px solid var(--accent,#1E7BF0);color:var(--accent,#1E7BF0);background:transparent;border-radius:8px;padding:4px 10px;cursor:pointer}
+/* ---------- telefoon ---------- */
+.ph{width:246px;height:500px;border:7px solid #1c1c1e;border-radius:38px;background:#F2F2F7;overflow:hidden;position:relative;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;color:#111;font-size:11px;line-height:1.3;box-sizing:border-box}
+.ph *{box-sizing:border-box}
+.sb{height:26px;display:flex;justify-content:space-between;align-items:center;padding:0 18px;font-size:10px;font-weight:600}
+.isl{position:absolute;top:6px;left:50%;transform:translateX(-50%);width:70px;height:18px;background:#000;border-radius:12px}
+.lt{font-size:22px;font-weight:700;padding:4px 14px 2px;letter-spacing:-.3px}
+.sub{color:#6b6b70;font-size:10.5px;padding:0 14px 8px}
+.ac{color:#1E7BF0}.mut{color:#6b6b70}
+.row{background:#fff;margin:0 10px;padding:8px 10px;border-bottom:.5px solid #e2e2e7;display:flex;gap:8px}
+.row:first-of-type{border-radius:12px 12px 0 0}
+.rowlast{border-radius:0 0 12px 12px;border-bottom:0}
+.t{font-weight:600;font-size:11.5px;line-height:1.25}
+.meta{font-size:9.5px;color:#6b6b70;margin-bottom:2px}
+.th{width:52px;height:52px;border-radius:8px;flex:none;position:relative;overflow:hidden}
+.img.g1{background:linear-gradient(160deg,#cfd9e6 0%,#8fa7c4 45%,#3d5878 100%)}
+.img.g2{background:linear-gradient(160deg,#f6d6a8,#d9894a 55%,#7a3b1d)}
+.img.g3{background:linear-gradient(160deg,#d9e8d0,#7fae6f 50%,#2f5a2a)}
+.img.g4{background:linear-gradient(160deg,#e3e3e3,#9a9a9f 50%,#3a3a3e)}
+.img.g5{background:linear-gradient(160deg,#e6d4f2,#a27ac9 50%,#4b2a72)}
+.img.g6{background:linear-gradient(160deg,#cdeff0,#4fb3b8 50%,#1d5e63)}
+.img{position:relative;overflow:hidden}
+.img:after{content:"";position:absolute;left:-10%;right:-10%;bottom:0;height:45%;background:radial-gradient(ellipse at 30% 100%,rgba(255,255,255,.25),transparent 60%)}
+.cap{font-family:-apple-system,system-ui;font-size:8.5px;color:#8e8e93;margin:2px 0 8px}
+.vis{margin:0 10px 8px;border-radius:14px;overflow:hidden;position:relative;height:150px}
+.vis .ov{position:absolute;left:0;right:0;bottom:0;padding:22px 10px 8px;background:linear-gradient(transparent,rgba(0,0,0,.72));color:#fff;z-index:1}
+.vis .ov .meta{color:rgba(255,255,255,.8)}
+.vis .ov .t{font-size:13px}
+.noimg{background:#fff;margin:0 10px 8px;border-radius:14px;padding:10px;border-left:4px solid #1E7BF0}
+.exch{display:inline-block;font-size:9px;padding:2px 7px;border-radius:999px;background:#fff4e0;color:#a0610a;margin-top:4px}
+.exch.ok{background:#eef0f3;color:#6b6b70}
+.acts{display:flex;gap:6px;margin-top:5px}.acts span{font-size:9.5px;font-weight:600;color:#1E7BF0}
+.vis .ov .exch{background:rgba(255,255,255,.9)}
+.badge{position:absolute;top:8px;right:8px;z-index:2;background:rgba(0,0,0,.55);color:#fff;font-size:9px;padding:2px 7px;border-radius:999px}
+.search{margin:0 14px 8px;background:#e3e3e8;border-radius:9px;padding:6px 9px;font-size:10.5px;color:#8e8e93}
+.tagc{display:inline-block;font-size:9px;padding:1px 6px;border-radius:5px;background:#eef5ff;color:#1E7BF0;margin:3px 3px 0 0}
+.endbox{margin:10px 14px;background:#fff;border-radius:14px;padding:12px;text-align:center;font-family:-apple-system,system-ui;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.btn{display:inline-block;font-size:11px;font-weight:600;padding:7px 14px;border-radius:999px;margin:6px 3px 0}
+.btn.p{background:#1E7BF0;color:#fff}.btn.s{background:#eef0f3;color:#111}
+.set{background:#fff;margin:0 10px;border-radius:12px}
+.set div{display:flex;justify-content:space-between;padding:9px 10px;border-bottom:.5px solid #e2e2e7;font-size:11px}
+.set div:last-child{border-bottom:0}
+.sethdr{font-size:9.5px;color:#6b6b70;text-transform:uppercase;padding:12px 14px 5px;letter-spacing:.3px}
+.setft{font-size:9.5px;color:#6b6b70;padding:5px 14px 0;line-height:1.35}
+.swipe{display:flex;margin:0 10px 8px;border-radius:14px;overflow:hidden;height:64px}
+.swipe .lbl{width:64px;background:#ff9f0a;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:9px;font-weight:600}
+.swipe .lbl b{font-size:16px}
+.swipe .rest{flex:1;background:#fff;padding:8px 10px}
+.num{width:18px;font-weight:700;color:#1E7BF0;font-size:13px;flex:none}
+.bias{height:4px;border-radius:2px;background:linear-gradient(90deg,#d94b4b,#c9c9cf 50%,#3b6fd9);position:relative;margin-top:5px;width:90px}
+.bias i{position:absolute;top:-2px;width:8px;height:8px;border-radius:50%;background:#111;border:1.5px solid #fff}
+.tb{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,.92);border-radius:999px;padding:5px;display:flex;gap:2px;box-shadow:0 2px 10px rgba(0,0,0,.12)}
+.tb span{font-size:9.5px;padding:5px 9px;border-radius:999px;color:#444}
+.tb span.on{background:#1E7BF0;color:#fff}
+.done{margin:10px 10px 0;padding:10px;border-radius:12px;background:#e8f2fe;color:#1E7BF0;text-align:center;font-weight:600;font-size:11px}
+.chip{display:inline-block;font-size:9.5px;padding:3px 8px;border-radius:999px;background:#fff;border:.5px solid #d8d8de;margin:0 3px 3px 0}
+.chip.on{background:#1E7BF0;color:#fff;border-color:#1E7BF0}
+.seg{display:flex;margin:0 14px 8px;background:#e3e3e8;border-radius:8px;padding:2px}
+.seg span{flex:1;text-align:center;font-size:10px;padding:4px 0;border-radius:6px}
+.seg span.on{background:#fff;font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.1)}
+.bigcard{background:#fff;margin:0 10px 8px;border-radius:14px;padding:10px}
+.hero{height:96px;border-radius:10px;background:linear-gradient(135deg,#f0b37e,#c0623b);margin-bottom:6px}
+.divider{margin:8px 14px 6px;font-size:9.5px;font-weight:600;color:#1E7BF0;display:flex;align-items:center;gap:6px}
+.divider:before,.divider:after{content:"";flex:1;height:1px;background:#1E7BF0;opacity:.35}
+.dim .t{color:#8e8e93;font-weight:500}
+.pill{position:absolute;bottom:58px;left:50%;transform:translateX(-50%);background:#1c1c1e;color:#fff;font-size:9.5px;padding:6px 11px;border-radius:999px;white-space:nowrap}
+.bottomchips{position:absolute;bottom:52px;left:0;right:0;padding:6px 10px;white-space:nowrap;overflow:hidden;background:linear-gradient(transparent,#F2F2F7 30%)}
+/* lezen */
+.rd{background:#fdfcf9;height:100%}
+.prog{height:2px;background:#e6e6e6}.prog i{display:block;height:2px;width:34%;background:#1E7BF0}
+.art{padding:10px 18px;font-family:"New York","Iowan Old Style",Georgia,serif;font-size:11.5px;line-height:1.55;color:#222}
+.art h4{font-family:inherit;font-size:16px;line-height:1.2;margin:4px 0 6px}
+.art .meta{font-family:-apple-system,system-ui,sans-serif}
+.tool{position:absolute;bottom:10px;left:12px;right:12px;background:rgba(255,255,255,.95);border-radius:999px;display:flex;justify-content:space-around;padding:8px 0;box-shadow:0 2px 10px rgba(0,0,0,.12);font-size:12px;color:#1E7BF0;font-family:-apple-system,system-ui}
+.tldr{background:#eef5ff;border-radius:10px;padding:8px 10px;margin:4px 0 8px;font-family:-apple-system,system-ui;font-size:10.5px;line-height:1.4}
+.tldr ul{margin:4px 0 0;padding-left:14px}
+.aimark{font-size:9px;color:#6b6b70;margin-top:4px}
+.fc{display:inline-block;font-family:-apple-system,system-ui;font-size:9.5px;background:#e9f7ee;color:#1d7a3e;border-radius:999px;padding:2px 7px;margin-right:4px}
+.fc.w{background:#fff4e0;color:#a0610a}
+.sheet{position:absolute;left:0;right:0;bottom:0;height:168px;background:#fff;border-radius:18px 18px 0 0;box-shadow:0 -4px 16px rgba(0,0,0,.12);padding:6px 14px;font-family:-apple-system,system-ui}
+.grab{width:34px;height:4px;border-radius:2px;background:#d1d1d6;margin:0 auto 8px}
+.src{display:flex;justify-content:space-between;font-size:10.5px;padding:4px 0;border-bottom:.5px solid #eee}
+.exp{font-size:9px;color:#a0610a}
+.sec{font-size:9.5px;font-weight:700;color:#6b6b70;text-transform:uppercase;letter-spacing:.4px;padding:8px 14px 4px}
+</style></head><body><div class="wrap">
+
+<input type="radio" name="scr" id="r1" checked><input type="radio" name="scr" id="r2"><input type="radio" name="scr" id="r3"><input type="radio" name="scr" id="r4">
+<div class="tabs">
+  <label for="r1" class="l1">1 · Vandaag</label>
+  <label for="r2" class="l2">2 · Artikelen</label>
+  <label for="r3" class="l3">3 · Lezen</label>
+  <label for="r4" class="l4">4 · Later</label>
+</div>
+<div class="legend"><b>E1</b> informatiegeur · <b>E2</b> leesweergave · <b>E3</b> toegankelijkheid · <b>E4</b> duimbediening · <b>E5</b> snelheid/offline · <b>E6</b> geen telle­rdruk · <b>E7</b> controle/beperkte keuze · <b>E8</b> iOS-patronen · <b>E9</b> instap · <b>E10</b> privacy · <b>E11</b> beeld bij artikel (indien aanwezig)</div>
+
+<!-- ============ 1 VANDAAG ============ -->
+<div class="screen" id="s1">
+<p class="intro">Nu: lijst met onderwerpclusters en uitklapbare samenvattingen. Drie alternatieven voor het startscherm:</p>
+<div class="grid">
+
+<div class="card"><div class="ph"><div class="isl"></div><div class="sb"><span>7:42</span><span>●●●</span></div>
+  <div class="lt">Ochtendeditie</div><div class="sub">do 5 nov · 4 verhalen · ±11 min</div>
+  <div class="row"><div class="num">1</div><div><div class="t">Kabinet presenteert plan voor zorgpersoneel</div><div class="meta">5 bronnen · 3 min</div><div class="bias" style="width:70px"><i style="left:30%"></i><i style="left:55%"></i><i style="left:78%"></i></div></div><div class="th img g1" style="margin-left:auto;width:44px;height:44px"></div></div>
+  <div class="row"><div class="num">2</div><div><div class="t">EU stemt in met AI-gedragscode voor zorg</div><div class="meta">3 bronnen · 2 min</div></div><div class="th img g6" style="margin-left:auto;width:44px;height:44px"></div></div>
+  <div class="row"><div class="num">3</div><div><div class="t">Apple brengt iOS 27.1 uit</div><div class="meta">4 bronnen · 2 min</div></div><div class="th img g4" style="margin-left:auto;width:44px;height:44px"></div></div>
+  <div class="row rowlast"><div class="num">4</div><div><div class="t">Nieuw onderzoek naar slaap en schermtijd</div><div class="meta">2 bronnen · 4 min</div></div></div>
+  <div class="done">✓ Je bent bij · volgende editie 18:00</div>
+  <div class="tb"><span class="on">Vandaag</span><span>Artikelen</span><span>Bewaard</span></div></div>
+  <h3>A · Ochtendeditie</h3>
+  <p><b>Idee:</b> een vaste, afgesloten selectie met een einde, zoals een krant.</p>
+  <p><b>Basis:</b> afsluiting werkt tegen het Zeigarnik-effect en nieuwsmoeheid (Reuters DNR). Een genummerde lijst geeft overzicht.</p>
+  <p><b>Afweging:</b> wie nieuws "live" volgt, mist een doorlopende stroom. Die kan in tab 2 blijven.</p>
+  <div class="tags"><span class="tag">E11</span><span class="tag">E1</span><span class="tag">E6</span><span class="tag">E7</span></div>
+  <button class="go" data-hermes-send="Werk FableFlux-alternatief 1A Ochtendeditie uit: SwiftUI-schets op basis van de bestaande SummaryListView, plus een issue-tekst.">Uitwerken</button>
+</div>
+
+<div class="card"><div class="ph"><div class="isl"></div><div class="sb"><span>7:42</span><span>●●●</span></div>
+  <div class="lt">Verhaallijnen</div><div class="sub">Hetzelfde nieuws, verschillende bronnen</div>
+  <div class="bigcard"><div class="hero img g1" style="height:80px"></div><div class="meta">ZORG · 5 bronnen</div><div class="t" style="font-size:13px">Kabinet presenteert plan voor zorgpersoneel</div>
+    <div class="mut" style="margin:4px 0;font-size:10.5px">Het kabinet wil 40.000 extra zorgmedewerkers…</div>
+    <div class="bias" style="width:100%"><i style="left:20%"></i><i style="left:48%"></i><i style="left:52%"></i><i style="left:80%"></i></div>
+    <div class="meta" style="margin-top:6px">NOS · Volkskrant · Trouw · Telegraaf · Skipr</div>
+    <div class="ac" style="font-size:10.5px;font-weight:600;margin-top:4px">Wat verschilt er per bron? ›</div></div>
+  <div class="bigcard"><div class="meta">TECH · 4 bronnen</div><div class="t" style="font-size:13px">EU stemt in met AI-gedragscode</div>
+    <div class="bias" style="width:100%"><i style="left:40%"></i><i style="left:60%"></i></div>
+    <div><span class="fc">✓ 2 claims gecheckt</span></div></div>
+  <div class="tb"><span class="on">Vandaag</span><span>Artikelen</span><span>Bewaard</span></div></div>
+  <h3>B · Verhaallijnen</h3>
+  <p><b>Idee:</b> clusters laten zien als verhaal met spreiding over bronnen. FableFlux heeft hiervoor al de BiasBar en de factcheck.</p>
+  <p><b>Basis:</b> tegenwicht voor selectieve blootstelling en filterbubbels. Een zichtbare herkomst wekt vertrouwen.</p>
+  <p><b>Afweging:</b> dichter scherm en minder verhalen per scroll. Werkt alleen met genoeg bronnen per cluster.</p>
+  <div class="tags"><span class="tag">E11</span><span class="tag">E1</span><span class="tag">E7</span><span class="tag">E10</span></div>
+  <button class="go" data-hermes-send="Werk FableFlux-alternatief 1B Verhaallijnen uit: SwiftUI-schets met BiasBarView en StoryGroupHeaderView, plus een issue-tekst.">Uitwerken</button>
+</div>
+
+<div class="card"><div class="ph"><div class="isl"></div><div class="sb"><span>7:42</span><span>●●●</span></div>
+  <div class="lt">Vandaag</div><div class="sub">Hoeveel tijd heb je?</div>
+  <div class="seg"><span>5 min</span><span class="on">15 min</span><span>30 min</span></div>
+  <div style="display:flex;align-items:center;gap:10px;margin:0 14px 8px">
+    <svg width="38" height="38" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" fill="none" stroke="#e3e3e8" stroke-width="4"/><circle cx="18" cy="18" r="15" fill="none" stroke="#1E7BF0" stroke-width="4" stroke-dasharray="57 94" transform="rotate(-90 18 18)" stroke-linecap="round"/></svg>
+    <div><div class="t">9 van 15 min gelezen</div><div class="meta">Nog 2 stukken in je selectie</div></div></div>
+  <div class="row"><div><div class="meta">ZORG · 3 min</div><div class="t">Kabinet presenteert plan voor zorgpersoneel</div></div><div class="th img g1" style="margin-left:auto;width:44px;height:44px"></div></div>
+  <div class="row"><div><div class="meta">ICT · 3 min</div><div class="t">NCSC waarschuwt voor phishing via Teams</div></div><div class="th img g6" style="margin-left:auto;width:44px;height:44px"></div></div>
+  <div class="row rowlast dim"><div><div class="meta">✓ gelezen</div><div class="t">Apple brengt iOS 27.1 uit</div></div></div>
+  <div class="sub" style="padding-top:8px">De selectie gaat op volgorde van je favoriete onderwerpen.</div>
+  <div class="tb"><span class="on">Vandaag</span><span>Artikelen</span><span>Bewaard</span></div></div>
+  <h3>C · Aandachtsbudget</h3>
+  <p><b>Idee:</b> je kiest hoeveel tijd je hebt, de app vult die tijd met de belangrijkste stukken.</p>
+  <p><b>Basis:</b> doelen stellen (Locke &amp; Latham) en timeboxing. De voortgangsring beloont afronden, niet eindeloos scrollen.</p>
+  <p><b>Afweging:</b> vraagt een goede schatting van de leestijd en een goede rangschikking.</p>
+  <div class="tags"><span class="tag">E11</span><span class="tag">E5</span><span class="tag">E6</span><span class="tag">E7</span></div>
+  <button class="go" data-hermes-send="Werk FableFlux-alternatief 1C Aandachtsbudget uit: SwiftUI-schets, leestijdberekening en rangschikking, plus een issue-tekst.">Uitwerken</button>
+</div>
+</div></div>
+
+<!-- ============ 2 ARTIKELEN ============ -->
+<div class="screen" id="s2">
+<p class="intro">Nu: chronologische lijst met mapchips bovenaan en miniaturen. Vier alternatieven:</p>
+<div class="grid">
+
+<div class="card"><div class="ph"><div class="isl"></div><div class="sb"><span>7:42</span><span>●●●</span></div>
+  <div class="lt">Artikelen</div><div class="sub">Alle bronnen</div>
+  <div class="row"><div style="flex:1"><div class="meta">NOS · 12 m · 3 min</div><div class="t">Kabinet presenteert plan voor zorgpersoneel</div></div><div class="th img g1"></div></div>
+  <div class="row"><div style="flex:1"><div class="meta">Tweakers · 25 m · 5 min</div><div class="t">Review: de nieuwe MacBook Air M5</div></div><div class="th img g4"></div></div>
+  <div class="row"><div style="flex:1"><div class="meta">Skipr · 1 u · 4 min</div><div class="t">Wachtlijsten ouderenzorg lopen verder op</div></div></div>
+  <div class="row"><div style="flex:1"><div class="meta">NCSC · 2 u · 2 min</div><div class="t">Advies: patch Citrix NetScaler direct</div></div></div>
+  <div class="row rowlast"><div style="flex:1"><div class="meta">The Verge · 3 u · 6 min</div><div class="t">Why RSS is quietly having a moment</div></div><div class="th img g5"></div></div>
+  <div class="bottomchips"><span class="chip on">Alle</span><span class="chip">Zorg</span><span class="chip">ICT</span><span class="chip">Tech</span><span class="chip">Sport</span></div>
+  <div class="tb"><span>Vandaag</span><span class="on">Artikelen</span><span>Bewaard</span></div></div>
+  <h3>A · Scanlijst, filters in de duimzone</h3>
+  <p><b>Idee:</b> compacte rijen met bron, tijd en leestijd. De mapchips staan onderin, bij de duim.</p>
+  <p><b>Basis:</b> Fitts en de duimzone. De leestijd versterkt de informatiegeur. Er passen meer koppen op één scherm.</p>
+  <p><b>Afweging:</b> chips onderin wijken af van gangbare iOS-patronen. Test of gebruikers ze vinden.</p>
+  <div class="tags"><span class="tag">E11</span><span class="tag">E1</span><span class="tag">E4</span><span class="tag">E8</span></div>
+  <button class="go" data-hermes-send="Werk FableFlux-alternatief 2A Scanlijst uit: wijzigingen in AllArticlesView (leestijd in de rij, mapchips onderin), plus een issue-tekst.">Uitwerken</button>
+</div>
+
+<div class="card"><div class="ph"><div class="isl"></div><div class="sb"><span>7:42</span><span>●●●</span></div>
+  <div class="lt">Artikelen</div>
+  <div class="bigcard"><div class="hero img g2"></div><div class="meta">Volkskrant · 40 m · 8 min</div><div class="t" style="font-size:14px">De stille revolutie in de wijkverpleging</div>
+    <div class="mut" style="font-size:10.5px;margin-top:3px">Hoe sensoren en slimme planning de werkdruk verlagen.</div></div>
+  <div class="row"><div style="flex:1"><div class="meta">NOS · 12 m</div><div class="t">Kabinet presenteert plan voor zorgpersoneel</div></div><div class="th img g1"></div></div>
+  <div class="row rowlast"><div style="flex:1"><div class="meta">Tweakers · 25 m</div><div class="t">Review: de nieuwe MacBook Air M5</div></div><div class="th img g4"></div></div>
+  <div class="tb"><span>Vandaag</span><span class="on">Artikelen</span><span>Bewaard</span></div></div>
+  <h3>B · Magazine</h3>
+  <p><b>Idee:</b> lange achtergrondstukken krijgen een grote kaart, kort nieuws blijft een compacte rij.</p>
+  <p><b>Basis:</b> visuele hiërarchie: grootte geeft gewicht aan. Bekend uit Apple News en Reeder.</p>
+  <p><b>Afweging:</b> minder koppen per scherm. Het "gewicht" moet uit leestijd of type komen, anders wordt het willekeurig.</p>
+  <div class="tags"><span class="tag">E11</span><span class="tag">E1</span><span class="tag">E2</span></div>
+  <button class="go" data-hermes-send="Werk FableFlux-alternatief 2B Magazine uit: regel voor wanneer een artikel een grote kaart krijgt, SwiftUI-schets, plus een issue-tekst.">Uitwerken</button>
+</div>
+
+<div class="card"><div class="ph"><div class="isl"></div><div class="sb"><span>7:42</span><span>●●●</span></div>
+  <div class="lt">Stroom</div><div class="sub">Geen tellers · laatst bijgewerkt 7:40</div>
+  <div class="divider">Nieuw sinds 22:10 gisteren</div>
+  <div class="row"><div style="flex:1"><div class="meta">NOS · 12 m</div><div class="t">Kabinet presenteert plan voor zorgpersoneel</div></div><div class="th img g1"></div></div>
+  <div class="row rowlast"><div style="flex:1"><div class="meta">NCSC · 2 u</div><div class="t">Advies: patch Citrix NetScaler direct</div></div></div>
+  <div class="divider">Hier was je gebleven</div>
+  <div class="row dim"><div style="flex:1"><div class="meta">Skipr · gisteren</div><div class="t">Wachtlijsten ouderenzorg lopen verder op</div></div></div>
+  <div class="row rowlast dim"><div style="flex:1"><div class="meta">The Verge · gisteren</div><div class="t">Why RSS is quietly having a moment</div></div><div class="th img g5" style="opacity:.6"></div></div>
+  <div class="pill">↑ Markeer alles hierboven als gelezen</div>
+  <div class="tb"><span>Vandaag</span><span class="on">Stroom</span><span>Bewaard</span></div></div>
+  <h3>C · Stroom met een bladwijzer</h3>
+  <p><b>Idee:</b> geen ongelezen-getal, wel een duidelijke markering waar je gebleven was. Eén actie om alles daarboven af te ronden.</p>
+  <p><b>Basis:</b> je ziet de systeemstatus (Nielsen) zonder de druk van een badge. Bijlezen voelt als een klus met een eind.</p>
+  <p><b>Afweging:</b> sommige gebruikers willen juist een getal. Maak tellers een instelling; die bestaat al.</p>
+  <div class="tags"><span class="tag">E11</span><span class="tag">E4</span><span class="tag">E6</span><span class="tag">E8</span></div>
+  <button class="go" data-hermes-send="Werk FableFlux-alternatief 2C Stroom met bladwijzer uit: leesmarkering opslaan, 'markeer hierboven gelezen', SwiftUI-schets, plus een issue-tekst.">Uitwerken</button>
+</div>
+
+<div class="card"><div class="ph"><div class="isl"></div><div class="sb"><span>7:42</span><span>●●●</span></div>
+  <div class="lt">Artikelen</div><div class="sub">Beeld eerst · tekst als er geen beeld is</div>
+  <div class="vis img g1"><div class="ov"><div class="meta">NOS · 12 m · 3 min</div><div class="t">Kabinet presenteert plan voor zorgpersoneel</div></div></div>
+  <div class="noimg"><div class="meta">NCSC · 2 u · 2 min · geen afbeelding</div><div class="t" style="font-size:12.5px">Advies: patch Citrix NetScaler direct</div><div class="mut" style="font-size:10.5px;margin-top:3px">Kwetsbaarheid wordt actief misbruikt; update zo snel mogelijk.</div></div>
+  <div class="vis img g3" style="height:120px"><div class="ov"><div class="meta">Volkskrant · 1 u · 8 min</div><div class="t">Groene daken koelen de stad</div></div></div>
+  <div class="tb"><span>Vandaag</span><span class="on">Artikelen</span><span>Bewaard</span></div></div>
+  <h3>D · Beeld eerst</h3>
+  <p><b>Idee:</b> als er een afbeelding is, krijgt het artikel een beeldkaart met de kop eroverheen. Zonder afbeelding volgt een tekstkaart met inleiding, dus geen lege placeholder en geen stockfoto.</p>
+  <p><b>Basis:</b> beelden worden sneller herkend en beter onthouden (picture superiority, Paivio's dual coding). Uit eye-tracking (Nielsen) blijkt dat lezers <i>informatieve</i> foto's bekijken en decoratieve stockfoto's overslaan.</p>
+  <p><b>Afweging:</b> veel minder koppen per scherm, dus scannen gaat trager. Een afbeelding kan ook een andere lading geven dan de tekst (framing). Vraagt lazy loading en caching (E5).</p>
+  <div class="tags"><span class="tag">E11</span><span class="tag">E1</span><span class="tag">E5</span><span class="tag">E8</span></div>
+  <button class="go" data-hermes-send="Werk FableFlux-alternatief 2D Beeld eerst uit: beeldkaart met kop eroverheen, tekstkaart als er geen afbeelding is, regels voor het kiezen van een afbeelding (og:image, enclosure, eerste img), caching, plus een issue-tekst.">Uitwerken</button>
+</div>
+</div></div>
+
+<!-- ============ 3 LEZEN ============ -->
+<div class="screen" id="s3">
+<p class="intro">Nu: WKWebView-reader met acties bovenin de werkbalk (vernieuwen, bewaren, browser, delen). Drie alternatieven:</p>
+<div class="grid">
+
+<div class="card"><div class="ph"><div class="rd"><div class="isl"></div><div class="sb"><span>7:42</span><span>●●●</span></div>
+  <div class="prog"><i></i></div>
+  <div class="art"><div class="meta">NOS · 5 nov · 3 min · nog 2 min</div>
+  <h4>Kabinet presenteert plan voor zorgpersoneel</h4>
+  <div class="hero img g1" style="height:105px;margin:0"></div><div class="cap">Zorgmedewerkers in Zwolle · Foto: ANP</div>
+  Het kabinet wil de komende vijf jaar ruim 40.000 extra mensen in de zorg aan het werk krijgen. Daarvoor komt er een opleidingsbudget en moet de regeldruk omlaag.<br><br>
+  Volgens de minister verdwijnt nu een kwart van de werktijd aan administratie. Brancheorganisaties reageren positief, maar zetten vraagtekens bij de financiering…</div>
+  <div class="tool"><span>Aa</span><span>☆</span><span>⇪</span><span>⌕</span><span>›</span></div></div></div>
+  <h3>A · Rustig lezen</h3>
+  <p><b>Idee:</b> serif-tekst in een smalle kolom (±60 tekens), een voortgangsbalk met resterende tijd, en alle acties onderin in één capsule.</p>
+  <p><b>Basis:</b> regellengte (Dyson), cognitieve belasting (Sweller) en Fitts. "Nog 2 min" helpt je beslissen of je doorleest.</p>
+  <p><b>Afweging:</b> de acties onderin botsen met de navigatie van iOS 26. Test of dit naast de zwevende werkbalk werkt.</p>
+  <div class="tags"><span class="tag">E11</span><span class="tag">E2</span><span class="tag">E3</span><span class="tag">E4</span></div>
+  <button class="go" data-hermes-send="Werk FableFlux-alternatief 3A Rustig lezen uit: aanpassingen aan het HTML-template en de werkbalk van ItemDetailView, plus een issue-tekst.">Uitwerken</button>
+</div>
+
+<div class="card"><div class="ph"><div class="rd"><div class="isl"></div><div class="sb"><span>7:42</span><span>●●●</span></div>
+  <div class="art"><div class="meta">Volkskrant · 8 min</div>
+  <h4>De stille revolutie in de wijkverpleging</h4>
+  <div class="hero img g2" style="height:70px;margin:0 0 4px"></div>
+  <div class="tldr"><b>In het kort</b><ul><li>Sensoren melden vallen automatisch.</li><li>Teams winnen ±6 uur per week.</li><li>Privacyzorgen blijven.</li></ul>
+  <div class="aimark">✦ AI-samenvatting · kan fouten bevatten · <span class="ac">bron tonen</span></div></div>
+  <span class="fc">✓ cijfer bevestigd</span><span class="fc w">! 1 claim onzeker</span><br><br>
+  In Almere draait sinds maart een proef waarbij wijkteams…</div>
+  <div class="tool"><span>Lees verder ↓</span><span>☆</span><span>⇪</span></div></div></div>
+  <h3>B · Samenvatting eerst</h3>
+  <p><b>Idee:</b> eerst 3 kernpunten met de factcheck-chips, daarna de volledige tekst. Vooral handig bij lange stukken.</p>
+  <p><b>Basis:</b> informatiegeur binnen het artikel: na 10 seconden weet je of doorlezen loont. De AI-markering maakt duidelijk waar de tekst vandaan komt.</p>
+  <p><b>Afweging:</b> een samenvatting kan het lezen vervangen. Slecht voor uitgevers en voor nuance. Toon hem daarom alleen bij lange stukken, of op verzoek.</p>
+  <div class="tags"><span class="tag">E11</span><span class="tag">E1</span><span class="tag">E2</span><span class="tag">E7</span></div>
+  <button class="go" data-hermes-send="Werk FableFlux-alternatief 3B Samenvatting eerst uit: samenvatting per artikel bovenaan de reader met FactCheckChipView, drempel op leestijd, plus een issue-tekst.">Uitwerken</button>
+</div>
+
+<div class="card"><div class="ph"><div class="rd"><div class="isl"></div><div class="sb"><span>7:42</span><span>●●●</span></div>
+  <div class="art"><div class="hero img g1" style="height:90px;margin:0 -18px 8px;border-radius:0"></div><div class="meta">NOS · 3 min</div><h4>Kabinet presenteert plan voor zorgpersoneel</h4>
+  Het kabinet wil de komende vijf jaar ruim 40.000 extra mensen in de zorg aan het werk krijgen…</div>
+  <div class="sheet"><div class="grab"></div>
+    <div class="t" style="margin-bottom:4px">Context</div>
+    <div class="bias" style="width:100%;margin:2px 0 8px"><i style="left:20%"></i><i style="left:48%"></i><i style="left:80%"></i></div>
+    <div class="src"><span>Volkskrant</span><span class="mut">nadruk op kosten</span></div>
+    <div class="src"><span>Telegraaf</span><span class="mut">nadruk op migratie</span></div>
+    <div class="src"><span>Skipr</span><span class="mut">reactie branche</span></div>
+    <div style="margin-top:6px"><span class="fc">Bron: hoog betrouwbaar</span></div></div></div></div>
+  <h3>C · Contextlaag</h3>
+  <p><b>Idee:</b> het artikel blijft schoon. Onderin zit een sheet die je omhoog veegt voor andere bronnen, de spreiding en de betrouwbaarheid.</p>
+  <p><b>Basis:</b> geleidelijke onthulling (progressive disclosure): extra lagen alleen op verzoek, zodat lezen voorgaat. Ook een bekend iOS-patroon (Kaarten, Muziek).</p>
+  <p><b>Afweging:</b> een sheet die half in beeld staat kost leesruimte. Laat hem standaard ingeklapt als een klein lipje.</p>
+  <div class="tags"><span class="tag">E11</span><span class="tag">E2</span><span class="tag">E7</span><span class="tag">E8</span></div>
+  <button class="go" data-hermes-send="Werk FableFlux-alternatief 3C Contextlaag uit: bottom sheet in ItemDetailView met andere bronnen uit hetzelfde cluster, BiasBar en ReliabilityBadge, plus een issue-tekst.">Uitwerken</button>
+</div>
+</div></div>
+
+<!-- ============ 4 LATER ============ -->
+<div class="screen" id="s4">
+<p class="intro">Gekozen richting: één tab <b>Later</b> met twee lijsten. <b>Lees later</b> heeft een instelbare termijn (standaard 14 dagen). <b>Bewaard</b> heeft geen termijn. Stijl gelijk aan Artikelen 2D. Vervangt de eerdere varianten 4A en 4B.</p>
+<div class="grid">
+
+<div class="card"><div class="ph"><div class="isl"></div><div class="sb"><span>7:42</span><span>●●●</span></div>
+  <div class="lt">Later</div>
+  <div class="seg"><span class="on">🕐 Lees later · 4</span><span>🔖 Bewaard</span></div>
+  <div class="vis img g2" style="height:132px"><span class="badge">nog 12 d</span><div class="ov"><div class="meta">Volkskrant · 8 min</div><div class="t">De stille revolutie in de wijkverpleging</div></div></div>
+  <div class="noimg"><div class="meta">The Verge · 6 min · geen afbeelding</div><div class="t" style="font-size:12px">Why RSS is quietly having a moment</div>
+    <span class="exch">⏳ verloopt over 2 dagen</span><div class="acts"><span>Verlengen</span><span>· Bewaren</span></div></div>
+  <div class="vis img g6" style="height:96px"><span class="badge">nog 9 d</span><div class="ov"><div class="meta">NCSC · 2 min</div><div class="t">Advies: patch Citrix NetScaler direct</div></div></div>
+  <div class="tb"><span>Vandaag</span><span>Artikelen</span><span class="on">Later</span></div></div>
+  <h3>Lees later</h3>
+  <p><b>Idee:</b> een stapel voor de korte termijn. De termijn staat op de kaart, en vlak voor het verlopen verschijnt een chip met <i>Verlengen</i> of <i>Bewaren</i>. Geen pushmelding.</p>
+  <p><b>Bij verlopen:</b> het artikel verdwijnt uit Lees later en valt terug onder de normale opschoontermijn van zijn feed.</p>
+  <div class="tags"><span class="tag">E6</span><span class="tag">E7</span><span class="tag">E11</span></div>
+</div>
+
+<div class="card"><div class="ph"><div class="isl"></div><div class="sb"><span>7:42</span><span>●●●</span></div>
+  <div class="lt">Later</div>
+  <div class="seg"><span>🕐 Lees later</span><span class="on">🔖 Bewaard · 23</span></div>
+  <div class="search">⌕ Zoek in bewaard</div>
+  <div class="vis img g1" style="height:120px"><span class="badge">⤓ offline</span><div class="ov"><div class="meta">NOS · bewaard 3 nov</div><div class="t">Kabinet presenteert plan voor zorgpersoneel</div></div></div>
+  <div style="margin:-4px 10px 8px"><span class="tagc">#zorg</span><span class="tagc">#arbeidsmarkt</span></div>
+  <div class="noimg"><div class="meta">Skipr · bewaard 28 okt · ⤓ offline</div><div class="t" style="font-size:12px">Wachtlijsten ouderenzorg lopen verder op</div><span class="tagc">#zorg</span><span class="tagc">#amsta</span></div>
+  <div class="tb"><span>Vandaag</span><span>Artikelen</span><span class="on">Later</span></div></div>
+  <h3>Bewaard</h3>
+  <p><b>Idee:</b> een archief zonder termijn. Bij het bewaren worden de volledige tekst en de afbeelding lokaal opgeslagen, zodat het artikel blijft als de feed wordt opgeschoond of de webpagina verdwijnt. Je vindt artikelen terug met zoeken en de bestaande tags.</p>
+  <div class="tags"><span class="tag">E5</span><span class="tag">E7</span><span class="tag">E11</span></div>
+</div>
+
+<div class="card"><div class="ph"><div class="rd"><div class="isl"></div><div class="sb"><span>7:42</span><span>●●●</span></div>
+  <div class="art" style="padding-top:4px"><div class="meta">Swipe in de artikellijst</div></div>
+  <div class="swipe"><div class="lbl"><b>🕐</b>Later</div><div class="rest"><div class="meta">Tweakers · 25 m</div><div class="t">Review: de nieuwe MacBook Air M5</div></div></div>
+  <div class="art" style="padding-top:0">…en daarom is dit de beste instap-Mac van dit moment.<div class="meta" style="margin-top:8px">— einde artikel —</div></div>
+  <div class="endbox"><div class="t" style="font-size:12.5px">Uitgelezen</div><div class="meta" style="margin-top:3px">Dit artikel gaat uit Lees later.<br>Wil je het bewaren?</div>
+    <span class="btn p">🔖 Bewaren</span><span class="btn s">Klaar</span></div>
+  <div class="tool"><span>Aa</span><span>🕐</span><span>🔖</span><span>⇪</span><span>›</span></div></div></div>
+  <h3>Acties</h3>
+  <p><b>Snel:</b> veeg naar rechts voor 🕐 Lees later. <b>Bewust:</b> 🔖 Bewaren via het leesscherm of door lang indrukken. Twee duidelijk verschillende icoontjes.</p>
+  <p><b>Trechter:</b> wie een Lees later-artikel uitleest, krijgt onderaan de vraag "Bewaren?". Zo stroomt Lees later vanzelf door naar Bewaard of verdwijnt het.</p>
+  <div class="tags"><span class="tag">E4</span><span class="tag">E8</span></div>
+</div>
+
+<div class="card"><div class="ph"><div class="isl"></div><div class="sb"><span>7:42</span><span>●●●</span></div>
+  <div class="lt">Instellingen</div>
+  <div class="sethdr">Lees later</div>
+  <div class="set"><div><span>Termijn</span><span class="ac">14 dagen ›</span></div><div><span>Waarschuwen vooraf</span><span class="mut">2 dagen</span></div></div>
+  <div class="setft">Opties: 7 · 14 · 30 dagen · nooit. Telt vanaf het moment van toevoegen. Bewaarde artikelen verlopen nooit.</div>
+  <div class="sethdr">Feeds</div>
+  <div class="set"><div><span>Opruimen na</span><span class="ac">30 dagen ›</span></div></div>
+  <div class="setft">Voorheen "Bewaarperiode". Geldt voor gewone feedartikelen, nooit voor Lees later of Bewaard.</div>
+  <div class="tb"><span>Vandaag</span><span>Artikelen</span><span class="on">Later</span></div></div>
+  <h3>Instellingen</h3>
+  <p><b>Eén algemene termijn</b> voor Lees later, niet per feed. "Bewaarperiode" heet nu <b>"Opruimen na"</b>, zodat niemand denkt dat bewaarde artikelen ook verlopen.</p>
+  <div class="tags"><span class="tag">E7</span><span class="tag">E8</span></div>
+</div>
+</div></div>
+</div>
+</body></html>
