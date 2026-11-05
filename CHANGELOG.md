@@ -8,6 +8,7 @@ en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 ## [Unreleased]
 
 ### Toegevoegd
+- UX-eisenkader (E1–E11) en klikbare schermschetsen met alternatieven per scherm in `docs/ux/`; gekozen richting vastgelegd in #224–#227
 - OPML-export van alle feeds (met mapindeling, exclusief Mastodon-koppelingen) via de systeem-Share-sheet, naast de bestaande OPML-import (#217)
 - Onderwerpen (voor de AI-samenvatting) kunnen als JSON geëxporteerd en weer geïmporteerd worden; een onderwerp met een bestaande naam wordt bij import overgeslagen (#219)
 - Bewaarde artikelen (met tags) kunnen als JSON geëxporteerd en weer geïmporteerd worden; dubbele artikelen worden herkend op guid/link, een ontbrekende bronfeed wordt als placeholder aangemaakt (#220)
