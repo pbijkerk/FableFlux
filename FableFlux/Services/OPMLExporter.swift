@@ -1,4 +1,5 @@
 import Foundation
+import CoreTransferable
 import UniformTypeIdentifiers
 
 /// Bouwt een geldig OPML-bestand uit de huidige feeds, voor backup/herstel (#217).
