@@ -22,6 +22,7 @@ en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 - Lettertype van de feedlijst is apart instelbaar in Instellingen, los van het artikel-lettertype (#194)
 
 ### Opgelost
+- Het getrackte `.xcodeproj` bevatte `OPMLExporter.swift`, `TopicIO.swift` en `SavedArticleIO.swift` niet (sinds #223); opnieuw gegenereerd met XcodeGen, zodat Xcode en Xcode Cloud de im-/exportcode meebouwen en CI weer groen is
 - Na het inloggen bij Mastodon blijft de setup open en toont die het resultaat, in plaats van terug te springen naar Vandaag (#205)
 - Een lettertype- of tekstgrootte-wijziging in Instellingen werkt nu direct door op een al geopend artikelscherm (#195)
 - ArticleExtractorService: delegate-callbacks didFail/didFailProvisionalNavigation vangen self nu consequent als [weak self] (#191)
