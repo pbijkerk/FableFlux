@@ -107,6 +107,7 @@ struct LaterView: View {
                 Text(importMelding ?? "")
             }
             .opslagFoutmelding($opslagFout)
+            .task { ReadLater.removeOrphans(context: modelContext) }
         }
     }
 

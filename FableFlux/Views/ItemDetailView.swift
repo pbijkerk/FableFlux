@@ -325,7 +325,8 @@ struct ItemDetailView: View {
     private func toggleSaved() {
         let wasSaved = item.isSaved
         LaterActions.toggleSaved(
-            item, contentHTML: hasFullArticle ? currentContent : nil, context: modelContext, melding: &opslagFout)
+            item, contentHTML: hasFullArticle ? currentContent : nil, deleteOrphan: false, context: modelContext,
+            melding: &opslagFout)
         guard !wasSaved, item.isSaved, !hasFullArticle, canExtract, let url = articleURL else { return }
         Task {
             guard let html = try? await extractor.extract(from: url), !html.isEmpty, item.isSaved else { return }

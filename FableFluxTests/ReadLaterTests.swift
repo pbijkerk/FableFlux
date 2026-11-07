@@ -226,6 +226,21 @@ final class ReadLaterTests: XCTestCase {
         XCTAssertEqual(try titels(context), [], "Zonder feed zou het als wees blijven staan")
     }
 
+    func testLosArtikelUitHetLeesschermWordtLaterOpgeruimd() throws {
+        let context = ModelContext(container)
+        let item = FeedItem(title: "Los")
+        ReadLater.save(item, now: nu)
+        context.insert(item)
+        try context.save()
+
+        ReadLater.unsave(item, context: context, deleteOrphan: false)
+        try context.save()
+        XCTAssertEqual(try titels(context), ["Los"], "Niet onder het open leesscherm vandaan")
+
+        ReadLater.removeOrphans(context: context)
+        XCTAssertEqual(try titels(context), [])
+    }
+
     // MARK: - Export en import
 
     func testExportBevatStatusEnImportZetDieTerug() throws {

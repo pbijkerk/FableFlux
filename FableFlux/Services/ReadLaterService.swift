@@ -114,12 +114,26 @@ enum ReadLater {
     /// Uit Bewaard halen. De lokale kopie gaat weg (ruimte). Hangt het artikel niet meer aan
     /// een feed — die is verwijderd terwijl het bewaard was — dan wordt het verwijderd: anders
     /// blijft het als wees in de store staan, buiten bereik van elke opruimronde.
-    static func unsave(_ item: FeedItem, context: ModelContext) {
+    ///
+    /// `deleteOrphan: false` voor het leesscherm: daar is het artikel nog open en mag het
+    /// niet onder de view vandaan verdwijnen. `removeOrphans` ruimt het later alsnog op.
+    static func unsave(_ item: FeedItem, context: ModelContext, deleteOrphan: Bool = true) {
         item.isSaved = false
         item.savedAt = nil
         item.savedContentHTML = nil
         item.savedImageData = nil
-        if item.feed == nil { context.delete(item) }
+        if deleteOrphan, item.feed == nil { context.delete(item) }
+    }
+
+    /// Verwijdert artikelen zonder feed die niet (meer) bewaard zijn: overblijfsels van een
+    /// verwijderde feed die in het leesscherm uit Bewaard zijn gehaald.
+    static func removeOrphans(context: ModelContext) {
+        let descriptor = FetchDescriptor<FeedItem>(
+            predicate: #Predicate { $0.feed == nil && !$0.isSaved }
+        )
+        guard let orphans = try? context.fetch(descriptor), !orphans.isEmpty else { return }
+        for item in orphans { context.delete(item) }
+        context.saveOrLog("losse, niet-bewaarde artikelen op te ruimen")
     }
 
     // MARK: - Opruimen

@@ -76,10 +76,11 @@ enum LaterActions {
 
     /// Bewaren met lokale kopie van tekst en afbeelding; of weer uit Bewaard halen.
     static func toggleSaved(
-        _ item: FeedItem, contentHTML: String? = nil, context: ModelContext, melding: inout OpslagFoutmelding?
+        _ item: FeedItem, contentHTML: String? = nil, deleteOrphan: Bool = true, context: ModelContext,
+        melding: inout OpslagFoutmelding?
     ) {
         if item.isSaved {
-            ReadLater.unsave(item, context: context)
+            ReadLater.unsave(item, context: context, deleteOrphan: deleteOrphan)
             context.saveOrReport("het artikel uit Bewaard te halen", melding: &melding)
         } else {
             save(item, contentHTML: contentHTML, context: context, melding: &melding)
