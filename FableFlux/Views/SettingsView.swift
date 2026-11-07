@@ -40,6 +40,8 @@ struct SettingsView: View {
 
     @AppStorage(AppConfiguration.UserDefaultsKeys.retentionDays)
     private var defaultRetentionDays = AppConfiguration.defaultRetentionDays
+    @AppStorage(AppConfiguration.UserDefaultsKeys.readLaterDays)
+    private var readLaterDays = AppConfiguration.defaultReadLaterDays
 
     @AppStorage(AppConfiguration.UserDefaultsKeys.hideReadArticles) private var hideReadArticles = false
     @AppStorage(AppConfiguration.UserDefaultsKeys.feedCountMode) private var feedCountMode = "total"
@@ -119,6 +121,7 @@ struct SettingsView: View {
                 tekstgrootteSection
                 samenvattingenSection
                 bronanalyseSection
+                leesLaterSection
                 bewaarperiodeSection
                 onderwerpenSection
                 mastodonSection
@@ -414,20 +417,38 @@ struct SettingsView: View {
         }
     }
 
-    // MARK: - 5. Artikelen bewaren
+    // MARK: - 5. Lees later en opruimen
+
+    private var leesLaterSection: some View {
+        Section {
+            Picker("Termijn", selection: $readLaterDays) {
+                ForEach(ReadLater.termOptions, id: \.days) { opt in
+                    Text(opt.label).tag(opt.days)
+                }
+            }
+        } header: {
+            Text("Lees later")
+        } footer: {
+            Text(
+                readLaterDays > 0
+                    ? "Een artikel in Lees later dat je niet leest, verdwijnt na \(readLaterDays) dagen uit de lijst, gerekend vanaf het moment van toevoegen. Daarna geldt weer de gewone opruimtermijn. Bewaard heeft geen termijn."
+                    : "Artikelen blijven in Lees later staan tot je ze er zelf uithaalt. Bewaard heeft geen termijn."
+            )
+        }
+    }
 
     private var bewaarperiodeSection: some View {
         Section {
-            Picker("Standaard bewaarperiode", selection: $defaultRetentionDays) {
+            Picker("Opruimen na", selection: $defaultRetentionDays) {
                 ForEach(retentionOptions, id: \.days) { opt in
                     Text(opt.label).tag(opt.days)
                 }
             }
         } header: {
-            Text("Artikelen bewaren")
+            Text("Feedartikelen opruimen")
         } footer: {
             Text(
-                "Feeds zonder eigen instelling gebruiken deze periode. De instelling gaat in bij de volgende verversing."
+                "Geldt voor gewone feedartikelen, nooit voor Lees later of Bewaard. Feeds zonder eigen instelling gebruiken deze periode; de instelling gaat in bij de volgende verversing."
             )
         }
     }
@@ -454,7 +475,10 @@ struct SettingsView: View {
             .onDelete { indexSet in
                 for index in indexSet {
                     let account = mastodonAccounts[index]
-                    if let feed = account.feed { modelContext.delete(feed) }
+                    if let feed = account.feed {
+                        ReadLater.detachSavedItems(from: feed)
+                        modelContext.delete(feed)
+                    }
                     modelContext.delete(account)
                 }
                 modelContext.saveOrReport("het Mastodon-account te verwijderen", melding: &opslagFout)

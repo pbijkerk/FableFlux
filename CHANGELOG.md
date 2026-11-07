@@ -8,6 +8,7 @@ en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 ## [Unreleased]
 
 ### Toegevoegd
+- "Lees later" (met instelbare termijn: 7, 14, 30 dagen of nooit) en "Bewaard" (zonder termijn) zijn gescheiden. De tab Bewaard heet nu "Later", met een schakelaar tussen beide lijsten. Veeg naar rechts voor Lees later, bewaar via het leesscherm of lang indrukken. Een verlopen Lees later-artikel valt terug onder de gewone opruimtermijn. Bewaarde artikelen krijgen een lokale kopie van tekst en afbeelding en blijven staan als de feed wordt verwijderd. De export bevat de status; oude exportbestanden importeren als Bewaard (#224)
 - UX-eisenkader (E1–E11) en klikbare schermschetsen met alternatieven per scherm in `docs/ux/`; gekozen richting vastgelegd in #224–#227
 - OPML-export van alle feeds (met mapindeling, exclusief Mastodon-koppelingen) via de systeem-Share-sheet, naast de bestaande OPML-import (#217)
 - Onderwerpen (voor de AI-samenvatting) kunnen als JSON geëxporteerd en weer geïmporteerd worden; een onderwerp met een bestaande naam wordt bij import overgeslagen (#219)

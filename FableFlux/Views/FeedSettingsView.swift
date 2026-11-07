@@ -59,13 +59,13 @@ struct FeedSettingsView: View {
                     Text(
                         includedInSummary
                             ? "Artikelen van deze feed tellen mee in de samenvatting op Vandaag."
-                            : "Artikelen van deze feed tellen niet mee in de samenvatting op Vandaag. Ze blijven wel gewoon zichtbaar in Artikelen en Bewaard."
+                            : "Artikelen van deze feed tellen niet mee in de samenvatting op Vandaag. Ze blijven wel gewoon zichtbaar in Artikelen en Later."
                     )
                     .font(.caption)
                 }
 
                 Section {
-                    Picker("Bewaarperiode", selection: $selectedDays) {
+                    Picker("Opruimen na", selection: $selectedDays) {
                         ForEach(feedRetentionOptions, id: \.days.debugDescription) { opt in
                             if let d = opt.days {
                                 Text(opt.label).tag(Optional(d))
@@ -76,7 +76,7 @@ struct FeedSettingsView: View {
                         }
                     }
                 } header: {
-                    Text("Bewaarperiode artikelen")
+                    Text("Artikelen opruimen")
                 } footer: {
                     if selectedDays == nil {
                         Text(
@@ -88,7 +88,7 @@ struct FeedSettingsView: View {
                             .font(.caption)
                     } else if let d = selectedDays {
                         Text(
-                            "Artikelen ouder dan \(d) dagen worden verwijderd zodra je op Gereed tikt. Bewaarde artikelen blijven staan."
+                            "Artikelen ouder dan \(d) dagen worden verwijderd zodra je op Gereed tikt. Artikelen in Lees later en Bewaard blijven staan."
                         )
                         .font(.caption)
                     }

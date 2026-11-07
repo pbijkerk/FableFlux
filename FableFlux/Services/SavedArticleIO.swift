@@ -14,14 +14,22 @@ struct SavedArticleExportItem: Codable {
     var tags: [String]
     var feedTitle: String?
     var feedURL: String?
+    /// Lees later of Bewaard (#224). Ontbreekt in bestanden van vóór #224; die artikelen
+    /// waren toen per definitie bewaard en komen dus onder Bewaard binnen.
+    var status: LaterStatus?
+    var readLaterAddedAt: Date?
+    var savedAt: Date?
+    /// De lokale kopie van de tekst, zodat een hersteld bewaard artikel offline leesbaar is.
+    var savedContentHTML: String?
 }
 
 enum SavedArticleIO {
 
-    /// Alleen artikelen die nú bewaard zijn (`isSaved == true`) — geen historie van
-    /// ooit-bewaard-en-weer-unsaved items (besluit Peter, #220).
+    /// Alleen artikelen die nú in Lees later of Bewaard staan — geen historie van
+    /// ooit-bewaard-en-weer-unsaved items (besluit Peter, #220). Andere artikelen in
+    /// `items` worden overgeslagen.
     static func export(_ items: [FeedItem]) -> Data {
-        let exportItems = items.map { item in
+        let exportItems = items.filter { $0.laterStatus != .regular }.map { item in
             SavedArticleExportItem(
                 title: item.title,
                 link: item.link,
@@ -29,8 +37,12 @@ enum SavedArticleIO {
                 pubDate: item.pubDate,
                 guid: item.guid,
                 tags: item.effectiveTags,
-                feedTitle: item.feed?.title,
-                feedURL: item.feed?.url
+                feedTitle: item.sourceTitle,
+                feedURL: item.feed?.url,
+                status: item.laterStatus,
+                readLaterAddedAt: item.readLaterAddedAt,
+                savedAt: item.savedAt,
+                savedContentHTML: item.savedContentHTML
             )
         }
         let encoder = JSONEncoder()
@@ -39,7 +51,7 @@ enum SavedArticleIO {
         return (try? encoder.encode(exportItems)) ?? Data()
     }
 
-    /// Importeert bewaarde artikelen. Dubbele herkenning op `guid` (of anders `link`) om
+    /// Importeert Lees later- en bewaarde artikelen. Dubbele herkenning op `guid` (of anders `link`) om
     /// hetzelfde artikel niet dubbel te importeren. Ontbreekt de bronfeed op dit toestel,
     /// dan wordt een placeholder-feed aangemaakt op basis van de opgeslagen titel/url
     /// (besluit Peter, #220). Geeft het aantal geïmporteerde artikelen.
@@ -60,11 +72,19 @@ enum SavedArticleIO {
                 pubDate: export.pubDate,
                 guid: export.guid
             )
-            item.isSaved = true
-            item.isRead = true
             item.tags = export.tags
             item.feed = resolveFeed(title: export.feedTitle, url: export.feedURL, context: context)
             context.insert(item)
+            switch export.status ?? .saved {
+            case .readLater:
+                // Lees later is ongelezen werk; de termijn loopt door vanaf het oorspronkelijke
+                // moment van toevoegen (verlopen items gaan bij de volgende opruimronde terug).
+                ReadLater.addToReadLater(item, now: export.readLaterAddedAt ?? Date())
+            case .saved, .regular:
+                item.isRead = true
+                item.savedSourceTitle = export.feedTitle
+                ReadLater.save(item, contentHTML: export.savedContentHTML, now: export.savedAt ?? Date())
+            }
             added += 1
         }
         return added

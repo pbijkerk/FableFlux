@@ -9,7 +9,30 @@ class FeedItem {
     var itemDescription: String?
     var pubDate: Date?
     var isRead: Bool
+    /// Bewaard: bewust archief zonder termijn (#224). Bewust dezelfde opgeslagen eigenschap
+    /// als vóór #224, zodat bestaande bewaarde artikelen zonder migratiecode onder Bewaard
+    /// blijven staan. De status voor de UI komt uit `laterStatus`.
     var isSaved: Bool = false
+
+    /// Moment waarop het artikel in Lees later is gezet (#224); `nil` = niet in Lees later.
+    /// De termijn telt vanaf dit moment, niet vanaf de publicatiedatum.
+    var readLaterAddedAt: Date?
+
+    /// Moment van bewaren (#224), voor de sortering in Bewaard. `nil` bij artikelen die
+    /// vóór #224 zijn bewaard; die sorteren op hun eigen datum.
+    var savedAt: Date?
+
+    /// Lokale kopie van de artikeltekst (HTML) op het moment van bewaren, zodat een bewaard
+    /// artikel leesbaar blijft als de feed wordt opgeruimd of de webpagina verdwijnt (#224).
+    var savedContentHTML: String?
+
+    /// Lokale kopie van de artikelafbeelding (#224). Externe opslag: geen blobs in de rij.
+    @Attribute(.externalStorage) var savedImageData: Data?
+
+    /// Bronnaam op het moment van bewaren (#224). Blijft zichtbaar als de feed later wordt
+    /// verwijderd en het bewaarde artikel daardoor los komt te staan.
+    var savedSourceTitle: String?
+
     var guid: String?
 
     /// Vrije tags, alleen toe te kennen vanuit het detailscherm wanneer het item bewaard

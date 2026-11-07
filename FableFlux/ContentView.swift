@@ -33,7 +33,7 @@ struct ContentView: View {
             )
             .tag(1)
 
-            SavedArticlesView()
+            LaterView()
                 .tag(2)
         }
         .floatingTabBar(selection: $selectedTab) { tab in

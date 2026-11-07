@@ -62,27 +62,9 @@ private struct FeedItemsList: View {
                     }
                     .tint(.gray)
                 }
-                .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                    Button {
-                        item.isSaved.toggle()
-                        modelContext.saveOrReport("de bewaarstatus van het artikel te wijzigen", melding: &opslagFout)
-                    } label: {
-                        Label(
-                            item.isSaved ? "Niet bewaard" : "Bewaar",
-                            systemImage: item.isSaved ? "bookmark.slash" : "bookmark"
-                        )
-                    }
-                    .tint(Theme.accentSecondary)
-                }
+                .readLaterSwipe(item, melding: $opslagFout)
                 .contextMenu {
-                    Button {
-                        item.isSaved.toggle()
-                        modelContext.saveOrReport("de bewaarstatus van het artikel te wijzigen", melding: &opslagFout)
-                    } label: {
-                        Label(
-                            item.isSaved ? "Verwijder uit bewaard" : "Bewaar",
-                            systemImage: item.isSaved ? "bookmark.slash" : "bookmark")
-                    }
+                    LaterContextMenuButtons(item: item, melding: $opslagFout)
                     Button {
                         item.isRead.toggle()
                         modelContext.saveOrLog("de gelezen-markering te bewaren")
@@ -158,14 +140,23 @@ struct FeedItemCard: View {
         Theme.brandColor(for: item.feed?.title ?? item.feed?.url ?? "")
     }
 
+    /// Lokaal bewaarde afbeelding van een bewaard artikel (#224): toont ook offline.
+    private var savedImage: UIImage? {
+        item.savedImageData.flatMap { UIImage(data: $0) }
+    }
+
     private var hasBanner: Bool {
-        showArticleThumbnails && item.imageURL.flatMap { URL(string: $0) } != nil
+        showArticleThumbnails && (savedImage != nil || item.imageURL.flatMap { URL(string: $0) } != nil)
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            if hasBanner, let urlString = item.imageURL, let url = URL(string: urlString) {
-                bannerImage(url: url)
+            if hasBanner {
+                if let savedImage {
+                    localBannerImage(savedImage)
+                } else if let urlString = item.imageURL, let url = URL(string: urlString) {
+                    bannerImage(url: url)
+                }
             }
 
             VStack(alignment: .leading, spacing: 8) {
@@ -174,7 +165,7 @@ struct FeedItemCard: View {
                     if !item.isRead {
                         Circle().fill(brand).frame(width: 7, height: 7)
                     }
-                    if let feedTitle = item.feed?.title {
+                    if let feedTitle = item.sourceTitle {
                         Text(feedTitle.uppercased())
                             .font(Theme.categoryLabel(metaSize))
                             .tracking(0.8)
@@ -192,10 +183,19 @@ struct FeedItemCard: View {
                             .foregroundStyle(brand)
                     }
                     Spacer(minLength: 0)
-                    if item.isSaved {
+                    switch item.laterStatus {
+                    case .saved:
                         Image(systemName: "bookmark.fill")
                             .font(.system(size: metaSize))
                             .foregroundStyle(Theme.accentSecondary)
+                            .accessibilityLabel("Bewaard")
+                    case .readLater:
+                        Image(systemName: "clock.fill")
+                            .font(.system(size: metaSize))
+                            .foregroundStyle(Theme.accentSecondary)
+                            .accessibilityLabel("In Lees later")
+                    case .regular:
+                        EmptyView()
                     }
                 }
 
@@ -305,6 +305,18 @@ struct FeedItemCard: View {
     /// het scherm (#96). Daarom bepaalt een lege `Color.clear` het kader en hangt de
     /// afbeelding daar als overlay in: die kan het kader niet oprekken.
     @ViewBuilder
+    private func localBannerImage(_ image: UIImage) -> some View {
+        Color.clear
+            .frame(maxWidth: .infinity)
+            .frame(height: 168)
+            .overlay {
+                Image(uiImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+            }
+            .clipped()
+    }
+
     private func bannerImage(url: URL) -> some View {
         Color.clear
             .frame(maxWidth: .infinity)
