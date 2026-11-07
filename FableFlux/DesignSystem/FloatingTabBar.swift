@@ -11,7 +11,7 @@ struct FloatingTab: Identifiable {
 let appTabs: [FloatingTab] = [
     FloatingTab(id: 0, icon: "newspaper", title: "Vandaag"),
     FloatingTab(id: 1, icon: "list.bullet.rectangle", title: "Artikelen"),
-    FloatingTab(id: 2, icon: "bookmark", title: "Bewaard"),
+    FloatingTab(id: 2, icon: "clock", title: "Later"),
 ]
 
 // MARK: - Zwevende tab bar

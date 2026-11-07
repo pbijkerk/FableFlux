@@ -301,18 +301,8 @@ private struct ArticleListView<EmptyState: View>: View {
                     }
                     .tint(.gray)
                 }
-                .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                    Button {
-                        item.isSaved.toggle()
-                        modelContext.saveOrReport("de bewaarstatus van het artikel te wijzigen", melding: &opslagFout)
-                    } label: {
-                        Label(
-                            item.isSaved ? "Niet bewaard" : "Bewaar",
-                            systemImage: item.isSaved ? "bookmark.slash" : "bookmark"
-                        )
-                    }
-                    .tint(Theme.accentSecondary)
-                }
+                .readLaterSwipe(item, melding: $opslagFout)
+                .contextMenu { LaterContextMenuButtons(item: item, melding: $opslagFout) }
             }
 
             if hasOlderArticles {

@@ -36,6 +36,13 @@ struct ItemDetailView: View {
     @State private var safariItem: IdentifiableURL? = nil
     @State private var readingProgress: Double = 0
     @State private var opslagFout: OpslagFoutmelding?
+    /// Of `currentContent` het volledige web-artikel is (geëxtraheerd of uit de lokale
+    /// kopie), en niet de feedtekst. Alleen dan is het de betere tekst om te bewaren (#224).
+    @State private var hasFullArticle = false
+    /// De kaart "Uitgelezen, bewaren?" is voor dit artikel weggeklikt (#224).
+    @State private var finishCardDismissed = false
+    /// Na "Klaar": het oude Lees later-moment, voor ongedaan maken.
+    @State private var undoReadLaterAddedAt: Date?
     @StateObject private var extractor = ArticleExtractorService()
 
     private var articleURL: URL? {
@@ -91,6 +98,7 @@ struct ItemDetailView: View {
         // achtergrondloze VStack de systeemstandaard in plaats van de appkleur.
         .background(Theme.background.ignoresSafeArea())
         .overlay(alignment: .top) { readingProgressBar }
+        .overlay(alignment: .bottom) { finishedReadingOverlay }
         // De titel alleen voor de zichtbare pagina, net als de knoppen. De pager bouwt ook de
         // buren op; zetten die alle drie een titel, dan is niet bepaald welke SwiftUI toont en
         // liep de feednaam een artikel achter (#174). Via een lege achtergrond en niet met een
@@ -98,7 +106,7 @@ struct ItemDetailView: View {
         // al. Een titel uit een achtergrond komt gewoon in de navigatiebalk terecht.
         .background {
             if isActive {
-                Color.clear.navigationTitle(item.feed?.title ?? "Artikel")
+                Color.clear.navigationTitle(item.sourceTitle ?? "Artikel")
             }
         }
         .navigationBarTitleDisplayMode(.inline)
@@ -267,12 +275,11 @@ struct ItemDetailView: View {
                 }
 
                 Button {
-                    item.isSaved.toggle()
-                    modelContext.saveOrReport("de bewaarstatus van het artikel te wijzigen", melding: &opslagFout)
+                    toggleSaved()
                 } label: {
                     Image(systemName: item.isSaved ? "bookmark.fill" : "bookmark")
                 }
-                .accessibilityLabel(item.isSaved ? "Verwijder uit bewaard" : "Bewaar artikel")
+                .accessibilityLabel(item.isSaved ? "Verwijder uit Bewaard" : "Bewaar artikel")
 
                 if let url = articleURL {
                     Button {
@@ -310,6 +317,80 @@ struct ItemDetailView: View {
         return parts.joined(separator: "\n\n")
     }
 
+    // MARK: - Lees later / Bewaard (#224)
+
+    /// Bewaren met de best beschikbare tekst. Is het volledige artikel nog niet geladen,
+    /// dan wordt het op de achtergrond opgehaald voor de lokale kopie, zonder het scherm
+    /// te verversen.
+    private func toggleSaved() {
+        let wasSaved = item.isSaved
+        LaterActions.toggleSaved(
+            item, contentHTML: hasFullArticle ? currentContent : nil, deleteOrphan: false, context: modelContext,
+            melding: &opslagFout)
+        guard !wasSaved, item.isSaved, !hasFullArticle, canExtract, let url = articleURL else { return }
+        Task {
+            guard let html = try? await extractor.extract(from: url), !html.isEmpty, item.isSaved else { return }
+            item.savedContentHTML = html
+            modelContext.saveOrLog("de volledige tekst van het bewaarde artikel op te slaan")
+        }
+    }
+
+    private var showsFinishCard: Bool {
+        isActive && item.readLaterAddedAt != nil && !item.isSaved && !finishCardDismissed
+            && readingProgress >= 0.97
+    }
+
+    @ViewBuilder
+    private var finishedReadingOverlay: some View {
+        if showsFinishCard {
+            HStack(spacing: 12) {
+                Text("Uitgelezen. Bewaren?")
+                    .font(.subheadline.weight(.semibold))
+                Spacer(minLength: 0)
+                Button("Bewaren") {
+                    LaterActions.save(
+                        item, contentHTML: hasFullArticle ? currentContent : nil, context: modelContext,
+                        melding: &opslagFout)
+                    finishCardDismissed = true
+                }
+                .buttonStyle(.borderedProminent)
+                .accessibilityHint("Zet het artikel in Bewaard, zonder termijn")
+                Button("Klaar") {
+                    undoReadLaterAddedAt = item.readLaterAddedAt
+                    ReadLater.removeFromReadLater(item)
+                    modelContext.saveOrReport("het artikel uit Lees later te halen", melding: &opslagFout)
+                    finishCardDismissed = true
+                }
+                .buttonStyle(.bordered)
+                .accessibilityHint("Haalt het artikel uit Lees later")
+            }
+            .padding(14)
+            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
+            .padding(.horizontal, 16)
+            .padding(.bottom, 24)
+            .transition(.move(edge: .bottom).combined(with: .opacity))
+        } else if let previous = undoReadLaterAddedAt {
+            HStack(spacing: 12) {
+                Text("Uit Lees later gehaald")
+                    .font(.subheadline)
+                Spacer(minLength: 0)
+                Button("Ongedaan maken") {
+                    item.readLaterAddedAt = previous
+                    modelContext.saveOrReport("het artikel terug in Lees later te zetten", melding: &opslagFout)
+                    undoReadLaterAddedAt = nil
+                }
+            }
+            .padding(14)
+            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
+            .padding(.horizontal, 16)
+            .padding(.bottom, 24)
+            .task {
+                try? await Task.sleep(for: .seconds(5))
+                undoReadLaterAddedAt = nil
+            }
+        }
+    }
+
     // MARK: - HTML helpers
 
     private var descriptionHTML: String {
@@ -318,7 +399,7 @@ struct ItemDetailView: View {
                 ? "<p><em>Geen beschrijving beschikbaar.</em></p>"
                 : item.sanitisedHTML,
             title: item.title,
-            feedName: item.feed?.title,
+            feedName: item.sourceTitle,
             date: item.pubDate,
             authorAvatarURL: item.authorAvatarURL,
             fontSize: articleFontSize,
@@ -360,6 +441,15 @@ struct ItemDetailView: View {
             rssHTML +=
                 "\n<img src=\"\(escapeHTML(imgURL))\" alt=\"\" style=\"max-width:100%;border-radius:8px;margin:8px 0;display:block;\">"
         }
+        // Een bewaard artikel met een volledige lokale kopie toont die: dan blijft het
+        // leesbaar als de webpagina verdwijnt of het toestel offline is (#224).
+        if item.isSaved, let saved = item.savedContentHTML, !saved.isEmpty, saved != item.sanitisedHTML {
+            currentArticleLink = nil
+            currentContent = saved
+            hasFullArticle = true
+            rebuildDisplayHTML()
+            return
+        }
         currentArticleLink = articleLink
         currentContent =
             rssHTML.isEmpty
@@ -376,7 +466,13 @@ struct ItemDetailView: View {
             let html = try await extractor.extract(from: url)
             currentArticleLink = nil
             currentContent = html.isEmpty ? "<p><em>Geen inhoud gevonden.</em></p>" : html
+            hasFullArticle = !html.isEmpty
             rebuildDisplayHTML()
+            // Bewaard? Dan de lokale kopie bijwerken met de volledige tekst (#224).
+            if item.isSaved, !html.isEmpty {
+                item.savedContentHTML = html
+                modelContext.saveOrLog("de volledige tekst van het bewaarde artikel op te slaan")
+            }
         } catch {
             extractionFailed = true
         }
@@ -392,7 +488,7 @@ struct ItemDetailView: View {
         displayHTML = ArticleHTMLBuilder.build(
             content: currentContent,
             title: item.title,
-            feedName: item.feed?.title,
+            feedName: item.sourceTitle,
             date: item.pubDate,
             articleLink: currentArticleLink,
             authorAvatarURL: item.authorAvatarURL,

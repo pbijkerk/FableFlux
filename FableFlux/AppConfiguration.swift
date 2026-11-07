@@ -52,6 +52,9 @@ enum AppConfiguration {
     /// Standaard aantal dagen dat artikelen bewaard blijven (als feed geen eigen instelling heeft)
     static let defaultRetentionDays = 30
 
+    /// Standaardtermijn van Lees later in dagen (#224).
+    static let defaultReadLaterDays = 14
+
     // MARK: - API & Network
 
     /// Timeout voor artikel-extractie (in seconden)
@@ -109,6 +112,8 @@ enum AppConfiguration {
 
     enum UserDefaultsKeys {
         static let retentionDays = "defaultRetentionDays"
+        /// Termijn van Lees later in dagen; 0 = nooit verlopen (#224).
+        static let readLaterDays = "readLaterDays"
         static let claudeAPIKey = "claudeAPIKey"  // legacy – gebruik Keychain
         static let articleFontSize = "articleFontSize"
         static let articleFontFamily = "articleFontFamily"

@@ -294,6 +294,8 @@ struct FeedListView: View {
     }
 
     private func delete(feed: Feed) {
+        // Bewaarde artikelen blijven staan, ook zonder feed (#224).
+        ReadLater.detachSavedItems(from: feed)
         modelContext.delete(feed)
         modelContext.saveOrReport("de feed te verwijderen", melding: &opslagFout)
     }

@@ -296,11 +296,18 @@ class FeedRefreshService {
     /// instantie te maken: die houdt `isRefreshing`/`lastError` bij en hoort bij een scherm.
     /// `now` is injecteerbaar zodat het opruimen toetsbaar is zonder van de echte klok
     /// af te hangen; in de app blijft het gewoon "nu".
-    nonisolated static func pruneOldItems(feed: Feed, context: ModelContext, now: Date = Date()) {
+    nonisolated static func pruneOldItems(
+        feed: Feed, context: ModelContext, now: Date = Date(), readLaterTermDays: Int? = nil
+    ) {
         let globalDefault =
             UserDefaults.standard.object(
                 forKey: AppConfiguration.UserDefaultsKeys.retentionDays
             ) as? Int ?? AppConfiguration.defaultRetentionDays
+
+        // Eerst verlopen Lees later-artikelen terugzetten: die vallen daarna gewoon onder
+        // de opruimtermijn hieronder (#224). Ook als opruimen voor deze feed uit staat.
+        ReadLater.expireItems(
+            feedID: feed.id, context: context, termDays: readLaterTermDays ?? ReadLater.termDays, now: now)
 
         let effective = feed.retentionDays ?? globalDefault
         guard effective > 0 else { return }
@@ -315,11 +322,12 @@ class FeedRefreshService {
         // staan (`.distantFuture`), zodat er niets onverwachts verdwijnt.
         // Het predicaat is `effectiveDate` uitgeschreven, zodat alleen de te verwijderen
         // artikelen worden opgehaald in plaats van de hele feed (#119).
+        // Bewaard en (niet-verlopen) Lees later worden nooit opgeruimd (#224).
         let feedID = feed.id
         let distantFuture = Date.distantFuture
         var descriptor = FetchDescriptor<FeedItem>(
             predicate: #Predicate { item in
-                item.feed?.id == feedID && !item.isSaved
+                item.feed?.id == feedID && !item.isSaved && item.readLaterAddedAt == nil
                     && (item.pubDate ?? item.fetchedAt ?? distantFuture) < cutoff
             }
         )

@@ -76,7 +76,7 @@ struct SummaryListView: View {
             Text(
                 "Vandaag vat de artikelen van de afgelopen \(vensterInUren) uur samen. "
                     + "Staat hier niets, dan is er in die periode niets binnengekomen — "
-                    + "de artikelen zelf blijven gewoon in Artikelen en Bewaard staan."
+                    + "de artikelen zelf blijven gewoon in Artikelen en Later staan."
             )
             .multilineTextAlignment(.center)
             .foregroundStyle(Theme.textSecondary)
