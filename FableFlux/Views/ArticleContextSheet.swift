@@ -39,14 +39,15 @@ struct ArticleContextSheet: View {
     let item: FeedItem
     let related: [FeedItem]
 
-    /// Tekst op het lipje, of `nil` als er geen lipje hoort: zonder verhaalgroep en zonder
-    /// factcheck is er geen context om te tonen.
-    static func lipLabel(relatedCount: Int, hasFactCheck: Bool) -> String? {
+    /// Tekst op het lipje, of `nil` als er geen lipje hoort: zonder verhaalgroep, factcheck
+    /// én beoordeling van de bron is er geen context om te tonen. Een beoordeling alleen is
+    /// genoeg (besluit Peter, #226): anders zie je de bronduiding nergens meer bij het lezen.
+    static func lipLabel(relatedCount: Int, hasFactCheck: Bool, hasSourceRating: Bool = false) -> String? {
         switch (relatedCount > 1, hasFactCheck) {
         case (true, true): return "Context · \(relatedCount) bronnen · factcheck"
         case (true, false): return "Context · \(relatedCount) bronnen"
         case (false, true): return "Context · factcheck"
-        case (false, false): return nil
+        case (false, false): return hasSourceRating ? "Context · over deze bron" : nil
         }
     }
 

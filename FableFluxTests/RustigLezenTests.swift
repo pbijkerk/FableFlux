@@ -99,6 +99,12 @@ final class RustigLezenTests: XCTestCase {
 
     func testLipjeAlleenMetVerhaalgroepOfFactcheck() {
         XCTAssertNil(ArticleContextSheet.lipLabel(relatedCount: 0, hasFactCheck: false), "Geen sheet zonder context")
+        XCTAssertEqual(
+            ArticleContextSheet.lipLabel(relatedCount: 0, hasFactCheck: false, hasSourceRating: true),
+            "Context · over deze bron", "Alleen een beoordeling van de bron is ook context")
+        XCTAssertEqual(
+            ArticleContextSheet.lipLabel(relatedCount: 4, hasFactCheck: false, hasSourceRating: true),
+            "Context · 4 bronnen")
         XCTAssertEqual(ArticleContextSheet.lipLabel(relatedCount: 4, hasFactCheck: false), "Context · 4 bronnen")
         XCTAssertEqual(ArticleContextSheet.lipLabel(relatedCount: 0, hasFactCheck: true), "Context · factcheck")
         XCTAssertEqual(

@@ -395,7 +395,8 @@ struct ItemDetailView: View {
     @ViewBuilder
     private var contextLip: some View {
         if let label = ArticleContextSheet.lipLabel(
-            relatedCount: relatedSourceCount, hasFactCheck: !item.factCheckResults.isEmpty)
+            relatedCount: relatedSourceCount, hasFactCheck: !item.factCheckResults.isEmpty,
+            hasSourceRating: showBiasIndicators && item.feed?.biasScore != nil)
         {
             Button {
                 showContext = true
