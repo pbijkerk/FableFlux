@@ -72,10 +72,24 @@ private struct FolderItemsContent: View {
 
     // MARK: - Timeline
 
+    private var markerScope: String { ReadingMarkerStore.folderScope(folder.id) }
+
     private var timelineList: some View {
-        List {
+        let marker = ReadingMarkerStore.standard.marker(for: markerScope)
+        let dividerIndex = ReadingMarker.dividerIndex(dates: sortedItems.map(\.effectiveDate), marker: marker)
+        return List {
             ForEach(Array(sortedItems.enumerated()), id: \.element.id) { index, item in
-                itemRow(item: item, allItems: sortedItems, index: index)
+                itemRow(
+                    item: item, allItems: sortedItems, index: index,
+                    divider: index == dividerIndex ? marker : nil,
+                    isOlder: dividerIndex.map { index >= $0 } ?? false
+                )
+                .onAppear { ReadingMarkerStore.standard.noteSeen(item.effectiveDate, in: markerScope) }
+            }
+        }
+        .overlay(alignment: .bottom) {
+            if let dividerIndex {
+                MarkAboveAsReadOverlay(itemsAbove: Array(sortedItems.prefix(dividerIndex)))
             }
         }
     }
@@ -135,12 +149,17 @@ private struct FolderItemsContent: View {
     // MARK: - Shared item row
 
     @ViewBuilder
-    private func itemRow(item: FeedItem, allItems: [FeedItem], index: Int) -> some View {
+    private func itemRow(
+        item: FeedItem, allItems: [FeedItem], index: Int, divider: Date? = nil, isOlder: Bool = false
+    ) -> some View {
         // Selectie in plaats van een NavigationLink: zie `FeedItemsView` (#139).
         Button {
             geopend = MapArtikel(id: item.id, lijst: allItems)
         } label: {
-            FeedItemCard(item: item)
+            VStack(spacing: 8) {
+                if let divider { ReadingMarkerDivider(marker: divider) }
+                ArticleCard(item: item, isOlder: isOlder)
+            }
         }
         .buttonStyle(.plain)
         .listRowSeparator(.hidden)

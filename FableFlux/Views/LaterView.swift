@@ -214,7 +214,7 @@ struct LaterView: View {
 
     private func articleLink(_ item: FeedItem, in items: [FeedItem], index: Int) -> some View {
         ZStack {
-            FeedItemCard(item: item)
+            ArticleCard(item: item)
             NavigationLink(destination: ArticlePageView(items: items, initialIndex: index)) {
                 EmptyView()
             }

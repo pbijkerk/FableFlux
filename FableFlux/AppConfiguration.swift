@@ -114,6 +114,13 @@ enum AppConfiguration {
         static let retentionDays = "defaultRetentionDays"
         /// Termijn van Lees later in dagen; 0 = nooit verlopen (#224).
         static let readLaterDays = "readLaterDays"
+        /// Lijstweergave "Beeld eerst" of "Compact" (`ArticleListStyle`, #225).
+        static let articleListStyle = "articleListStyle"
+        /// Afbeeldingen laden: altijd of alleen via wifi (`ImageLoadPolicy`, #225).
+        static let imageLoadPolicy = "imageLoadPolicy"
+        /// Leesmarkeringen per lijst (#225): getoond en "deze sessie gezien".
+        static let readingMarkersCommitted = "readingMarkersCommitted"
+        static let readingMarkersPending = "readingMarkersPending"
         static let claudeAPIKey = "claudeAPIKey"  // legacy – gebruik Keychain
         static let articleFontSize = "articleFontSize"
         static let articleFontFamily = "articleFontFamily"

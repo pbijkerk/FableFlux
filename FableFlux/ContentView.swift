@@ -3,6 +3,7 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.scenePhase) private var scenePhase
     @Query private var feeds: [Feed]
     @Query private var topics: [Topic]
 
@@ -40,6 +41,11 @@ struct ContentView: View {
             if tab == 1 { articlesScrollToTop += 1 }
         }
         .appThemeTint()
+        // Wat je deze sessie hebt gezien, wordt bij naar de achtergrond gaan de nieuwe
+        // "Hier was je gebleven" (#225). Zo verspringt de lijn niet terwijl je leest.
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .background { ReadingMarkerStore.standard.commitAll() }
+        }
         .task {
             await refreshAndCluster()
         }
