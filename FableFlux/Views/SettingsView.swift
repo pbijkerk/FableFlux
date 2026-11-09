@@ -47,6 +47,10 @@ struct SettingsView: View {
     @AppStorage(AppConfiguration.UserDefaultsKeys.feedCountMode) private var feedCountMode = "total"
     @AppStorage(AppConfiguration.UserDefaultsKeys.previewLineCount) private var previewLineCount = 2
     @AppStorage(AppConfiguration.UserDefaultsKeys.showArticleThumbnails) private var showArticleThumbnails = true
+    @AppStorage(AppConfiguration.UserDefaultsKeys.articleListStyle)
+    private var articleListStyle = ArticleListStyle.imageFirst.rawValue
+    @AppStorage(AppConfiguration.UserDefaultsKeys.imageLoadPolicy)
+    private var imageLoadPolicy = ImageLoadPolicy.always.rawValue
     @AppStorage(AppConfiguration.UserDefaultsKeys.articleLoadLimit)
     private var articleLoadLimit = AppConfiguration.defaultArticleLoadLimit
 
@@ -296,7 +300,15 @@ struct SettingsView: View {
     private var weergaveSection: some View {
         Section {
             Toggle("Verberg gelezen artikelen", isOn: $hideReadArticles)
-            Toggle("Toon miniatuurafbeeldingen", isOn: $showArticleThumbnails)
+            Picker("Lijstweergave", selection: $articleListStyle) {
+                ForEach(ArticleListStyle.allCases) { Text($0.label).tag($0.rawValue) }
+            }
+            Toggle("Toon afbeeldingen", isOn: $showArticleThumbnails)
+            if showArticleThumbnails {
+                Picker("Afbeeldingen laden", selection: $imageLoadPolicy) {
+                    ForEach(ImageLoadPolicy.allCases) { Text($0.label).tag($0.rawValue) }
+                }
+            }
             Picker("Teller per feed", selection: $feedCountMode) {
                 Text("Totaal aantal artikelen").tag("total")
                 Text("Ongelezen artikelen").tag("unread")
@@ -310,8 +322,15 @@ struct SettingsView: View {
         } header: {
             Text("Weergave")
         } footer: {
-            if articleLoadLimit > AppConfiguration.defaultArticleLoadLimit {
-                Text("Langere lijsten kunnen minder soepel scrollen.")
+            VStack(alignment: .leading, spacing: 4) {
+                if imageLoadPolicy == ImageLoadPolicy.wifiOnly.rawValue, showArticleThumbnails {
+                    Text(
+                        "Op mobiel netwerk worden geen nieuwe afbeeldingen geladen; eerder geladen afbeeldingen blijven zichtbaar."
+                    )
+                }
+                if articleLoadLimit > AppConfiguration.defaultArticleLoadLimit {
+                    Text("Langere lijsten kunnen minder soepel scrollen.")
+                }
             }
         }
     }

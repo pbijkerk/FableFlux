@@ -45,6 +45,10 @@ class FeedItem {
     var enclosureURL: String?
     var enclosureMIMEType: String?
     var imageURL: String?
+    /// Wanneer de app op de artikelpagina naar een afbeelding (`og:image`) heeft gezocht
+    /// (#225). Gezet ook als er niets werd gevonden, zodat hij dat niet bij elke keer
+    /// scrollen opnieuw probeert. `nil` = nog niet gezocht.
+    var imageLookedUpAt: Date?
     var feed: Feed?
     @Relationship(deleteRule: .cascade) var factCheckResults: [FactCheckResult] = []
     var factCheckCheckedAt: Date?  // nil = nooit gecontroleerd

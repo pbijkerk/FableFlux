@@ -206,11 +206,14 @@ final class ReadLaterTests: XCTestCase {
         context.delete(feed)
         try context.save()
 
+        // Of de cascade de andere artikelen in een in-memory store meteen weghaalt, verschilt
+        // per SDK (Xcode 26: ja, Xcode 27: niet altijd). Hier gaat het om het bewaarde artikel.
         let over = try context.fetch(FetchDescriptor<FeedItem>())
-        XCTAssertEqual(over.map(\.title), ["Bewaard"])
-        XCTAssertNil(over.first?.feed)
-        XCTAssertEqual(over.first?.sourceTitle, "Testfeed", "De bronnaam blijft zichtbaar")
-        XCTAssertEqual(over.first?.savedContentHTML, "<p>Tekst</p>", "Offline leesbaar")
+        let bewaardOver = try XCTUnwrap(over.first { $0.title == "Bewaard" }, "Bewaard blijft staan")
+        XCTAssertNil(bewaardOver.feed)
+        XCTAssertTrue(bewaardOver.isSaved)
+        XCTAssertEqual(bewaardOver.sourceTitle, "Testfeed", "De bronnaam blijft zichtbaar")
+        XCTAssertEqual(bewaardOver.savedContentHTML, "<p>Tekst</p>", "Offline leesbaar")
     }
 
     func testUitBewaardHalenVanLosArtikelVerwijdertHet() throws {

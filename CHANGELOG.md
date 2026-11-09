@@ -8,6 +8,7 @@ en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 ## [Unreleased]
 
 ### Toegevoegd
+- Artikellijsten in "Beeld eerst": beeldkaart met de kop over de afbeelding, of een tekstkaart met inleiding als er geen afbeelding is. Geeft de feed geen afbeelding, dan haalt de app `og:image` van de artikelpagina op (één keer per artikel; logo's, standaardbeelden en afbeeldingen kleiner dan 200 px vallen af). Afbeeldingen worden op schijf gecachet en verkleind; nieuwe instellingen "Lijstweergave" (Beeld eerst / Compact) en "Afbeeldingen laden" (altijd / alleen via wifi). Leesmarkering "Hier was je gebleven" per lijst, map en feed, met "Markeer alles hierboven als gelezen" en ongedaan maken (#225)
 - "Lees later" (met instelbare termijn: 7, 14, 30 dagen of nooit) en "Bewaard" (zonder termijn) zijn gescheiden. De tab Bewaard heet nu "Later", met een schakelaar tussen beide lijsten. Veeg naar rechts voor Lees later, bewaar via het leesscherm of lang indrukken. Een verlopen Lees later-artikel valt terug onder de gewone opruimtermijn. Bewaarde artikelen krijgen een lokale kopie van tekst en afbeelding en blijven staan als de feed wordt verwijderd. De export bevat de status; oude exportbestanden importeren als Bewaard (#224)
 - UX-eisenkader (E1–E11) en klikbare schermschetsen met alternatieven per scherm in `docs/ux/`; gekozen richting vastgelegd in #224–#227
 - OPML-export van alle feeds (met mapindeling, exclusief Mastodon-koppelingen) via de systeem-Share-sheet, naast de bestaande OPML-import (#217)

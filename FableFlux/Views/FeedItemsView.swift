@@ -34,8 +34,12 @@ private struct FeedItemsList: View {
         _sortedItems = Query(ArticleFilter.descriptor(hideRead: hideRead, feedIDs: [feed.id]))
     }
 
+    private var markerScope: String { ReadingMarkerStore.feedScope(feed.id) }
+
     var body: some View {
-        List {
+        let dividerIndex = ReadingMarker.dividerIndex(
+            dates: sortedItems.map(\.effectiveDate), marker: ReadingMarkerStore.standard.marker(for: markerScope))
+        return List {
             ForEach(Array(sortedItems.enumerated()), id: \.element.id) { index, item in
                 // Geen NavigationLink per rij: die verdwijnt met de rij (gelezen verbergen),
                 // en dan verdwijnt ook het geopende artikel. Ook geen `NavigationLink(value:)`:
@@ -44,9 +48,15 @@ private struct FeedItemsList: View {
                 Button {
                     geopend = FeedArtikel(id: item.id)
                 } label: {
-                    FeedItemCard(item: item)
+                    VStack(spacing: 8) {
+                        if index == dividerIndex, let marker = ReadingMarkerStore.standard.marker(for: markerScope) {
+                            ReadingMarkerDivider(marker: marker)
+                        }
+                        ArticleCard(item: item, isOlder: dividerIndex.map { index >= $0 } ?? false)
+                    }
                 }
                 .buttonStyle(.plain)
+                .onAppear { ReadingMarkerStore.standard.noteSeen(item.effectiveDate, in: markerScope) }
                 .listRowSeparator(.hidden)
                 .listRowBackground(Color.clear)
                 .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
@@ -96,6 +106,11 @@ private struct FeedItemsList: View {
         }
         .refreshable {
             await refreshService.refresh(feed: feed, context: modelContext)
+        }
+        .overlay(alignment: .bottom) {
+            if let dividerIndex {
+                MarkAboveAsReadOverlay(itemsAbove: Array(sortedItems.prefix(dividerIndex)))
+            }
         }
         .navigationTitle(feed.title)
         .navigationBarTitleDisplayMode(.inline)

@@ -56,6 +56,7 @@ struct AllArticlesView: View {
                 limit: limit,
                 maximum: maximum,
                 scrollToTop: scrollToTopTrigger + chipScrollToTop,
+                markerScope: ReadingMarkerStore.allArticlesScope(folderID: activeFolder?.id),
                 onReachEnd: {
                     limit = ArticleFilter.nextLimit(
                         after: limit, pageSize: AppConfiguration.articlePageSize, maximum: maximum)
@@ -217,6 +218,8 @@ private struct ArticleListView<EmptyState: View>: View {
     private let limit: Int
     private let maximum: Int
     private let scrollToTop: Int
+    /// Sleutel van de leesmarkering voor deze lijst: alle artikelen, of één map (#225).
+    private let markerScope: String
     private let predicate: Predicate<FeedItem>
     /// Wanneer `hasOlderArticles` opnieuw bepaald moet worden: bij een ander aantal, een
     /// ander filter of een ander maximum, en wanneer er bovenaan nieuwe artikelen bijkomen.
@@ -237,6 +240,7 @@ private struct ArticleListView<EmptyState: View>: View {
         limit: Int,
         maximum: Int,
         scrollToTop: Int,
+        markerScope: String,
         onReachEnd: @escaping () -> Void,
         onRefresh: @escaping () async -> Void,
         @ViewBuilder emptyState: @escaping () -> EmptyState
@@ -244,6 +248,7 @@ private struct ArticleListView<EmptyState: View>: View {
         self.limit = limit
         self.maximum = maximum
         self.scrollToTop = scrollToTop
+        self.markerScope = markerScope
         self.predicate = ArticleFilter.predicate(hideRead: hideRead, feedIDs: feedIDs)
         self.olderArticlesCheck = OlderArticlesCheck(hideRead: hideRead, feedIDs: feedIDs, maximum: maximum)
         self.onReachEnd = onReachEnd
@@ -264,19 +269,26 @@ private struct ArticleListView<EmptyState: View>: View {
     }
 
     private var list: some View {
-        List {
-            ForEach(items, id: \.id) { item in
-                ZStack {
-                    FeedItemCard(item: item)
-                    // De ZStack met een onzichtbare link verbergt de disclosure-chevron
-                    // die een List aan een NavigationLink hangt. De link geeft een waarde
-                    // door in plaats van een destination: een destination-link bouwt zijn
-                    // bestemming meteen op, dus elke gerealiseerde rij construeerde een
-                    // volledige ArticlePageView met de hele lijst erin (#115).
-                    NavigationLink(value: item.id) {
-                        EmptyView()
+        let dividerIndex = ReadingMarker.dividerIndex(
+            dates: items.map(\.effectiveDate), marker: ReadingMarkerStore.standard.marker(for: markerScope))
+        return List {
+            ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
+                VStack(spacing: 8) {
+                    if index == dividerIndex, let marker = ReadingMarkerStore.standard.marker(for: markerScope) {
+                        ReadingMarkerDivider(marker: marker)
                     }
-                    .opacity(0)
+                    ZStack {
+                        ArticleCard(item: item, isOlder: dividerIndex.map { index >= $0 } ?? false)
+                        // De ZStack met een onzichtbare link verbergt de disclosure-chevron
+                        // die een List aan een NavigationLink hangt. De link geeft een waarde
+                        // door in plaats van een destination: een destination-link bouwt zijn
+                        // bestemming meteen op, dus elke gerealiseerde rij construeerde een
+                        // volledige ArticlePageView met de hele lijst erin (#115).
+                        NavigationLink(value: item.id) {
+                            EmptyView()
+                        }
+                        .opacity(0)
+                    }
                 }
                 .listRowSeparator(.hidden)
                 .listRowBackground(Color.clear)
@@ -285,6 +297,7 @@ private struct ArticleListView<EmptyState: View>: View {
                 // dat de database er precies zoveel gaf als gevraagd; dan zijn er
                 // waarschijnlijk meer. Gaf hij er minder, dan is dit het einde.
                 .onAppear {
+                    ReadingMarkerStore.standard.noteSeen(item.effectiveDate, in: markerScope)
                     if item.id == items.last?.id, items.count == limit, limit < maximum {
                         onReachEnd()
                     }
@@ -336,6 +349,11 @@ private struct ArticleListView<EmptyState: View>: View {
         .overlay {
             if items.isEmpty {
                 emptyState()
+            }
+        }
+        .overlay(alignment: .bottom) {
+            if let dividerIndex {
+                MarkAboveAsReadOverlay(itemsAbove: Array(items.prefix(dividerIndex)))
             }
         }
         .opslagFoutmelding($opslagFout)
