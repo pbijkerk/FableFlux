@@ -194,6 +194,8 @@ class FeedRefreshService {
                 enclosureMIMEType: parsedItem.enclosureMIMEType,
                 imageURL: parsedItem.imageURL
             )
+            item.imageCaption = parsedItem.imageCaption
+            item.imageCredit = parsedItem.imageCredit
             item.feed = feed
             context.insert(item)
             newItems.append(item)
