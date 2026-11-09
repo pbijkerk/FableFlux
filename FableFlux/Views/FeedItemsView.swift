@@ -503,7 +503,11 @@ struct ArticlePageView: View {
                 ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
                     Group {
                         if abs(index - huidige) <= Self.buren {
-                            ItemDetailView(item: item, isActive: item.id == currentID)
+                            ItemDetailView(
+                                item: item, isActive: item.id == currentID,
+                                onNext: items.indices.contains(index + 1)
+                                    ? { [nextID = items[index + 1].id] in withAnimation { scrollID = nextID } }
+                                    : nil)
                         } else {
                             Theme.background
                         }

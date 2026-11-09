@@ -49,6 +49,10 @@ class FeedItem {
     /// (#225). Gezet ook als er niets werd gevonden, zodat hij dat niet bij elke keer
     /// scrollen opnieuw probeert. `nil` = nog niet gezocht.
     var imageLookedUpAt: Date?
+    /// Bijschrift en fotobron van de afbeelding uit de feed (#226), getoond onder de
+    /// hoofdfoto in het leesscherm. `nil` als de feed ze niet meegeeft.
+    var imageCaption: String?
+    var imageCredit: String?
     var feed: Feed?
     @Relationship(deleteRule: .cascade) var factCheckResults: [FactCheckResult] = []
     var factCheckCheckedAt: Date?  // nil = nooit gecontroleerd

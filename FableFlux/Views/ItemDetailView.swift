@@ -18,6 +18,10 @@ struct ItemDetailView: View {
     /// zodat het scherm losstaand — vanuit de samenvatting — ongewijzigd werkt.
     var isActive = true
 
+    /// Naar het volgende artikel in dezelfde lijst (knop › in de actiecapsule, #226). `nil`
+    /// als er geen volgend artikel is of het scherm losstaand is geopend.
+    var onNext: (() -> Void)? = nil
+
     @AppStorage(AppConfiguration.UserDefaultsKeys.articleFontSize) private var articleFontSize = AppConfiguration
         .defaultArticleFontSize
     @AppStorage(AppConfiguration.UserDefaultsKeys.articleFontFamily) private var articleFontFamily = AppConfiguration
@@ -44,6 +48,10 @@ struct ItemDetailView: View {
     /// Na "Klaar": het oude Lees later-moment, voor ongedaan maken.
     @State private var undoReadLaterAddedAt: Date?
     @StateObject private var extractor = ArticleExtractorService()
+    /// Andere artikelen over hetzelfde verhaal, voor de contextlaag (#226).
+    @State private var relatedItems: [FeedItem] = []
+    @State private var showContext = false
+    @State private var showReadingSettings = false
 
     private var articleURL: URL? {
         guard let link = item.link else { return nil }
@@ -63,14 +71,16 @@ struct ItemDetailView: View {
 
     /// Of er een strip bovenaan staat (bronduiding en/of tag-editor) die eigen
     /// topmarge nodig heeft om niet achter de zwevende navigatiebalk te verdwijnen.
+    ///
+    /// De bronduiding staat sinds #226 niet meer bovenaan maar in de contextlaag: lezen
+    /// gaat voor, context op verzoek.
     private var showsTopStrip: Bool {
-        (showBiasIndicators && item.feed?.biasScore != nil) || (isActive && item.isSaved)
+        isActive && item.isSaved
     }
 
     var body: some View {
         VStack(spacing: 0) {
             VStack(spacing: 0) {
-                sourceRatingStrip
                 if isActive, item.isSaved {
                     TagEditorStrip(item: item)
                 }
@@ -98,7 +108,26 @@ struct ItemDetailView: View {
         // achtergrondloze VStack de systeemstandaard in plaats van de appkleur.
         .background(Theme.background.ignoresSafeArea())
         .overlay(alignment: .top) { readingProgressBar }
-        .overlay(alignment: .bottom) { finishedReadingOverlay }
+        .overlay(alignment: .bottom) {
+            if isActive {
+                VStack(spacing: 10) {
+                    finishedReadingOverlay
+                    contextLip
+                    actionCapsule
+                }
+                // Boven de zwevende tabbalk.
+                .padding(.bottom, 84)
+            }
+        }
+        .sheet(isPresented: $showContext) {
+            ArticleContextSheet(item: item, related: relatedItems)
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
+        }
+        .task(id: isActive) {
+            guard isActive, showBiasIndicators else { return }
+            relatedItems = StoryContext.relatedItems(for: item, context: modelContext)
+        }
         // De titel alleen voor de zichtbare pagina, net als de knoppen. De pager bouwt ook de
         // buren op; zetten die alle drie een titel, dan is niet bepaald welke SwiftUI toont en
         // liep de feednaam een artikel achter (#174). Via een lege achtergrond en niet met een
@@ -214,32 +243,6 @@ struct ItemDetailView: View {
         }
     }
 
-    /// Compacte bron-duidingsstrip boven alle layouts (audio/video/reader).
-    /// Toont politieke positie (BiasBarView) en betrouwbaarheid (ReliabilityBadgeView)
-    /// alleen wanneer de feed een beoordeling heeft. Tik op de balk opent de
-    /// bestaande transparantie-sheet ("Over deze bron"). Consistent met FeedItemsView.
-    @ViewBuilder
-    private var sourceRatingStrip: some View {
-        if showBiasIndicators, let feed = item.feed, let score = feed.biasScore {
-            HStack(alignment: .center, spacing: 8) {
-                BiasBarView(
-                    biasScore: score,
-                    feedName: feed.title,
-                    reliabilityLevel: feed.reliabilityLevel,
-                    ratingSource: feed.ratingSource,
-                    biasRatedAt: feed.biasRatedAt
-                )
-                ReliabilityBadgeView(level: feed.reliabilityLevel)
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
-            .background(Theme.card)
-            .overlay(alignment: .bottom) {
-                Divider()
-            }
-        }
-    }
-
     /// Flinterdunne leesvoortgangsbalk bovenin, in de accentkleur van de bron.
     @ViewBuilder
     private var readingProgressBar: some View {
@@ -274,29 +277,12 @@ struct ItemDetailView: View {
                     .disabled(isExtracting)
                 }
 
-                Button {
-                    toggleSaved()
-                } label: {
-                    Image(systemName: item.isSaved ? "bookmark.fill" : "bookmark")
-                }
-                .accessibilityLabel(item.isSaved ? "Verwijder uit Bewaard" : "Bewaar artikel")
-
+                // Bewaren, Lees later en Delen staan sinds #226 onderin, in de actiecapsule.
                 if let url = articleURL {
                     Button {
                         safariItem = IdentifiableURL(url: url)
                     } label: {
                         Label("Open in browser", systemImage: "safari")
-                    }
-
-                    Menu {
-                        ShareLink(item: url) {
-                            Text("Alleen link")
-                        }
-                        ShareLink(item: shareText) {
-                            Text("Link + tekst")
-                        }
-                    } label: {
-                        Label("Delen", systemImage: "square.and.arrow.up")
                     }
                 }
             }
@@ -315,6 +301,132 @@ struct ItemDetailView: View {
         if !body.isEmpty { parts.append(body) }
         if let url = articleURL { parts.append(url.absoluteString) }
         return parts.joined(separator: "\n\n")
+    }
+
+    // MARK: - Rustig lezen: actiecapsule en contextlaag (#226)
+
+    /// Totale leestijd van wat er nu staat (feedtekst of volledig artikel).
+    private var totalMinutes: Int? {
+        guard let currentContent, !item.isVideoItem, !item.isAudioItem else { return nil }
+        return ArticleHTMLBuilder.readingMinutes(forHTML: currentContent)
+    }
+
+    /// "nog X min": wat er bij deze leesvoortgang nog over is.
+    private var remainingMinutesText: String? {
+        guard let totalMinutes else { return nil }
+        let left = Int((Double(totalMinutes) * (1 - readingProgress)).rounded(.up))
+        return left <= 0 ? "uitgelezen" : "nog \(left) min"
+    }
+
+    /// Acties onderin, binnen bereik van de duim (Fitts). Elke knop 44×44 pt.
+    private var actionCapsule: some View {
+        HStack(spacing: 2) {
+            if let remainingMinutesText {
+                Text(remainingMinutesText)
+                    .font(.caption.monospacedDigit())
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 10)
+                    .accessibilityLabel("Leestijd: \(remainingMinutesText)")
+            }
+            capsuleButton("textformat.size", label: "Leesinstellingen") { showReadingSettings = true }
+                .popover(isPresented: $showReadingSettings) {
+                    ReadingSettingsPopover().presentationCompactAdaptation(.popover)
+                }
+            if !item.isSaved {
+                capsuleButton(
+                    item.readLaterAddedAt != nil ? "clock.fill" : "clock",
+                    label: item.readLaterAddedAt != nil ? "Uit Lees later" : "Lees later"
+                ) {
+                    LaterActions.toggleReadLater(item, context: modelContext, melding: &opslagFout)
+                }
+            }
+            capsuleButton(
+                item.isSaved ? "bookmark.fill" : "bookmark",
+                label: item.isSaved ? "Verwijder uit Bewaard" : "Bewaar artikel"
+            ) { toggleSaved() }
+            shareMenu
+            if let onNext {
+                capsuleButton("chevron.right", label: "Volgend artikel", action: onNext)
+            }
+        }
+        .padding(.horizontal, 6)
+        .background(.regularMaterial, in: Capsule())
+        .shadow(color: .black.opacity(0.12), radius: 8, y: 2)
+    }
+
+    private func capsuleButton(_ systemName: String, label: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: systemName)
+                .font(.body.weight(.medium))
+                .frame(width: 44, height: 44)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(label)
+    }
+
+    @ViewBuilder
+    private var shareMenu: some View {
+        if let url = articleURL {
+            Menu {
+                ShareLink(item: url) { Text("Alleen link") }
+                ShareLink(item: shareText) { Text("Link + tekst") }
+            } label: {
+                Image(systemName: "square.and.arrow.up")
+                    .font(.body.weight(.medium))
+                    .frame(width: 44, height: 44)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Delen")
+        } else {
+            ShareLink(item: shareText) {
+                Image(systemName: "square.and.arrow.up")
+                    .font(.body.weight(.medium))
+                    .frame(width: 44, height: 44)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Delen")
+        }
+    }
+
+    /// Het lipje van de contextlaag: alleen als er iets te tonen is — een verhaalgroep of
+    /// een factcheck (#226). Tik of veeg omhoog om te openen.
+    @ViewBuilder
+    private var contextLip: some View {
+        if let label = ArticleContextSheet.lipLabel(
+            relatedCount: relatedSourceCount, hasFactCheck: !item.factCheckResults.isEmpty)
+        {
+            Button {
+                showContext = true
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "chevron.up")
+                        .font(.caption2.weight(.bold))
+                    Text(label)
+                        .font(.footnote.weight(.semibold))
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 8)
+                .background(.regularMaterial, in: Capsule())
+            }
+            .buttonStyle(.plain)
+            .simultaneousGesture(
+                DragGesture(minimumDistance: 12).onEnded { value in
+                    if value.translation.height < -12 { showContext = true }
+                }
+            )
+            .accessibilityLabel(label)
+            .accessibilityHint("Opent de context: andere bronnen, betrouwbaarheid en factcheck")
+        }
+    }
+
+    /// Aantal bronnen in het verhaal, inclusief deze.
+    private var relatedSourceCount: Int {
+        guard !relatedItems.isEmpty else { return 0 }
+        var feeds = Set(relatedItems.compactMap { $0.feed?.id })
+        if let own = item.feed?.id { feeds.insert(own) }
+        return feeds.count
     }
 
     // MARK: - Lees later / Bewaard (#224)
@@ -367,7 +479,6 @@ struct ItemDetailView: View {
             .padding(14)
             .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
             .padding(.horizontal, 16)
-            .padding(.bottom, 24)
             .transition(.move(edge: .bottom).combined(with: .opacity))
         } else if let previous = undoReadLaterAddedAt {
             HStack(spacing: 12) {
@@ -383,7 +494,6 @@ struct ItemDetailView: View {
             .padding(14)
             .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
             .padding(.horizontal, 16)
-            .padding(.bottom, 24)
             .task {
                 try? await Task.sleep(for: .seconds(5))
                 undoReadLaterAddedAt = nil
@@ -406,6 +516,17 @@ struct ItemDetailView: View {
             fontFamily: articleFontFamily,
             topPadding: htmlTopPadding
         )
+    }
+
+    /// Hoofdfoto voor de reader-layout (#226): de lokaal bewaarde afbeelding als die er is
+    /// (offline), anders de afbeelding uit de feed of van de pagina. Niet bij Mastodon, audio
+    /// en video: daar staat het beeld al in de inhoud of in de speler.
+    private var heroImageSource: String? {
+        guard !item.isAudioItem, !item.isVideoItem, item.feed?.isMastodonFeed != true else { return nil }
+        if let data = item.savedImageData, data.count < 3_000_000 {
+            return "data:image/jpeg;base64,\(data.base64EncodedString())"
+        }
+        return item.imageURL
     }
 
     /// De webview staat alleen bij de reader-layout bovenaan; bij audio en video zit er
@@ -494,7 +615,11 @@ struct ItemDetailView: View {
             authorAvatarURL: item.authorAvatarURL,
             fontSize: articleFontSize,
             fontFamily: articleFontFamily,
-            topPadding: htmlTopPadding
+            topPadding: htmlTopPadding,
+            heroImageURL: heroImageSource,
+            heroCaption: item.imageCaption,
+            heroCredit: item.imageCredit,
+            readingMinutes: totalMinutes
         )
     }
 }
@@ -514,7 +639,11 @@ enum ArticleHTMLBuilder {
         authorAvatarURL: String? = nil,
         fontSize: Int = AppConfiguration.defaultArticleFontSize,
         fontFamily: String = AppConfiguration.defaultArticleFontFamily,
-        topPadding: Int = AppConfiguration.floatingNavBarClearance
+        topPadding: Int = AppConfiguration.floatingNavBarClearance,
+        heroImageURL: String? = nil,
+        heroCaption: String? = nil,
+        heroCredit: String? = nil,
+        readingMinutes: Int? = nil
     ) -> String {
         let dateStr: String
         if let date {
@@ -528,6 +657,10 @@ enum ArticleHTMLBuilder {
         }
 
         let meta = [feedName, dateStr].compactMap { $0?.isEmpty == false ? $0 : nil }.joined(separator: " · ")
+        let metaLine = [dateStr, readingMinutes.map { "\($0) min leestijd" }]
+            .compactMap { $0?.isEmpty == false ? $0 : nil }.joined(separator: " · ")
+        let heroHTML = heroFigure(
+            url: heroImageURL, caption: heroCaption, credit: heroCredit, content: content)
         let bodyFont: String
         switch fontFamily {
         case "charter": bodyFont = "Charter, Georgia, 'Times New Roman', serif"
@@ -582,14 +715,19 @@ enum ArticleHTMLBuilder {
             body {
                 font-family: \(bodyFont);
                 font-size: \(fontSize)px;
-                line-height: 1.72;
+                /* Rustig lezen (#226): regelafstand 1,5 */
+                line-height: 1.5;
                 color: var(--text);
                 background: var(--bg);
                 /* Bovenmarge komt van buiten: bij de reader-layout staat de webview
                    bovenaan en moet de tekst vrij van de zwevende balk beginnen; bij audio
                    en video staat er een speler boven en is die ruimte niet nodig (#63). */
-                padding: \(topPadding)px 24px 64px;
-                max-width: 680px;
+                /* Onderaan ruimte voor de actiecapsule en de tabbalk (#226). */
+                padding: \(topPadding)px 20px 160px;
+                /* Kolom van ±65 tekens, in `ch` zodat hij met de lettergrootte meeschaalt
+                   in plaats van een vaste 680px (#226). Gemeten: `1ch` is de breedte van een
+                   "0", breder dan een gemiddelde letter; 56ch geeft ±65 tekens per regel. */
+                max-width: 56ch;
                 margin: 0 auto;
                 word-break: break-word;
                 -webkit-text-size-adjust: 100%;
@@ -626,6 +764,11 @@ enum ArticleHTMLBuilder {
             .link-card-title { display: block; font-weight: 700; }
             .link-card-description { display: block; color: var(--secondary); margin-top: 2px; }
             .link-card-host { display: block; color: var(--secondary); font-size: 0.85em; margin-top: 4px; }
+            /* Hoofdfoto met bijschrift en fotobron (#226) */
+            figure.hero { margin: 0 0 1.6em; }
+            figure.hero img { width: 100%; margin: 0; }
+            figure.hero figcaption { text-align: left; margin-top: 0.5em; line-height: 1.4; }
+            figure.hero .credit { opacity: 0.8; }
             </style>
             </head>
             <body>
@@ -633,11 +776,42 @@ enum ArticleHTMLBuilder {
             \(categoryHTML)
             <h1 class="article-title">\(escape(title))</h1>
             \(articleLink != nil ? "<p class=\"read-full-hint\">Tik voor het volledige artikel ›</p></a>" : "")
-            \(meta.isEmpty ? "" : "<p class=\"article-meta\">\(escape(dateStr))</p>")
+            \(meta.isEmpty && metaLine.isEmpty ? "" : "<p class=\"article-meta\">\(escape(metaLine))</p>")
+            \(heroHTML)
             \(content)
             </body>
             </html>
             """
+    }
+
+    /// De hoofdfoto boven de tekst, met bijschrift en fotobron als die er zijn (#226). Leeg
+    /// als er geen afbeelding is (geen placeholder) of als de tekst dezelfde afbeelding al
+    /// bevat: dan zou hij er dubbel staan.
+    static func heroFigure(url: String?, caption: String?, credit: String?, content: String) -> String {
+        guard let url, !url.isEmpty, !contentContainsImage(url, content: content) else { return "" }
+        let captionParts = [
+            caption.flatMap { $0.isEmpty ? nil : "<span>\(escape($0))</span>" },
+            credit.flatMap { $0.isEmpty ? nil : "<span class=\"credit\">Foto: \(escape($0))</span>" },
+        ].compactMap { $0 }
+        let figcaption =
+            captionParts.isEmpty ? "" : "<figcaption>\(captionParts.joined(separator: " · "))</figcaption>"
+        return
+            "<figure class=\"hero\"><img src=\"\(escape(url))\" alt=\"\(escape(caption ?? ""))\">\(figcaption)</figure>"
+    }
+
+    /// Of de artikeltekst dezelfde afbeelding al toont. Vergeleken op bestandsnaam, zonder
+    /// query: feeds geven vaak een andere maat (`?w=1200`) van dezelfde foto mee.
+    static func contentContainsImage(_ url: String, content: String) -> Bool {
+        if url.hasPrefix("data:") { return false }
+        let file = URL(string: url)?.lastPathComponent ?? url
+        guard file.count > 4 else { return content.contains(url) }
+        return content.contains(file)
+    }
+
+    /// Leestijd in minuten bij ±230 woorden per minuut (lezen op een scherm), minstens 1.
+    static func readingMinutes(forHTML html: String) -> Int {
+        let words = FeedItem.plainText(from: html).split(whereSeparator: \.isWhitespace).count
+        return max(1, Int((Double(words) / 230).rounded()))
     }
 
     static func escape(_ text: String) -> String {

@@ -10,6 +10,10 @@ struct ParsedFeedItem: Sendable {
     var enclosureURL: String? = nil
     var enclosureMIMEType: String? = nil
     var imageURL: String? = nil
+    /// Bijschrift en fotobron bij de afbeelding (`media:description`/`media:title`,
+    /// `media:credit`), voor de hoofdfoto in het leesscherm (#226).
+    var imageCaption: String? = nil
+    var imageCredit: String? = nil
 }
 
 struct ParsedFeed: Sendable {
@@ -25,6 +29,9 @@ class RSSParser: NSObject, XMLParserDelegate {
     private var currentText = ""
     private var currentElement = ""
     private var insideItem = false
+    /// Binnen `<media:content>`/`<media:group>`: dan hoort een `media:description` bij de
+    /// afbeelding en niet bij het artikel.
+    private var insideMediaContent = false
     private var insideChannel = false
     private var channelTitleSet = false
     private var channelDescSet = false
@@ -96,8 +103,9 @@ class RSSParser: NSObject, XMLParserDelegate {
                     currentItem?.imageURL = url
                 }
             }
-        case "media:content", "media:thumbnail":
-            if insideItem, currentItem?.imageURL == nil {
+        case "media:content", "media:thumbnail", "media:group":
+            if currentElement != "media:thumbnail" { insideMediaContent = true }
+            if insideItem, currentItem?.imageURL == nil, currentElement != "media:group" {
                 if let url = attributeDict["url"],
                     attributeDict["medium"] == "image" || elementName.contains("thumbnail")
                 {
@@ -146,6 +154,14 @@ class RSSParser: NSObject, XMLParserDelegate {
                 if let date = parseDate(text) { currentItem?.pubDate = date }
             case "guid", "id":
                 currentItem?.guid = text
+            case "media:content", "media:group":
+                insideMediaContent = false
+            case "media:credit":
+                if currentItem?.imageCredit == nil, !text.isEmpty { currentItem?.imageCredit = text }
+            case "media:description", "media:title", "media:text":
+                if insideMediaContent, currentItem?.imageCaption == nil, !text.isEmpty {
+                    currentItem?.imageCaption = FeedItem.plainText(from: text)
+                }
             case "item", "entry":
                 // `var`, niet `let`: ParsedFeedItem is een struct. Bij `let` werd de
                 // gevonden afbeelding op `currentItem` gezet terwijl de al gemaakte kopie
