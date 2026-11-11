@@ -6,6 +6,8 @@ import SafariServices
 
 struct ItemDetailView: View {
     @Environment(\.modelContext) private var modelContext
+    /// Ruimte die de podcast-mini-speler boven de tabbalk inneemt (#233).
+    @Environment(\.miniPlayerInset) private var miniPlayerInset
     let item: FeedItem
 
     /// Of dit de pagina is die de gebruiker daadwerkelijk bekijkt. De artikelpager bouwt de
@@ -115,8 +117,8 @@ struct ItemDetailView: View {
                     contextLip
                     actionCapsule
                 }
-                // Boven de zwevende tabbalk.
-                .padding(.bottom, 84)
+                // Boven de zwevende tabbalk, en boven de mini-speler als die er staat.
+                .padding(.bottom, 84 + miniPlayerInset)
             }
         }
         .sheet(isPresented: $showContext) {
@@ -173,12 +175,12 @@ struct ItemDetailView: View {
 
     @ViewBuilder
     private var audioLayout: some View {
-        if let audioURL = item.directAudioURL {
+        if item.directAudioURL != nil {
             VStack(spacing: 0) {
                 // Vrij van de zwevende iOS 26-balk: de speler staat bovenaan en werd
                 // er anders door afgesneden (#63). Alleen de volle marge nodig als er
                 // geen strip (bronduiding/tags) boven staat die dat al regelt (#215).
-                AudioPlayerView(url: audioURL)
+                PodcastPlayerView(item: item)
                     .padding(.top, showsTopStrip ? 0 : CGFloat(AppConfiguration.floatingNavBarClearance))
                 ReaderWebView(
                     html: displayHTML,
@@ -189,6 +191,21 @@ struct ItemDetailView: View {
                 )
             }
             .ignoresSafeArea(edges: .bottom)
+            // Zolang dit de zichtbare pagina is, hoeft de mini-speler deze aflevering niet
+            // óók te tonen (#233). Alleen de eigen id wissen: bij vegen kan de volgende
+            // pagina zich al hebben aangemeld.
+            .onChange(of: isActive, initial: true) { _, active in
+                if active {
+                    AudioPlaybackService.shared.visibleDetailItemID = item.id
+                } else if AudioPlaybackService.shared.visibleDetailItemID == item.id {
+                    AudioPlaybackService.shared.visibleDetailItemID = nil
+                }
+            }
+            .onDisappear {
+                if AudioPlaybackService.shared.visibleDetailItemID == item.id {
+                    AudioPlaybackService.shared.visibleDetailItemID = nil
+                }
+            }
         }
     }
 

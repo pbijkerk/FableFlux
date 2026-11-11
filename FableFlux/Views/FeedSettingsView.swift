@@ -25,11 +25,17 @@ struct FeedSettingsView: View {
     /// Lokale kopie van retentionDays voor de Picker (Int? werkt niet direct als Picker-selection).
     @State private var selectedDays: Int? = nil
     @State private var includedInSummary = true
+    @State private var autoDownloadEpisodes = false
     @State private var opslagFout: OpslagFoutmelding?
 
     /// Draait een nieuwe clustering-ronde zodat het effect van de schakelaar direct
     /// zichtbaar is op Vandaag.
     var onSummaryInclusionChanged: (() async -> Void)? = nil
+
+    /// Alleen bij een podcastfeed is automatisch downloaden zinvol (#233).
+    private var isPodcastFeed: Bool {
+        feed.folder?.name == "Audio" || feed.items.contains(where: \.isAudioItem)
+    }
 
     private var effectiveLabel: String {
         feedRetentionOptions.first(where: { $0.days == defaultRetentionDays })?.label
@@ -62,6 +68,19 @@ struct FeedSettingsView: View {
                             : "Artikelen van deze feed tellen niet mee in de samenvatting op Vandaag. Ze blijven wel gewoon zichtbaar in Artikelen en Later."
                     )
                     .font(.caption)
+                }
+
+                if isPodcastFeed {
+                    Section {
+                        Toggle("Nieuwe afleveringen automatisch downloaden", isOn: $autoDownloadEpisodes)
+                    } header: {
+                        Text("Podcast")
+                    } footer: {
+                        Text(
+                            "De \(AppConfiguration.Podcast.autoDownloadCount) nieuwste afleveringen die je nog niet hebt uitgeluisterd, staan klaar om offline te luisteren. Downloaden gebeurt op de achtergrond, standaard alleen via wifi (zie Instellingen). Een download verdwijnt een dag na het uitluisteren, of samen met de aflevering als die wordt opgeruimd."
+                        )
+                        .font(.caption)
+                    }
                 }
 
                 Section {
@@ -107,6 +126,7 @@ struct FeedSettingsView: View {
             .onAppear {
                 selectedDays = feed.retentionDays
                 includedInSummary = feed.includedInSummary
+                autoDownloadEpisodes = feed.autoDownloadsEpisodes
             }
             .opslagFoutmelding($opslagFout)
         }
@@ -117,9 +137,12 @@ struct FeedSettingsView: View {
 
         feed.retentionDays = selectedDays
         feed.includedInSummary = includedInSummary
+        feed.autoDownloadEpisodes = autoDownloadEpisodes
         // Onmiddellijk opruimen als een kortere periode is ingesteld
         FeedRefreshService.pruneOldItems(feed: feed, context: modelContext)
         guard modelContext.saveOrReport("de feedinstellingen te bewaren", melding: &opslagFout) else { return }
+        // Meteen downloaden bij aanzetten, en bestanden van opgeruimde afleveringen weghalen.
+        PodcastDownloadService.shared.performMaintenance(context: modelContext)
         dismiss()
 
         // Pas na het opslaan: de samenvatting hoort de nieuwe instelling te weerspiegelen.

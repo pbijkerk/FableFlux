@@ -17,8 +17,14 @@ class Feed {
     /// Telt deze feed mee in de AI-samenvatting op Vandaag? Staat los van zichtbaarheid:
     /// een uitgesloten feed blijft gewoon in Artikelen en Bewaard staan.
     var includedInSummary: Bool = true
+    /// Nieuwe podcastafleveringen automatisch downloaden voor offline luisteren (#233).
+    /// Optioneel zodat de lichte migratie volstaat; `nil` gedraagt zich als uit.
+    var autoDownloadEpisodes: Bool?
     @Relationship var folder: FeedFolder?
     @Relationship(deleteRule: .cascade) var items: [FeedItem] = []
+
+    /// `autoDownloadEpisodes` zonder optionaliteit.
+    var autoDownloadsEpisodes: Bool { autoDownloadEpisodes ?? false }
 
     /// True als dit een virtuele Mastodon-feed is (geen RSS).
     var isMastodonFeed: Bool { url.hasPrefix("mastodon://") }

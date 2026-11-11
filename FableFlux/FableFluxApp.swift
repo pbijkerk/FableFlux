@@ -3,6 +3,7 @@ import SwiftData
 
 @main
 struct FableFluxApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     let modelContainer: ModelContainer
 
     init() {
