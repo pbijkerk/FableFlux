@@ -55,6 +55,39 @@ enum AppConfiguration {
     /// Standaardtermijn van Lees later in dagen (#224).
     static let defaultReadLaterDays = 14
 
+    // MARK: - Podcasts (#233)
+
+    enum Podcast {
+        /// Hoeveel van de nieuwste, nog niet uitgeluisterde afleveringen per feed automatisch
+        /// klaarstaan.
+        static let autoDownloadCount = 3
+
+        /// Hoelang een download na het uitluisteren blijft staan. Een dag geeft ruimte om
+        /// iets terug te luisteren, zonder dat de opslag vol raakt.
+        static let keepAfterFinished: TimeInterval = 24 * 3600
+
+        /// Sprongen voor terug/vooruit, gelijk aan Apple Podcasts.
+        static let skipBackward: TimeInterval = 15
+        static let skipForward: TimeInterval = 30
+
+        /// Hoe vaak de luisterpositie tijdens het afspelen wordt bewaard.
+        static let positionSaveInterval: TimeInterval = 10
+
+        /// Een positie binnen deze marge van het einde telt als uitgeluisterd; een positie
+        /// daarvóór als nog niet begonnen.
+        static let finishedMargin: TimeInterval = 20
+        static let minimumResumePosition: TimeInterval = 5
+
+        static let playbackRates: [Float] = [0.8, 1.0, 1.2, 1.5, 1.8, 2.0]
+
+        /// Identifier van de achtergrond-`URLSession`. Moet stabiel blijven: iOS koppelt
+        /// lopende downloads na een herstart van de app hieraan terug.
+        static let backgroundSessionIdentifier = "com.peterbijkerk.rssreader.podcast-downloads"
+
+        /// Hoogte van de mini-speler boven de tabbalk.
+        static let miniPlayerHeight: CGFloat = 64
+    }
+
     // MARK: - API & Network
 
     /// Timeout voor artikel-extractie (in seconden)
@@ -140,6 +173,10 @@ enum AppConfiguration {
         static let articleLoadLimit = "articleLoadLimit"
         /// Gekozen `AppTheme` (rawValue): bepaalt app-icoon en accentkleur.
         static let appTheme = "appTheme"
+        /// Podcasts ook via mobiele data downloaden (#233); standaard alleen via wifi.
+        static let podcastAllowsCellular = "podcastAllowsCellular"
+        /// Gekozen afspeelsnelheid voor podcasts (#233).
+        static let podcastPlaybackRate = "podcastPlaybackRate"
     }
 
     // MARK: - Summary length
@@ -230,6 +267,7 @@ enum AppConfiguration {
             static let feed = "feed"
             static let extraction = "extraction"
             static let persistence = "persistence"
+            static let audio = "audio"
         }
     }
 }

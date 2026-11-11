@@ -79,21 +79,33 @@ struct FloatingTabBar: View {
 
 /// Verbergt de native tab bar en plaatst de zwevende bar als bottom safe-area inset,
 /// zodat scroll-content netjes boven de bar eindigt.
+/// De mini-speler van de podcast (#233) staat in dezelfde inset, direct boven de bar.
 struct FloatingTabBarContainer: ViewModifier {
     @Binding var selection: Int
     var onReselect: (Int) -> Void
+    var onOpenNowPlaying: () -> Void
 
     func body(content: Content) -> some View {
+        let playback = AudioPlaybackService.shared
         content
             .toolbar(.hidden, for: .tabBar)
+            .environment(\.miniPlayerInset, playback.showsMiniPlayer ? AppConfiguration.Podcast.miniPlayerHeight : 0)
             .safeAreaInset(edge: .bottom, spacing: 0) {
-                FloatingTabBar(selection: $selection, onReselect: onReselect)
+                VStack(spacing: 0) {
+                    MiniPlayerView(onOpen: onOpenNowPlaying)
+                    FloatingTabBar(selection: $selection, onReselect: onReselect)
+                }
+                .animation(.spring(response: 0.35, dampingFraction: 0.85), value: playback.showsMiniPlayer)
             }
     }
 }
 
 extension View {
-    func floatingTabBar(selection: Binding<Int>, onReselect: @escaping (Int) -> Void = { _ in }) -> some View {
-        modifier(FloatingTabBarContainer(selection: selection, onReselect: onReselect))
+    func floatingTabBar(
+        selection: Binding<Int>, onReselect: @escaping (Int) -> Void = { _ in },
+        onOpenNowPlaying: @escaping () -> Void = {}
+    ) -> some View {
+        modifier(
+            FloatingTabBarContainer(selection: selection, onReselect: onReselect, onOpenNowPlaying: onOpenNowPlaying))
     }
 }

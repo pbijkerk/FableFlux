@@ -17,6 +17,8 @@ struct ContentView: View {
     @State private var lastClusteredAt: Date? = nil
     /// Resultaat van een feed-toevoeging via `rssreader://add` (#203), getoond als korte alert.
     @State private var feedToevoegMelding: FeedToevoegMelding? = nil
+    /// De aflevering die via de mini-speler is geopend (#233).
+    @State private var nowPlayingItem: FeedItem? = nil
 
     var body: some View {
         TabView(selection: $selectedTab) {
@@ -37,16 +39,38 @@ struct ContentView: View {
             LaterView()
                 .tag(2)
         }
-        .floatingTabBar(selection: $selectedTab) { tab in
-            if tab == 1 { articlesScrollToTop += 1 }
+        .floatingTabBar(
+            selection: $selectedTab,
+            onReselect: { tab in
+                if tab == 1 { articlesScrollToTop += 1 }
+            },
+            onOpenNowPlaying: openNowPlaying
+        )
+        .sheet(item: $nowPlayingItem) { item in
+            NavigationStack {
+                ItemDetailView(item: item)
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Sluit") { nowPlayingItem = nil }
+                        }
+                    }
+            }
         }
         .appThemeTint()
         // Wat je deze sessie hebt gezien, wordt bij naar de achtergrond gaan de nieuwe
         // "Hier was je gebleven" (#225). Zo verspringt de lijn niet terwijl je leest.
         .onChange(of: scenePhase) { _, phase in
-            if phase == .background { ReadingMarkerStore.standard.commitAll() }
+            if phase == .background {
+                ReadingMarkerStore.standard.commitAll()
+                AudioPlaybackService.shared.savePosition()
+            }
+            // Downloads die op de achtergrond klaar kwamen, meteen tonen.
+            if phase == .active { PodcastDownloadService.shared.refreshDownloadedFromDisk() }
         }
         .task {
+            AudioPlaybackService.shared.attach(context: modelContext)
+            PodcastDownloadService.shared.restore()
+            PodcastDownloadService.shared.performMaintenance(context: modelContext)
             await refreshAndCluster()
         }
         .onOpenURL { url in
@@ -67,6 +91,13 @@ struct ContentView: View {
                 dismissButton: .default(Text("Oké"))
             )
         }
+    }
+
+    private func openNowPlaying() {
+        guard let id = AudioPlaybackService.shared.current?.id else { return }
+        var descriptor = FetchDescriptor<FeedItem>(predicate: #Predicate { $0.id == id })
+        descriptor.fetchLimit = 1
+        nowPlayingItem = try? modelContext.fetch(descriptor).first
     }
 
     /// Verwerkt `rssreader://add?url=<feed-url>`: geeft de meegegeven URL door aan de
@@ -115,6 +146,8 @@ struct ContentView: View {
     /// om en hoort hij een nieuw resultaat te zien, ook binnen twee minuten.
     private func refreshAndCluster(force: Bool = false) async {
         await refreshService.refreshAll(feeds: feeds, context: modelContext)
+        // Nieuwe afleveringen downloaden en opgeruimde afleveringen hun bestand afnemen (#233).
+        PodcastDownloadService.shared.performMaintenance(context: modelContext)
 
         let shouldCluster =
             force

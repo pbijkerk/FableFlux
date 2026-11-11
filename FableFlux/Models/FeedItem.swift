@@ -67,6 +67,19 @@ class FeedItem {
     /// en voor berichten die vóór deze wijziging zijn opgehaald.
     var authorAvatarURL: String?
 
+    /// Luisterpositie in seconden van een podcastaflevering (#233); `nil` = nog niet
+    /// beluisterd of uitgeluisterd. Zo gaat een aflevering verder waar je was gebleven.
+    var playbackPosition: Double?
+
+    /// Moment waarop de aflevering is uitgeluisterd (#233). Een download wordt 24 uur
+    /// daarna opgeruimd (`PodcastDownloadStore.filesToRemove`).
+    var audioFinishedAt: Date?
+
+    /// Moment waarop de automatische download deze aflevering in de wachtrij zette (#233).
+    /// Zo komt een aflevering die je zelf hebt verwijderd niet bij de volgende verversing
+    /// terug.
+    var autoDownloadQueuedAt: Date?
+
     // Transient cache — niet bewaard, opnieuw berekend na SwiftData fault
     @Transient private var _cachedPlainDescription: String? = nil
 

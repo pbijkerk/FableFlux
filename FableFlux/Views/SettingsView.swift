@@ -90,6 +90,10 @@ struct SettingsView: View {
     @State private var showMastodonSetup = false
     @State private var showingClaudeConsole = false
     @State private var opslagFout: OpslagFoutmelding?
+    @AppStorage(AppConfiguration.UserDefaultsKeys.podcastAllowsCellular) private var podcastAllowsCellular = false
+    /// Omvang van de podcastdownloads; bijgewerkt bij openen en na verwijderen (#233).
+    @State private var podcastStorageBytes: Int64 = 0
+    @State private var confirmDeletePodcasts = false
 
     // MARK: - Percentage-state (uniforme tekstgrootte-regelaars)
     //
@@ -127,6 +131,7 @@ struct SettingsView: View {
                 bronanalyseSection
                 leesLaterSection
                 bewaarperiodeSection
+                podcastSection
                 onderwerpenSection
                 mastodonSection
                 overSection
@@ -470,6 +475,47 @@ struct SettingsView: View {
                 "Geldt voor gewone feedartikelen, nooit voor Lees later of Bewaard. Feeds zonder eigen instelling gebruiken deze periode; de instelling gaat in bij de volgende verversing."
             )
         }
+    }
+
+    // MARK: - Podcasts (#233)
+
+    private var podcastSection: some View {
+        Section {
+            Toggle("Downloaden via mobiele data", isOn: $podcastAllowsCellular)
+            LabeledContent("Opslag downloads") {
+                Text(ByteCountFormatter.string(fromByteCount: podcastStorageBytes, countStyle: .file))
+                    .foregroundStyle(.secondary)
+            }
+            Button("Alle downloads verwijderen", role: .destructive) {
+                confirmDeletePodcasts = true
+            }
+            .disabled(podcastStorageBytes == 0)
+            .confirmationDialog(
+                "Alle gedownloade afleveringen verwijderen?", isPresented: $confirmDeletePodcasts,
+                titleVisibility: .visible
+            ) {
+                Button("Verwijder downloads", role: .destructive) {
+                    PodcastDownloadService.shared.deleteAll()
+                    updatePodcastStorage()
+                }
+            } message: {
+                Text("Je kunt ze daarna gewoon weer streamen of opnieuw downloaden.")
+            }
+        } header: {
+            Text("Podcasts")
+        } footer: {
+            Text(
+                podcastAllowsCellular
+                    ? "Afleveringen worden ook via mobiele data gedownload. Geldt voor nieuwe downloads."
+                    : "Afleveringen worden alleen via wifi gedownload; een download wacht tot er wifi is. Streamen kan altijd. Automatisch downloaden zet je per podcast aan via de feedinstellingen."
+            )
+        }
+        .task { updatePodcastStorage() }
+    }
+
+    private func updatePodcastStorage() {
+        guard let dir = try? PodcastDownloadStore.directory() else { return }
+        podcastStorageBytes = PodcastDownloadStore.totalSize(in: dir)
     }
 
     // MARK: - 6. Onderwerpen
