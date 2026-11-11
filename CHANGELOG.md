@@ -7,6 +7,8 @@ en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 
 ## [Unreleased]
 
+## [1.14.0] - 2026-11-11
+
 ### Toegevoegd
 - Podcasts offline en op de achtergrond: één centrale speler die doorspeelt bij vergrendeld scherm en na het verlaten van de aflevering, met mini-speler boven de tabbalk, bediening via vergrendelscherm/Control Center/oortjes (−15 s, +30 s, scrubben, afspeelsnelheid 0,8×–2×), hervatten waar je was en pauzeren bij losgekoppelde oortjes. Per aflevering een downloadknop en per podcastfeed "Nieuwe afleveringen automatisch downloaden" (de 3 nieuwste niet-uitgeluisterde). Downloaden via een achtergrond-`URLSession`, standaard alleen via wifi (instelbaar). Een download verdwijnt 24 uur na uitluisteren of samen met de aflevering via de bewaarperiode; opslag en "Alle downloads verwijderen" in Instellingen (#233)
 - Leesscherm "Rustig lezen": tekstkolom van ±65 tekens die meeschaalt met de lettergrootte, regelafstand 1,5, hoofdfoto met bijschrift en fotobron (uit `media:description`/`media:credit`), leestijd en "nog X min". Bewaren, Lees later, delen, leesinstellingen (Aa) en volgend artikel staan in een capsule onderin. De bronduiding staat niet meer bovenaan maar in een contextlaag (lipje "Context · N bronnen") met andere bronnen over hetzelfde verhaal, betrouwbaarheid en factcheck; het lipje staat er ook als er alleen een beoordeling van de bron is (#226)
