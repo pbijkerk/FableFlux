@@ -34,9 +34,6 @@ en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 - Een lettertype- of tekstgrootte-wijziging in Instellingen werkt nu direct door op een al geopend artikelscherm (#195)
 - ArticleExtractorService: delegate-callbacks didFail/didFailProvisionalNavigation vangen self nu consequent als [weak self] (#191)
 
-### Opgelost
-- `ArticleExtractorService` vangt `self` in de mislukt-callbacks van de webview nu zwak, consistent met `didFinish` en de timeout (#191)
-
 ## [1.13.0] - 2026-10-04
 
 ### Toegevoegd
